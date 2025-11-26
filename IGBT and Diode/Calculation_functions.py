@@ -1,0 +1,401 @@
+import numpy as np
+import numexpr as ne
+
+class Calculation_functions_class:
+
+
+    @staticmethod
+    def compute_power_flow(P,
+                           Q,
+                           V_dc,
+                           Vs,
+                           M,
+                           single_phase_inverter_topology,
+                           inverter_phases,
+                           modulation_scheme,
+                           N_parallel):
+
+        """
+        Compute apparent power S, RMS current Is, and phase angle phi
+
+        Parameters
+        ----------
+        P : array
+            Active power per sec [W]
+        Q : array
+            Reactive power per sec [VAr]
+        V_dc : array
+             DC-side phase voltage per sec [V]
+        Vs : array
+             RMS AC-side phase voltage per sec [V]
+        M : float
+            Modulation index [-]
+        single_phase_inverter_topology : {"half","full"}
+            Inverter topology (affects Vs limit for single-phase).
+        inverter_phases : {1,3}
+            Number of phases. If 3, Vs is interpreted as PHASE RMS (i.e., V_ll/sqrt(3)).
+        modulation_scheme : {"spwm","svm"}
+            Modulation strategy used for generating inverter switching signals.
+
+        Vs, Is, phi, V_dc, pf, M, S
+        Returns
+        -------
+
+        Vs : array
+             RMS AC-side phase voltage per sec [V]
+        Is : array
+            RMS current per sample [A].
+        phi : array
+            Phase angle between voltage and current per sample [rad]
+        V_dc : array
+            DC-side  voltage per sec [V]
+        pf : array
+            Power factor per sec [-].
+        M : float
+            Modulation index [-]
+        S : array
+            Apparent power per sample [VA].
+
+
+        """
+
+        P = P / N_parallel
+        Q = Q / N_parallel
+
+        pf = np.zeros_like(P, dtype=float)
+        Is = np.zeros_like(P, dtype=float)  # [A] Inverter RMS current
+        phi = np.zeros_like(P, dtype=float)  # [rad] Phase angle
+
+        S = np.sqrt(P ** 2 + Q ** 2) # [VA] Inverter RMS apparent power
+
+        # Case 1: P = 0 AND Q != 0 → pf = 0
+        m_P0_Qnz = (P == 0) & (Q != 0)
+        pf[m_P0_Qnz] = 0.0
+
+        # Case 2: P != 0 AND Q = 0 → pf = ±1
+        m_Pnz_Q0 = (P != 0) & (Q == 0)
+        pf[m_Pnz_Q0] = np.sign(P[m_Pnz_Q0]) * 1.0
+
+        # Case 3: General case (both P and Q nonzero)
+        m_general = (P != 0) & (Q != 0)
+        pf[m_general] = np.abs(P[m_general] / S[m_general])
+        pf[(m_general & (Q < 0))] *= -1
+
+
+        if inverter_phases == 1:
+            if single_phase_inverter_topology == "full":
+                Vs_theoretical = (M * V_dc) / np.sqrt(2.0)
+            elif single_phase_inverter_topology == "half":
+                Vs_theoretical = (M * V_dc) / (2.0 * np.sqrt(2.0))
+        elif inverter_phases == 3:
+            if modulation_scheme == "svm":
+                # Space vector PWM (or 3rd harmonic injection)
+                Vs_theoretical = (M * V_dc) / np.sqrt(6.0)  # [V RMS phase]
+            elif modulation_scheme == "spwm":  # "spwm"
+                # Sinusoidal PWM
+                Vs_theoretical = (M * V_dc) / (2.0 * np.sqrt(2.0))
+
+        if Vs.size == 0:
+            Vs = Vs_theoretical.copy()
+
+        else:
+            indices = np.where(Vs > Vs_theoretical)[0]
+            if indices.size > 0:
+                raise ValueError(
+                    f"Invalid input: AC phase RMS voltage exceeds the theoretical limit "
+                    f"Vs must not be greater than {np.max(Vs_theoretical)}.")
+
+
+        # masks
+        m0 = pf == 0  # zero power factor
+        mneg = pf < 0  # inductive
+        mpos = pf > 0  # capacitive
+
+        # ---- pf == 0 branch ----
+        # P[i] = 0
+        P[m0] = 0.0
+
+        # S[i] = sqrt(P[i]^2 + Q[i]^2)  (with P already zeroed where m0)
+        S[m0] = np.sqrt(P[m0] ** 2 + Q[m0] ** 2)
+
+        # Is[i] = S[i] / Vs[i]
+        with np.errstate(divide='ignore', invalid='ignore'):
+            Is[m0] = S[m0] / (Vs[m0] if inverter_phases == 1 else (3.0 * Vs[m0]))
+
+        # phi: 0 if S==0 else ±pi/2 depending on sign of Q
+        phi[m0] = 0.0
+        nz = m0 & (S != 0)
+        phi[nz] = np.where(Q[nz] > 0, np.pi / 2, -np.pi / 2)
+
+        # ---- pf != 0 branch ----
+        abspf = np.abs(pf)
+        mnz = ~m0  # pf != 0
+
+        # S[i] = P[i] / abs(pf[i])
+        S[mnz] = P[mnz] / abs(pf[mnz])
+
+        # Is[i] = S[i] / Vs[i]
+        with np.errstate(divide='ignore', invalid='ignore'):
+            Is[mnz] = S[mnz] / (Vs[mnz] if inverter_phases == 1 else (3.0 * Vs[mnz]))
+
+        # phi[i] = ± arccos(abs(pf[i]))
+        phi[mneg] = -np.arccos(abspf[mneg])  # inductive
+        phi[mpos] = np.arccos(abspf[mpos])  # capacitive
+
+        # Q[i] = ± sqrt(S[i]^2 - P[i]^2) for pf != 0
+        # (Note: numerical noise can make the radicand slightly negative; clip at 0.)
+        rad = (S[mnz] ** 2 - P[mnz] ** 2)
+        root = np.sqrt(rad)
+        idx_mnz = np.where(mnz)[0]
+        Q[idx_mnz[mneg[mnz]]] = -root[mneg[mnz]]
+        Q[idx_mnz[mpos[mnz]]] = root[mpos[mnz]]
+
+        return Vs, Is, phi, V_dc, pf, M
+
+    @staticmethod
+    def check_max_package_current_limit(I_package_RMS, max_package_current):
+
+        """
+        Check that inverter apparent power does not exceed device current limits.
+
+        Parameters
+        ----------
+        I_package_RMS : array
+            Package RMS current [A].
+        max_IGBT_RMS_Current : float
+            Maximum allowable IGBT RMS current per phase [A].
+
+        Raises
+        ------
+        ValueError
+            If any sample of S exceeds the maximum current capability.
+        """
+
+        if np.any(I_package_RMS > max_package_current):
+            raise ValueError(
+                f"Current limit for the package exceeded")
+
+    @staticmethod
+    def check_vce(V_dc, max_V_CE):
+        """
+        Check if collector–emitter voltage exceeds the maximum allowed value.
+
+        Parameters
+        ----------
+
+        V_dc : float or np.ndarray
+            DC link voltage (single value or array of values).
+        max_V_CE : float
+            Maximum allowed collector–emitter voltage.
+
+        Raises
+        ------
+        UserWarning
+            If the collector–emitter voltage exceeds max_V_CE.
+        """
+        V_CE = V_dc
+
+        violations = np.where(V_CE > max_V_CE)[0]
+
+        if violations.size > 0:
+            raise ValueError(
+                f"Collector–emitter voltage exceeded! "
+                f"Maximum allowed: {max_V_CE}, but got values up to {V_CE.max()}. "
+                "Please reduce the DC voltage or update the IGBT specifications."
+            )
+
+        return V_CE
+
+    @staticmethod
+    def Instantaneous_modulation(M, omega, t, phi):
+
+        """
+        Calculate the inverter modulation function m(t).
+
+        Parameters
+        ----------
+        M : float
+            Modulation index of the inverter [-] (typically 0.8–1.0 for PV inverters).
+        omega : float
+            Angular frequency of the AC grid [rad/s] (ω = 2πf).
+        t : array
+            Time instant [s].
+        phi : float
+            Phase angle of the inverter output current relative to the voltage [rad].
+
+        Returns
+        -------
+        m : float
+                Instantaneous modulation function [-].
+
+        """
+
+        m = (M * np.sin(omega * t + phi) + 1) / 2
+
+        return m
+
+    @staticmethod
+    def IGBT_and_diode_current(Is, t, m, omega):
+
+        """
+        Calculate the instantaneous IGBT and diode currents in one inverter leg
+
+        Parameters
+        ----------
+        Is : float
+            RMS value of the inverter output current [A].
+        t : array
+            Time instant [s].
+        m : array
+            Instantaneous modulation function [-], typically between 0 and 1.
+
+        Returns
+        -------
+        is_I : array
+            Instantaneous IGBT current [A]. (Non-negative only, conduction blocked when negative.)
+        is_D : array
+            Instantaneous diode current [A]. (Non-negative only, conduction blocked when negative.)
+        """
+
+        base = np.sqrt(2) * Is * np.sin(omega * t) * m
+        is_I = np.maximum(base, 0)
+        is_D = np.maximum(-base, 0)
+
+        return is_I, is_D
+
+    @staticmethod
+    def Switching_losses(V_dc, is_I, t_on, t_off, f_sw, is_D, I_ref, V_ref, Err_D):
+
+        """
+        Calculate the IGBT and diode switching power losses.
+
+        Parameters
+        ----------
+        V_dc : float
+            DC-link voltage of the inverter [V].
+        is_I : array
+            Instantaneous current through the IGBT [A].
+        t_on : float
+            Effective IGBT turn-on time [s].
+        t_off : float
+            Effective IGBT turn-off time [s].
+        f_sw : float
+            Inverter switching frequency [Hz].
+        is_D : array
+            Instantaneous current through the diode [A].
+        I_ref : float
+            Reference test current for diode reverse recovery [A].
+        V_ref : float
+            Reference test voltage for diode reverse recovery [V].
+        Err_D : float
+            Reverse recovery energy per switching event for the diode [J].
+
+        Returns
+        -------
+        P_sw_I : array
+            Instantaneous IGBT switching power loss [W].
+        P_sw_D : array
+            Instantaneous diode switching power loss [W].
+
+        """
+
+        is_I = np.ascontiguousarray(is_I, dtype=np.float64)
+        is_D = np.ascontiguousarray(is_D, dtype=np.float64)
+
+        # IGBT
+
+        # E_on_I = ((np.sqrt(2) / (2 * np.pi)) * V_dc * is_I * t_on)
+        # E_off_I = ((np.sqrt(2) / (2 * np.pi)) * V_dc * is_I * t_off)
+
+        c1 = (np.sqrt(2) / (2 * np.pi))
+        c2 = (np.sqrt(2) / np.pi)
+
+        P_sw_I_expr = ne.evaluate("(( c1 * V_dc * is_I * t_on) + ( c1 * V_dc * is_I * t_off)) * f_sw",
+                                  local_dict=dict(c1=c1, V_dc=V_dc, is_I=is_I, t_on=t_on, t_off=t_off, f_sw=f_sw), )
+        P_sw_I = ne.evaluate("where(P_sw_I_expr > 0.0, P_sw_I_expr, 0.0)", local_dict=dict(P_sw_I_expr=P_sw_I_expr))
+
+        # Diode
+
+        P_sw_D_expr = ne.evaluate("((c2 * (is_D * V_dc) / (I_ref * V_ref)) * Err_D * f_sw)",
+                                  local_dict=dict(c2=c2, V_dc=V_dc, is_D=is_D, f_sw=f_sw, I_ref=I_ref, V_ref=V_ref,
+                                                  Err_D=Err_D), )
+        # P_sw_D = np.maximum(P_sw_D, 0)
+        P_sw_D = ne.evaluate("where(P_sw_D_expr > 0.0, P_sw_D_expr, 0.0)", local_dict=dict(P_sw_D_expr=P_sw_D_expr))
+
+        return P_sw_I, P_sw_D
+
+    @staticmethod
+    def Conduction_losses(is_I, R_IGBT, V_0_IGBT, M, pf, is_D, R_D, V_0_D):
+
+        """
+        Calculate conduction losses of the inverter’s IGBT and diode.
+
+        Parameters
+        ----------
+        is_I : array
+            Instantaneous value of the inverter output current flowing through the IGBT [A].
+        R_IGBT : float
+            Effective on-resistance of the IGBT conduction model [Ohm].
+        V_0_IGBT : float
+            Effective knee voltage of the IGBT [V].
+        M : float
+            Modulation index of the inverter [-].
+        pf : float
+            Power factor of inverter output current [-].
+            (negative = inductive load, current lags voltage;
+             positive = capacitive load, current leads voltage).
+        is_D : array
+            Instantaneous value of the inverter output current flowing through the diode [A].
+        R_D : float
+            Effective dynamic resistance of the diode [Ohm].
+        V_0_D : float
+            Effective forward knee voltage of the diode [V].
+
+        Returns
+        -------
+        P_con_I : array
+            Instantaneous conduction loss of the IGBT [W].
+        P_con_D : array
+            Instantaneous conduction loss of the diode [W].
+        """
+
+        is_I = np.ascontiguousarray(is_I, dtype=np.float64)
+        is_D = np.ascontiguousarray(is_D, dtype=np.float64)
+        pf = np.ascontiguousarray(pf, dtype=np.float64)
+
+        c1 = np.sqrt(2 * np.pi)
+        c2 = (3 * np.pi)
+        c3 = np.pi
+
+        # IGBT
+
+        # P_con_I = (((is_I ** 2 / 4.0) * R_IGBT) + ((is_I / np.sqrt(2 * np.pi)) * V_0_IGBT) +
+        #           ((((is_I ** 2 / 4.0) * (8 * M / (3 * np.pi)) * R_IGBT) + (
+        #                   (is_I / np.sqrt(2 * np.pi)) * (np.pi * M / 4.0) * V_0_IGBT)) * abs(pf)))
+        # P_con_I = np.maximum(P_con_I, 0)
+
+        P_con_I_expr = ne.evaluate("(((is_I ** 2 / 4.0) * R_IGBT) + ((is_I / c1) * V_0_IGBT) + "
+                                   "((((is_I ** 2 / 4.0) * (8 * M / c2) * R_IGBT) +"
+                                   " ((is_I / c1) * (c3 * M / 4.0) * V_0_IGBT)) * abs(pf)))",
+                                   local_dict=dict(is_I=is_I, R_IGBT=R_IGBT, V_0_IGBT=V_0_IGBT, M=M, pf=pf, c1=c1,
+                                                   c2=c2, c3=c3), )
+        P_con_I = ne.evaluate("where(P_con_I_expr > 0.0, P_con_I_expr, 0.0)",
+                              local_dict=dict(P_con_I_expr=P_con_I_expr))
+
+        # Diode
+
+        # P_con_D = ((((is_D ** 2 / 4.0) * R_D) + ((is_D / np.sqrt(2 * np.pi)) * V_0_D)) -
+        #           ((((is_D ** 2 / 4.0)) * ((8 * M / (3 * np.pi)) * R_D)) + (
+        #                       (is_D / np.sqrt(2 * np.pi)) * (np.pi * M / 4.0) * V_0_D)) * abs(pf))
+        # P_con_D = np.maximum(P_con_D, 0)
+
+        # Diode
+
+        P_con_D_expr = ne.evaluate("((((is_D ** 2 / 4.0) * R_D) + ((is_D / c1) * V_0_D)) -"
+                                   " ((((is_D ** 2 / 4.0)) * ((8 * M / c2) * R_D)) + "
+                                   "((is_D / c1) * (c3 * M / 4.0) * V_0_D)) * abs(pf))",
+                                   local_dict=dict(is_D=is_D, R_D=R_D, V_0_D=V_0_D, M=M, pf=pf, c1=c1, c2=c2, c3=c3), )
+        P_con_D = ne.evaluate("where(P_con_D_expr > 0.0, P_con_D_expr, 0.0)",
+                              local_dict=dict(P_con_D_expr=P_con_D_expr))
+
+        return P_con_I, P_con_D
