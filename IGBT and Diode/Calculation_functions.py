@@ -1,5 +1,6 @@
 import numpy as np
 import numexpr as ne
+from pathlib import Path
 
 class Calculation_functions_class:
 
@@ -153,27 +154,42 @@ class Calculation_functions_class:
         return Vs, Is, phi, V_dc, pf, M
 
     @staticmethod
-    def check_max_package_current_limit(I_package_RMS, max_package_current):
-
+    def check_max_package_current_limit(Is,M, max_IGBT_current, max_diode_current):
         """
-        Check that inverter apparent power does not exceed device current limits.
+        Check that inverter RMS currents do not exceed device package limits.
 
         Parameters
         ----------
-        I_package_RMS : array
-            Package RMS current [A].
-        max_IGBT_RMS_Current : float
-            Maximum allowable IGBT RMS current per phase [A].
+        Is : array
+            RMS current on the AC side [A].
+        max_IGBT_current : float
+            Maximum allowable RMS current rating of the IGBT [A].
+        max_diode_current : float, optional
+            Maximum allowable RMS current rating of the diode [A].
 
         Raises
         ------
         ValueError
-            If any sample of S exceeds the maximum current capability.
+            If IGBT or diode RMS currents exceed their device ratings.
         """
 
-        if np.any(I_package_RMS > max_package_current):
+        I_s_rms  = np.max(Is)
+        Maximum_IGBT_current = 0.5 * I_s_rms * np.sqrt(1.0 + ((8.0 * M * 1.0) / (3.0 * np.pi)))
+        Maximum_Diode_current = 0.5 * I_s_rms * np.sqrt(1.0 - ((8.0 * M * 1.0) / (3.0 * np.pi)))
+
+        # ---- IGBT CHECK ----
+        if np.any(Maximum_IGBT_current > max_IGBT_current):
             raise ValueError(
-                f"Current limit for the package exceeded")
+                f"IGBT RMS current limit exceeded: "
+                f"max allowed {max_IGBT_current} A"
+            )
+
+        if np.any(Maximum_Diode_current > max_diode_current):
+                raise ValueError(
+                    f"Diode RMS current limit exceeded: "
+                    f"max allowed {max_diode_current} A"
+                )
+
 
     @staticmethod
     def check_vce(V_dc, max_V_CE):
@@ -399,3 +415,50 @@ class Calculation_functions_class:
                               local_dict=dict(P_con_D_expr=P_con_D_expr))
 
         return P_con_I, P_con_D
+
+    import os
+    from pathlib import Path
+
+    def create_simulation_folders(base="Dataframes"):
+        """
+        Creates:
+            Dataframes/
+                Simulation_N/
+                    df_electrical/
+                    df_thermal/
+
+        Automatically increments Simulation_N.
+        Returns:
+            sim_dir, df_electrical_dir, df_thermal_dir
+        """
+
+        base_dir = Path(base)
+        base_dir.mkdir(exist_ok=True)
+
+        # --- detect existing Simulation_N folders ---
+        existing = []
+        for p in base_dir.iterdir():
+            if p.is_dir() and p.name.startswith("Simulation_"):
+                try:
+                    n = int(p.name.split("_")[1])
+                    existing.append(n)
+                except (IndexError, ValueError):
+                    pass
+
+        # --- choose next folder number ---
+        next_n = max(existing) + 1 if existing else 1
+
+        # --- create Simulation_N folder ---
+        sim_dir = base_dir / f"Simulation_{next_n}"
+        sim_dir.mkdir(exist_ok=True)
+
+        # --- create subfolders ---
+        df_electrical_dir = sim_dir / "df_electrical"
+        df_electrical_dir.mkdir(exist_ok=True)
+
+        df_thermal_dir = sim_dir / "df_thermal"
+        df_thermal_dir.mkdir(exist_ok=True)
+
+        #print(f"Created simulation folder: {sim_dir}")
+
+        return sim_dir, df_electrical_dir, df_thermal_dir

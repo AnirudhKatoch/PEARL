@@ -1,15 +1,11 @@
 import numpy as np
 from Calculation_functions import Calculation_functions_class
+from functools import lru_cache
 
 
-def compute_IGBT_and_Diode_power_losses(Is, phi, V_dc, pf, dt, M, omega, t_on, t_off, f_sw, I_ref, V_ref, Err_D, R_IGBT, V_0_IGBT, R_D, V_0_D):
 
-    #t = np.arange(0.0, len(Is), dt, dtype=np.float64)
-
-    #Is = np.repeat(Is, int(1 / dt))
-    #phi = np.repeat(phi, int(1 / dt))
-    #V_dc = np.repeat(V_dc, int(1 / dt))
-    #pf = np.repeat(pf, int(1 / dt))
+@lru_cache(maxsize=20000)
+def _compute_IGBT_and_Diode_power_losses_cached(Is, phi, V_dc, pf, dt, M, omega, t_on, t_off, f_sw, I_ref, V_ref, Err_D, R_IGBT, V_0_IGBT, R_D, V_0_D):
 
     t = np.arange(0.0, 1, dt, dtype=np.float64)
 
@@ -20,4 +16,26 @@ def compute_IGBT_and_Diode_power_losses(Is, phi, V_dc, pf, dt, M, omega, t_on, t
     P_I = np.ascontiguousarray(np.maximum(P_sw_I + P_con_I, 0.0), dtype=np.float64)
     P_D = np.ascontiguousarray(np.maximum(P_sw_D + P_con_D, 0.0), dtype=np.float64)
 
-    return P_I, P_D, is_I, is_D, P_sw_I, P_sw_D, P_con_I, P_con_D, Is, phi, V_dc, pf
+    # optional: freeze cached arrays so they can't be modified accidentally
+    for arr in (P_I, P_D, is_I, is_D, P_sw_I, P_sw_D, P_con_I, P_con_D):
+        arr.setflags(write=False)
+
+    return P_I, P_D, is_I, is_D, P_sw_I, P_sw_D, P_con_I, P_con_D
+
+
+
+def compute_IGBT_and_Diode_power_losses(Is, phi, V_dc, pf,
+                                        dt, M, omega,
+                                        t_on, t_off, f_sw,
+                                        I_ref, V_ref, Err_D,
+                                        R_IGBT, V_0_IGBT, R_D, V_0_D):
+
+    r = lambda x: float(round(float(x), 10))   # quantize for stable cache keys
+
+    return _compute_IGBT_and_Diode_power_losses_cached(
+        r(Is), r(phi), r(V_dc), r(pf),
+        r(dt), r(M), r(omega),
+        r(t_on), r(t_off), r(f_sw),
+        r(I_ref), r(V_ref), r(Err_D),
+        r(R_IGBT), r(V_0_IGBT), r(R_D), r(V_0_D)
+    )
