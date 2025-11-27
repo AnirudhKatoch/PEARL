@@ -1,0 +1,27 @@
+Thermal Interface and Heatsink Selection
+
+For the thermal path between the semiconductor junction and ambient, the case-to-sink interface and the sink-to-ambient heatsink represent the dominant resistances beyond the device’s own junction-to-case (RθJC). In this work, the Bergquist / Henkel SIL PAD® TSP-1600 insulating pad was selected as the case-to-sink thermal interface material (TIM). This choice was motivated by three factors:
+
+Electrical isolation — the TO-247 package of the Infineon IKW50N60H3 IGBT has an exposed metal tab; a pad provides the required dielectric barrier when the heatsink is at chassis potential.
+
+Low thermal resistance — the TSP-1600 series is optimized for power semiconductor mounting and offers RθCS values in the range of 0.2–0.3 K/W, significantly lower than conventional mica/grease combinations, while maintaining mechanical compliance under clip pressure .
+
+Ease of assembly and repeatability — phase-change pads eliminate application variability compared to greases, improving reproducibility of experimental setups.
+
+For the sink-to-ambient stage, the Aavid/Boyd 6399B bolt-on heatsink was selected. This extrusion is explicitly designed for TO-247 devices and offers a catalogued thermal resistance of 3.3 °C/W under natural convection . The choice reflects the following considerations:
+
+Published, vendor-verified RθSA — ensures that steady-state junction temperatures can be reliably predicted from average power dissipation.
+
+Package compatibility — the mechanical footprint supports TO-247 mounting with standard clips or screws, ensuring robust thermal contact.
+
+Research relevance — using a mid-range extrusion (~3.3 °C/W) represents a practical balance between compactness and sufficient heat dissipation in laboratory-scale inverter prototypes, avoiding the extremes of oversized forced-air coolers or undersized clip-on sinks.
+
+By combining the SIL PAD TSP-1600 (RθCS ≈ 0.25 K/W) and the Aavid 6399B heatsink (RθSA ≈ 3.3 K/W) with the device’s datasheet RθJC (≈0.45 K/W ), the total junction-to-ambient thermal resistance for the IGBT is approximately 4.0 K/W. This configuration provides both electrical isolation and a realistic thermal environment for evaluating junction temperature evolution and lifetime effects in photovoltaic inverter applications.
+
+
+References
+
+Henkel / Bergquist, SIL PAD® TSP-1600 Datasheet and Application Guide. (Thermal Paste)
+
+Aavid/Boyd, 6399B Heatsink for TO-247 Packages — Thermal Resistance RθSA = 3.3 °C/W (natural convection). (Heat Sink)
+
