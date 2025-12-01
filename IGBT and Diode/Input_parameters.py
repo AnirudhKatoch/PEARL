@@ -5,14 +5,14 @@ class Input_parameters_class:
 
     def __init__(self):
 
-        Profile_size = 60 # This is just to make a profile , one should put its own profile.
+        Profile_size = 180 # This is just to make a profile , one should put its own profile. # 31536000
 
         # ----------------------------------------#
         # Model Parameters
         # ----------------------------------------#
 
         self.dt = 0.001                 # Simulation step size
-        self.chunk_seconds = int(86400) # chunking to reduce the RAM usage
+        self.chunk_seconds = int(86400)   # chunking to reduce the RAM usage
         self.saving_dataframes = True   # Set True if you want to save dataframes and False if you don't want to save dataframes.
         self.plotting_values = True     # Set True if you want to plot values and False if you don't want to plot values.
 
@@ -57,8 +57,8 @@ class Input_parameters_class:
         # Thermal Parameters
         # ----------------------------------------#
 
-        self.Cauer_model_accuracy = 1e-2 # 1e-3 is the optimum balance between accuracy and computation
-
+        self.Cauer_model_accuracy = 1e-3 # 1e-3 is the optimum balance between accuracy and computation
+        self.deltaT_min = 30             # As LESIT model is invalid below 30 K hence we are going to clamp any value below 30 K as 30 K
         self.T_env = np.full(Profile_size, 298.15, dtype=np.float64)  # [K] Ambient Temperature
 
         # IGBT
@@ -68,7 +68,6 @@ class Input_parameters_class:
         self.r_I = np.array([7.0e-3, 3.736e-2, 9.205e-2, 1.2996e-1, 1.8355e-1])  # [K/W] Thermal resistance
         self.tau_I = np.array([4.4e-5, 1.0e-4, 7.2e-4, 8.3e-3, 7.425e-2])        # [s] Thermal time constant
         self.cap_I = self.tau_I / self.r_I                                       # [J/K] Thermal capacitance
-        self.alpha_I = np.exp(-self.dt / self.tau_I)
 
         # Diode
 
@@ -77,7 +76,6 @@ class Input_parameters_class:
         self.r_D = np.array([4.915956e-2, 2.254532e-1, 3.125229e-1, 2.677344e-1, 1.951733e-1])  # [K/W] Thermal resistance
         self.tau_D = np.array([7.5e-6, 2.2e-4, 2.3e-3, 1.546046e-2, 1.078904e-1])               # [s]   Thermal time constant
         self.cap_D = self.tau_D / self.r_D                            # [J/K] Thermal capacitance
-        self.alpha_D = np.exp(-self.dt / self.tau_D)
 
         # Thermal Paste
 
@@ -87,7 +85,6 @@ class Input_parameters_class:
         self.r_paste = np.array([0.0032])  # [K/W] Thermal resistance
         self.tau_paste = np.array([1e-3])  # [s]   Thermal time constant, this value is always almost zero for thermal pastes
         self.cap_paste = self.tau_paste / self.r_paste  # [J/K] Thermal capacitance
-        self.alpha_paste = np.exp(-self.dt / self.tau_paste)
 
         # Heat Sink
 
@@ -98,10 +95,9 @@ class Input_parameters_class:
         specific_heat = 900 # J/kg K
         Thermal_capacitance = Weight * specific_heat
 
-        self.r_sink = np.array([r_sink_dic[1]])  # [K/W] Thermal resistance
+        self.r_sink = np.array([r_sink_dic[2]])  # [K/W] Thermal resistance
         self.tau_sink = np.array([Thermal_capacitance * r_sink_dic[1]])  # [s]   Thermal time constant
         self.cap_sink = self.tau_sink / self.r_sink  # [J/K] Thermal capacitance
-        self.alpha_sink = np.exp(-self.dt / self.tau_sink)
 
         # ----------------------------------------#
         # Switching losses
@@ -141,8 +137,8 @@ class Input_parameters_class:
         V_D_Conduction_losses  = np.array([1.35, 1.65, 2.1])  # diode forward voltage in V Note: Value is temperature and current dependent, author assumes constant current of 50 A and temp of 25°C] [Fig 28]
 
         self.R_D, self.V_0_D = np.polyfit(I_D_Conduction_losses, V_D_Conduction_losses, 1)
-        #V_0_D  # [V]    Effective forward knee voltage
-        #R_D # [Ohm]  Effective dynamic resistance
+        # V_0_D  # [V]    Effective forward knee voltage
+        # R_D # [Ohm]  Effective dynamic resistance
 
         '''
         
@@ -165,8 +161,23 @@ class Input_parameters_class:
         
         '''
 
-        self.P = np.full(Profile_size, 50000, dtype=np.float64)  # [W]   Inverter RMS Active power  [Will always be positive] # Rated power = 48790
-        self.Q = np.full(Profile_size,0,dtype=float)  # [VAr] Inverter RMS Reactive power [Negative is inductive and positive is capacitive]
+        S_in = 50000
+        pf_in = -0.8
+
+        print("S", S_in)
+        print("pf", pf_in)
+
+        P_in = abs(S_in*pf_in)
+        Q_in = np.sqrt(S_in**2 - P_in**2)
+        if pf_in<0:
+            Q_in = Q_in*-1
+
+
+        print("P",P_in)
+        print("Q", Q_in)
+
+        self.P = np.full(Profile_size, P_in)  # [W]   Inverter RMS Active power  [Will always be positive] # Rated power = 48790
+        self.Q = np.full(Profile_size, Q_in)  # [VAr] Inverter RMS Reactive power [Negative is inductive and positive is capacitive]
 
         self.Vs = np.full(Profile_size, 230)  # [V] Inverter phase RMS AC side voltage
         self.V_dc = np.full(Profile_size, 600)  # [V] Inverter DC side voltage
@@ -187,7 +198,7 @@ class Input_parameters_class:
 
         self.N_parallel = 1 # This variable defines the number of switches in parallel per leg
 
-        self.Vs, self.Is, self.phi, self.V_dc, self.pf, self.M = Calculation_functions_class.compute_power_flow(P=self.P,
+        self.Vs, self.Is, self.phi, self.V_dc, self.pf, self.M, self.S = Calculation_functions_class.compute_power_flow(P=self.P,
                                                                                   Q=self.Q,
                                                                                   V_dc=self.V_dc,
                                                                                   Vs=self.Vs,

@@ -265,12 +265,12 @@ def simulate_igbt_diode_cauer(r_I, cap_I,
         # start from ambient for all nodes
         T0_amb = T_env[0]
         T0 = np.full(total_nodes, T0_amb)
+
     else:
         # reuse last state from previous chunk
         T0 = np.asarray(T0_init, dtype=float)
         if T0.size != total_nodes:
             raise ValueError(f"T0_init has wrong size {T0.size}, expected {total_nodes}")
-
 
 
     t_start = 0.0

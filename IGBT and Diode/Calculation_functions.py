@@ -1,6 +1,8 @@
 import numpy as np
 import numexpr as ne
 from pathlib import Path
+import rainflow
+import pandas as pd
 
 class Calculation_functions_class:
 
@@ -151,7 +153,7 @@ class Calculation_functions_class:
         Q[idx_mnz[mneg[mnz]]] = -root[mneg[mnz]]
         Q[idx_mnz[mpos[mnz]]] = root[mpos[mnz]]
 
-        return Vs, Is, phi, V_dc, pf, M
+        return Vs, Is, phi, V_dc, pf, M, S
 
     @staticmethod
     def check_max_package_current_limit(Is,M, max_IGBT_current, max_diode_current):
@@ -176,6 +178,8 @@ class Calculation_functions_class:
         I_s_rms  = np.max(Is)
         Maximum_IGBT_current = 0.5 * I_s_rms * np.sqrt(1.0 + ((8.0 * M * 1.0) / (3.0 * np.pi)))
         Maximum_Diode_current = 0.5 * I_s_rms * np.sqrt(1.0 - ((8.0 * M * 1.0) / (3.0 * np.pi)))
+
+        #print("Maximum_IGBT_current",Maximum_IGBT_current)
 
         # ---- IGBT CHECK ----
         if np.any(Maximum_IGBT_current > max_IGBT_current):
@@ -416,20 +420,18 @@ class Calculation_functions_class:
 
         return P_con_I, P_con_D
 
-    import os
-    from pathlib import Path
-
-    def create_simulation_folders(base="Dataframes"):
+    @staticmethod
+    def create_simulation_folders(base="Results"):
         """
         Creates:
             Dataframes/
                 Simulation_N/
-                    df_electrical/
+                    df_electrical_loss/
                     df_thermal/
 
         Automatically increments Simulation_N.
         Returns:
-            sim_dir, df_electrical_dir, df_thermal_dir
+            sim_dir, df_electrical_loss_dir, df_thermal_dir
         """
 
         base_dir = Path(base)
@@ -453,12 +455,195 @@ class Calculation_functions_class:
         sim_dir.mkdir(exist_ok=True)
 
         # --- create subfolders ---
-        df_electrical_dir = sim_dir / "df_electrical"
-        df_electrical_dir.mkdir(exist_ok=True)
+        df_electrical_loss_dir = sim_dir / "df_electrical_loss"
+        df_electrical_loss_dir.mkdir(exist_ok=True)
 
         df_thermal_dir = sim_dir / "df_thermal"
         df_thermal_dir.mkdir(exist_ok=True)
 
-        #print(f"Created simulation folder: {sim_dir}")
+        Figures_dir = sim_dir / "Figures"
+        Figures_dir.mkdir(exist_ok=True)
 
-        return sim_dir, df_electrical_dir, df_thermal_dir
+        df_lifetime_IGBT_dir = sim_dir / "df_lifetime_IGBT"
+        df_lifetime_IGBT_dir.mkdir(exist_ok=True)
+
+        df_lifetime_Diode_dir = sim_dir / "df_lifetime_Diode"
+        df_lifetime_Diode_dir.mkdir(exist_ok=True)
+
+        df_electrical_dir = sim_dir / "df_electrical"
+        df_electrical_dir.mkdir(exist_ok=True)
+
+        return sim_dir, df_electrical_loss_dir, df_thermal_dir, df_lifetime_IGBT_dir,df_lifetime_Diode_dir,df_electrical_dir, Figures_dir
+
+    @staticmethod
+    def rainflow_algorithm(temp, dt):
+        """
+        Compute ΔT, T_mean, t_on for each rainflow cycle of a temperature signal.
+
+        Parameters
+        ----------
+        temp : 1D array
+            Temperature signal (e.g. Tj_igbt) [K or °C].
+        dt : float
+            Time step [s] of the signal (e.g. 0.001).
+
+        Returns
+        -------
+        dT : 1D array
+            Cycle ranges ΔT.
+        Tmean : 1D array
+            Cycle mean temperature.
+        t_on : 1D array
+            Heating time per cycle [s], defined as |end_idx - start_idx| * dt.
+        count : 1D array
+            Cycle count (usually 0.5 or 1.0).
+        """
+        temp = np.asarray(temp, dtype=float)
+
+        cycles = list(rainflow.extract_cycles(temp))
+        if len(cycles) == 0:
+            return (np.empty(0), np.empty(0), np.empty(0), np.empty(0))
+
+        cycles = np.array(cycles, dtype=float)
+        dT = cycles[:, 0]
+        Tmean = cycles[:, 1]
+        count = cycles[:, 2]
+        starts = cycles[:, 3].astype(int)
+        ends = cycles[:, 4].astype(int)
+
+        # Option A: compute t_on via sample distance * dt
+        thermal_cycle_period = np.abs(ends - starts) * dt
+
+        # (equivalent to np.abs(ends - starts) / steps_per_sec)
+
+        return dT, Tmean, thermal_cycle_period, count
+
+
+    @staticmethod
+    def cycles_to_failure_lesit(deltaT,  # ΔT_j   : array or scalar
+                                Tmean,  # T_jm   : array or scalar (K)
+                                thermal_cycle_period,  # : array or scalar (s)
+                                A0,
+                                A1,
+                                T0_K,
+                                lambda_K,  # T0_K, λ
+                                alpha,
+                                Ea_J,
+                                kB_J_per_K,  # activation energy, Boltzmann
+                                C,
+                                gamma,
+                                k_thickness):  # k_thickness for IGBT or diode
+
+        """
+
+        Parameters
+        ----------
+        deltaT : array
+                Junction temperature swing per cycle ΔTj [K].
+        Tmean : array
+            Mean (medium) junction temperature per cycle Tjm [K].
+        thermal_cycle_period : array
+            Heating time per cycle ton [s]
+        A0 : float
+            Technology coefficient A0 [-]
+        A1 : float
+            Factor A1 for the low-ΔT extension [-].
+        T0_K : float
+            Reference temperature T0 for the low-ΔT extension [K].
+        lambda_K : float
+            Decay constant λ for the low-ΔT extension [K].
+        alpha : float
+            Coffin–Manson exponent α (typically negative) [-].
+        Ea_J : float
+            Activation energy Ea [J]. **Use Joules, not eV.**
+        kB_J_per_K : float
+            Boltzmann constant k_B [J/K].
+        C : float
+            Time-shape coefficient C [-] in the ton-scaling term.
+        gamma : float
+            Time-shape exponent γ [-] in the ton-scaling term.
+        k_thickness : float
+            Chip thickness factor kthickness [-], accounting for
+            chip thickness / technology (e.g. 1.0, 0.65, 0.5, 0.33).
+
+        Returns
+        -------
+        Nf : ndarray
+            Cycles-to-failure estimate per cycle Nf [-].
+        """
+
+        # Make sure inputs are float64 and contiguous (good for numexpr)
+        deltaT = np.ascontiguousarray(deltaT, dtype=np.float64)
+        Tmean = np.ascontiguousarray(Tmean, dtype=np.float64)
+        thermal_cycle_period = np.ascontiguousarray(thermal_cycle_period, dtype=np.float64)
+
+        if np.any(Tmean <= 0):
+            raise ValueError("Tmean contains 0 K or negative values, which is not physically possible.")
+
+        # Arrhenius temperature factor: exp(Ea / (kB * Tmean))
+        c_arrhenius = ne.evaluate("exp(Ea_J / (kB_J_per_K * Tmean))",
+                                  local_dict=dict(Ea_J=Ea_J, kB_J_per_K=kB_J_per_K, Tmean=Tmean))
+
+        # exp_low = exp( - (ΔT - T0_K) / λ )
+        exp_low = ne.evaluate("exp(-(deltaT - T0_K) / lambda_K)",
+                              local_dict=dict(deltaT=deltaT, T0_K=T0_K, lambda_K=lambda_K))
+
+        Nf = ne.evaluate(
+            "A0 * (A1 ** exp_low) * "
+            "(deltaT ** (alpha - exp_low)) * "
+            "c_arrhenius * "
+            "((C + thermal_cycle_period**gamma) / (C + 2.0**gamma)) * "
+            "k_thickness",
+            local_dict=dict(A0=A0, A1=A1, alpha=alpha, C=C,
+                            gamma=gamma, k_thickness=k_thickness, deltaT=deltaT, exp_low=exp_low,
+                            c_arrhenius=c_arrhenius, thermal_cycle_period=thermal_cycle_period))
+        return Nf
+
+    @staticmethod
+    def miners_rule(Nf, count, Is):
+        Nf = np.asarray(Nf, dtype=float)
+        count = np.asarray(count, dtype=float)
+
+        # Optional: filter out invalid entries
+        mask = (Nf > 0) & np.isfinite(Nf) & np.isfinite(count)
+        Nf = Nf[mask]
+        count = count[mask]
+
+        # Damage sum: D = Σ (count_i / Nf_i)
+        D = np.sum(count / Nf)
+
+        #print("count",count)
+
+        # Equivalent full cycles to failure: Nf_eq = 1 / D
+        Nf_eq = np.inf if D == 0 else 1.0 / D
+
+
+        mission_seconds_total = len(Is)
+
+
+        seconds_per_year = 365 * 24 * 3600
+        lifetime_years = (Nf_eq*mission_seconds_total)/(seconds_per_year)
+
+        return Nf_eq, lifetime_years
+
+    @staticmethod
+    def read_datafames(df_dir):
+        df_dir = Path(df_dir)
+        all_files = sorted(df_dir.glob("df_*.parquet"))  # all chunk files
+        df_list = []
+        for f in all_files:
+            df = pd.read_parquet(f)
+            df_list.append(df)
+        full_df = pd.concat(df_list, ignore_index=True)
+        return full_df
+
+    @staticmethod
+    def check_igbt_diode_temp_limits(Tj_igbt, Tj_diode,max_IGBT_temperature,max_Diode_temperature):
+
+        if  (np.max(Tj_igbt) > max_IGBT_temperature):
+            raise ValueError(f"IGBT junction temperature exceeded! "
+                             f"Max temperature is {np.max(Tj_igbt - 273.15)} Celsius.")
+
+        if  (np.max(Tj_diode) > max_Diode_temperature):
+            raise ValueError(f"Diode  junction temperature exceeded! "
+                             f"Max temperature is {np.max(Tj_diode - 273.15)} Celsius.")
