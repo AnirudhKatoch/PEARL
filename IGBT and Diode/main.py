@@ -53,7 +53,7 @@ for chunk_idx in range(n_chunks):
     if sec_start >= sec_end:
         break  # safety
 
-    #print(f"\n--- Chunk {chunk_idx+1}/{n_chunks} ---")
+    print(f"\n--- Chunk {chunk_idx+1}/{n_chunks} ---")
 
     Is_chunk   = Is[sec_start:sec_end]
     phi_chunk = phi[sec_start:sec_end]
@@ -194,3 +194,14 @@ del df_electrical_loss
 df_thermal = Calculation_functions.read_datafames(df_dir=df_thermal_dir)
 Plotting_thermal(df_thermal=df_thermal,Figures_dir=Figures_dir)
 del df_thermal
+
+
+
+
+
+
+
+
+
+end_time = time.time()
+print("Execution time all code:", end_time - start_time, "seconds")

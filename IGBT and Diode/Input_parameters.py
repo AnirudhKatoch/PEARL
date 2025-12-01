@@ -5,7 +5,7 @@ class Input_parameters_class:
 
     def __init__(self):
 
-        Profile_size = 180 # This is just to make a profile , one should put its own profile. # 31536000
+        Profile_size = 60 # This is just to make a profile , one should put its own profile. # 31536000
 
         # ----------------------------------------#
         # Model Parameters
@@ -96,8 +96,8 @@ class Input_parameters_class:
         Thermal_capacitance = Weight * specific_heat
 
         self.r_sink = np.array([r_sink_dic[2]])  # [K/W] Thermal resistance
-        self.tau_sink = np.array([Thermal_capacitance * r_sink_dic[1]])  # [s]   Thermal time constant
-        self.cap_sink = self.tau_sink / self.r_sink  # [J/K] Thermal capacitance
+        self.tau_sink = np.array([Thermal_capacitance * r_sink_dic[2]])  # [s]   Thermal time constant
+        self.cap_sink = np.array([Thermal_capacitance])    # [J/K] Thermal capacitance
 
         # ----------------------------------------#
         # Switching losses
@@ -162,7 +162,7 @@ class Input_parameters_class:
         '''
 
         S_in = 50000
-        pf_in = -0.8
+        pf_in = 0
 
         print("S", S_in)
         print("pf", pf_in)
@@ -171,7 +171,6 @@ class Input_parameters_class:
         Q_in = np.sqrt(S_in**2 - P_in**2)
         if pf_in<0:
             Q_in = Q_in*-1
-
 
         print("P",P_in)
         print("Q", Q_in)
