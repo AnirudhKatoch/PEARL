@@ -326,7 +326,6 @@ def Plotting_electrical(S,P,Q,Vs,Is,V_dc,pf,phi,T_env, Figures_dir):
     plt.savefig(Figures_dir / "5_T_env.png")
     plt.close(fig5)
 
-
 def Plotting_electrical_loss(df_electrical_loss, Figures_dir):
 
     # -------------------------------------------------
@@ -463,7 +462,7 @@ def Plotting_thermal(df_thermal, Figures_dir):
     plt.savefig(Figures_dir / "18_Tcase_Tsink.png")
     plt.close(fig18)
 
-def Plotting_IGBT_MC(df_lifetime_igbt_MC, df_lifetime_diode_MC, Figures_dir):
+def Plotting_Monte_Carlo(df_lifetime_igbt_MC, df_lifetime_diode_MC, Figures_dir):
 
     # -------------------------------------------------
     # Figure 19: Weibull PDF for IGBT Lifetime

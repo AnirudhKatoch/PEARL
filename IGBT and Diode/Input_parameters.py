@@ -3,9 +3,11 @@ from Calculation_functions import Calculation_functions_class
 
 class Input_parameters_class:
 
-    def __init__(self):
+    def __init__(self,P,Q,T_env):
 
-        Profile_size = 60  # This is just to make a profile , one should put its own profile. # 31536000
+        #Profile_size = 1000  # This is just to make a profile , one should put its own profile. # 31536000
+
+
 
         # ----------------------------------------#
         # Model Parameters
@@ -13,8 +15,12 @@ class Input_parameters_class:
 
         self.dt = 0.001                 # Simulation step size
         self.chunk_seconds = int(86400)   # chunking to reduce the RAM usage
-        self.saving_dataframes = True   # Set True if you want to save dataframes and False if you don't want to save dataframes.
-        self.plotting_values = True     # Set True if you want to plot values and False if you don't want to plot values.
+        self.Plotting_electrical_flag = True # True False
+        self.Plotting_lifetime_flag = True
+        self.Plotting_electrical_loss_flag = True
+        self.Plotting_thermal_flag = True
+        self.Plotting_Monte_Carlo_flag = True
+
 
         # -----------------------------
         # Power Cycle Model Parameters
@@ -61,7 +67,8 @@ class Input_parameters_class:
 
         self.Cauer_model_accuracy = 1e-3 # 1e-3 is the optimum balance between accuracy and computation
         self.deltaT_min = 30             # As LESIT model is invalid below 30 K hence we are going to clamp any value below 30 K as 30 K
-        self.T_env = np.full(Profile_size, 298.15, dtype=np.float64)  # [K] Ambient Temperature
+        #self.T_env = np.full(Profile_size, 298.15, dtype=np.float64)  # [K] Ambient Temperature
+        self.T_env = T_env
 
         # IGBT
 
@@ -163,22 +170,27 @@ class Input_parameters_class:
         
         '''
 
-        S_in = 50000
-        pf_in = 1
+        #S_in = 50000
+        #pf_in = 1
 
         #print("S", S_in)
         #print("pf", pf_in)
 
-        P_in = abs(S_in*pf_in)
-        Q_in = np.sqrt(S_in**2 - P_in**2)
-        if pf_in<0:
-            Q_in = Q_in*-1
+        #P_in = abs(S_in*pf_in)
+        #Q_in = np.sqrt(S_in**2 - P_in**2)
+        #if pf_in<0:
+        #    Q_in = Q_in*-1
 
         #print("P",P_in)
         #print("Q", Q_in)
 
-        self.P = np.full(Profile_size, P_in)  # [W]   Inverter RMS Active power  [Will always be positive] # Rated power = 48790
-        self.Q = np.full(Profile_size, Q_in)  # [VAr] Inverter RMS Reactive power [Negative is inductive and positive is capacitive]
+        #self.P = np.full(Profile_size, P_in)  # [W]   Inverter RMS Active power  [Will always be positive] # Rated power = 48790
+        #self.Q = np.full(Profile_size, Q_in)  # [VAr] Inverter RMS Reactive power [Negative is inductive and positive is capacitive]
+
+        self.P = P
+        self.Q = Q
+
+        Profile_size = len(P)
 
         self.Vs = np.full(Profile_size, 230)  # [V] Inverter phase RMS AC side voltage
         self.V_dc = np.full(Profile_size, 600)  # [V] Inverter DC side voltage
