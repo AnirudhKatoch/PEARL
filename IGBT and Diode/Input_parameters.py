@@ -5,7 +5,7 @@ class Input_parameters_class:
 
     def __init__(self):
 
-        Profile_size = 60 # This is just to make a profile , one should put its own profile. # 31536000
+        Profile_size = 60  # This is just to make a profile , one should put its own profile. # 31536000
 
         # ----------------------------------------#
         # Model Parameters
@@ -44,6 +44,8 @@ class Input_parameters_class:
         self.max_IGBT_temperature = 448.15  # [K] Maximum IGBT temperature
         self.max_Diode_current = 30         # [A] Maximum Diode Current limit
         self.max_Diode_temperature = 448.15 # [K] Maximum Diode temperature
+        self.IGBT_max_life = 15 # years
+        self.Diode_max_life = 15  # years
 
         # ----------------------------------------#
         # Miscellaneous
@@ -162,18 +164,18 @@ class Input_parameters_class:
         '''
 
         S_in = 50000
-        pf_in = 0
+        pf_in = 1
 
-        print("S", S_in)
-        print("pf", pf_in)
+        #print("S", S_in)
+        #print("pf", pf_in)
 
         P_in = abs(S_in*pf_in)
         Q_in = np.sqrt(S_in**2 - P_in**2)
         if pf_in<0:
             Q_in = Q_in*-1
 
-        print("P",P_in)
-        print("Q", Q_in)
+        #print("P",P_in)
+        #print("Q", Q_in)
 
         self.P = np.full(Profile_size, P_in)  # [W]   Inverter RMS Active power  [Will always be positive] # Rated power = 48790
         self.Q = np.full(Profile_size, Q_in)  # [VAr] Inverter RMS Reactive power [Negative is inductive and positive is capacitive]

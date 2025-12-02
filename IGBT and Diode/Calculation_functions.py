@@ -473,7 +473,13 @@ class Calculation_functions_class:
         df_electrical_dir = sim_dir / "df_electrical"
         df_electrical_dir.mkdir(exist_ok=True)
 
-        return sim_dir, df_electrical_loss_dir, df_thermal_dir, df_lifetime_IGBT_dir,df_lifetime_Diode_dir,df_electrical_dir, Figures_dir
+        df_lifetime_IGBT_MC_dir = sim_dir / "df_lifetime_IGBT_MC"
+        df_lifetime_IGBT_MC_dir.mkdir(exist_ok=True)
+
+        df_lifetime_Diode_MC_dir = sim_dir / "df_lifetime_Diode_MC"
+        df_lifetime_Diode_MC_dir.mkdir(exist_ok=True)
+
+        return sim_dir, df_electrical_loss_dir, df_thermal_dir, df_lifetime_IGBT_dir,df_lifetime_Diode_dir,df_electrical_dir, Figures_dir, df_lifetime_IGBT_MC_dir, df_lifetime_Diode_MC_dir
 
     @staticmethod
     def rainflow_algorithm(temp, dt):
@@ -599,6 +605,7 @@ class Calculation_functions_class:
                             c_arrhenius=c_arrhenius, thermal_cycle_period=thermal_cycle_period))
         return Nf
 
+
     @staticmethod
     def miners_rule(Nf, count, Is):
         Nf = np.asarray(Nf, dtype=float)
@@ -608,23 +615,27 @@ class Calculation_functions_class:
         mask = (Nf > 0) & np.isfinite(Nf) & np.isfinite(count)
         Nf = Nf[mask]
         count = count[mask]
-
         # Damage sum: D = Σ (count_i / Nf_i)
         D = np.sum(count / Nf)
-
-        #print("count",count)
-
         # Equivalent full cycles to failure: Nf_eq = 1 / D
         Nf_eq = np.inf if D == 0 else 1.0 / D
 
-
         mission_seconds_total = len(Is)
-
-
         seconds_per_year = 365 * 24 * 3600
         lifetime_years = (Nf_eq*mission_seconds_total)/(seconds_per_year)
 
-        return Nf_eq, lifetime_years
+        # ---- From here: get LC_year and Nf_target ----
+        # Yearly life consumption
+        LC_year = 1.0 / lifetime_years  # because LC_year * lifetime_years = 1
+
+        # Equivalent static: cycles per year (Table IV uses 50 Hz → *50)
+        cycles_per_year = seconds_per_year * 50.0
+
+        # Nf_target in cycles (this is what you want)
+        Nf_target_MC = cycles_per_year / LC_year  # same as cycles_per_year * lifetime_years
+
+
+        return Nf_eq, lifetime_years, Nf_target_MC
 
     @staticmethod
     def read_datafames(df_dir):
@@ -647,3 +658,75 @@ class Calculation_functions_class:
         if  (np.max(Tj_diode) > max_Diode_temperature):
             raise ValueError(f"Diode  junction temperature exceeded! "
                              f"Max temperature is {np.max(Tj_diode - 273.15)} Celsius.")
+
+
+    @staticmethod
+    def residual_deltaT_MC(deltaT, Nf_target, Tmean, thermal_cycle_period,
+                           A0, A1, T0_K, lambda_K, alpha, Ea_J, kB_J_per_K,
+                           C, gamma, k_thickness):
+
+        # Arrhenius temperature factor: exp(Ea / (kB * Tmean))
+        c_arrhenius = ne.evaluate("exp(Ea_J / (kB_J_per_K * Tmean))",
+                                  local_dict=dict(Ea_J=Ea_J, kB_J_per_K=kB_J_per_K, Tmean=Tmean))
+
+        # exp_low = exp( - (ΔT - T0_K) / λ )
+        exp_low = ne.evaluate("exp(-(deltaT - T0_K) / lambda_K)",
+                              local_dict=dict(deltaT=deltaT, T0_K=T0_K, lambda_K=lambda_K))
+
+        Nf = ne.evaluate(
+            "A0 * (A1 ** exp_low) * "
+            "(deltaT ** (alpha - exp_low)) * "
+            "c_arrhenius * "
+            "((C + thermal_cycle_period**gamma) / (C + 2.0**gamma)) * "
+            "k_thickness",
+            local_dict=dict(A0=A0, A1=A1, alpha=alpha, C=C,
+                            gamma=gamma, k_thickness=k_thickness, deltaT=deltaT, exp_low=exp_low,
+                            c_arrhenius=c_arrhenius, thermal_cycle_period=thermal_cycle_period))
+
+        return Nf - Nf_target
+
+    @staticmethod
+    def normal_distributio_MC(Tj_mean_MC, deltaT_MC, thermal_cycle_period_MC, A0, A1, T0_K, lambda_K, alpha, Ea_J,
+                              kB_J_per_K, C, gamma, k_thickness, normal_distribution, number_of_samples):
+
+        """
+        Create Monte Carlo samples for ALL stress parameters and ALL
+        lifetime-model parameters using a normal distribution.
+
+        Parameters are interpreted as the *nominal values* around which
+        the samples are drawn.
+        """
+
+        def normal_distribution_function(variable, normal_distribution, number_of_samples):
+            sigma = normal_distribution * abs(variable)
+            samples = np.random.normal(variable, sigma, number_of_samples)
+            return samples
+
+        # --------------------------------------------
+        # Generate samples for equivalent stress values
+        # --------------------------------------------
+
+        Tj_mean_samples = normal_distribution_function(Tj_mean_MC, normal_distribution, number_of_samples)
+        deltaT_samples = normal_distribution_function(deltaT_MC, normal_distribution, number_of_samples)
+        thermal_period_samples = normal_distribution_function(thermal_cycle_period_MC, normal_distribution,
+                                                              number_of_samples)
+
+        # --------------------------------------------
+        # Generate samples for lifetime-model parameters
+        # --------------------------------------------
+        A0_samples = normal_distribution_function(A0, normal_distribution, number_of_samples)
+        A1_samples = normal_distribution_function(A1, normal_distribution, number_of_samples)
+        T0_K_samples = normal_distribution_function(T0_K, normal_distribution, number_of_samples)
+        lambda_K_samples = normal_distribution_function(lambda_K, normal_distribution, number_of_samples)
+        alpha_samples = normal_distribution_function(alpha, normal_distribution, number_of_samples)
+        C_samples = normal_distribution_function(C, normal_distribution, number_of_samples)
+        gamma_samples = normal_distribution_function(gamma, normal_distribution, number_of_samples)
+        k_th_samples = normal_distribution_function(k_thickness, normal_distribution, number_of_samples)
+
+        Ea_J_samples = np.full(number_of_samples, Ea_J)
+        kB_samples = np.full(number_of_samples, kB_J_per_K)
+
+        return {"Tj_mean": Tj_mean_samples, "deltaT": deltaT_samples, "thermal_period": thermal_period_samples,
+                "A0": A0_samples, "A1": A1_samples, "T0_K": T0_K_samples, "lambda_K": lambda_K_samples,
+                "alpha": alpha_samples, "Ea_J": Ea_J_samples, "kB_J_per_K": kB_samples, "C": C_samples,
+                "gamma": gamma_samples, "k_thickness": k_th_samples}

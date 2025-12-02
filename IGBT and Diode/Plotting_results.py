@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import weibull_min
 
 def Plotting_lifetime(df_IGBT, df_Diode, Nf_igbt_eq, lifetime_years_igbt, Nf_diode_eq, lifetime_years_diode, Figures_dir):
 
@@ -185,6 +186,32 @@ def Plotting_lifetime(df_IGBT, df_Diode, Nf_igbt_eq, lifetime_years_igbt, Nf_dio
     plt.savefig(Figures_dir / "12_Lifetime_Years_TwinAxis.png")
     plt.close(fig12)
 
+    # -------------------------------------------------
+    # Figure 12a: Lifetime of Switch (Minimum of IGBT/Diode)
+    # -------------------------------------------------
+
+    # Switch lifetime = the smaller of the two
+    lifetime_years_switch = min(lifetime_years_igbt, lifetime_years_diode)
+
+    fig12a, ax = plt.subplots(figsize=(6.4, 4.8))
+
+    # Simple single bar
+    ax.bar(0, lifetime_years_switch, width=0.5, color="C2", label="Switch")
+
+    # Labels and title
+    ax.set_ylabel("Switch Lifetime [years]")
+    ax.set_title("Switch Lifetime (Min of IGBT & Diode)")
+
+    # X-axis label
+    ax.set_xticks([0])
+    ax.set_xticklabels(["Switch"])
+
+    # Grid for readability
+    ax.grid(axis="y")
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "12a_Lifetime_Switch.png")
+    plt.close(fig12a)
 
 def Plotting_electrical(S,P,Q,Vs,Is,V_dc,pf,phi,T_env, Figures_dir):
 
@@ -308,8 +335,8 @@ def Plotting_electrical_loss(df_electrical_loss, Figures_dir):
 
     fig13, ax = plt.subplots(figsize=(6.4, 4.8))
 
-    print("P_I",np.sqrt(np.mean(df_electrical_loss["P_I"] ** 2)))
-    print("P_D", np.sqrt(np.mean(df_electrical_loss["P_D"] ** 2)))
+    #print("P_I",np.sqrt(np.mean(df_electrical_loss["P_I"] ** 2)))
+    #print("P_D", np.sqrt(np.mean(df_electrical_loss["P_D"] ** 2)))
 
     ax.plot(df_electrical_loss["time"], df_electrical_loss["P_I"], label="P_I (IGBT)")
     ax.plot(df_electrical_loss["time"], df_electrical_loss["P_D"], label="P_D (Diode)")
@@ -331,8 +358,8 @@ def Plotting_electrical_loss(df_electrical_loss, Figures_dir):
 
     fig14, ax = plt.subplots(figsize=(6.4, 4.8))
 
-    print("is_I",np.sqrt(np.mean(df_electrical_loss["is_I"] ** 2)))
-    print("is_D", np.sqrt(np.mean(df_electrical_loss["is_D"] ** 2)))
+    #print("is_I",np.sqrt(np.mean(df_electrical_loss["is_I"] ** 2)))
+    #print("is_D", np.sqrt(np.mean(df_electrical_loss["is_D"] ** 2)))
 
     ax.plot(df_electrical_loss["time"], df_electrical_loss["is_I"], label="is_I (IGBT)")
     ax.plot(df_electrical_loss["time"], df_electrical_loss["is_D"], label="is_D (Diode)")
@@ -388,16 +415,14 @@ def Plotting_electrical_loss(df_electrical_loss, Figures_dir):
     plt.savefig(Figures_dir / "16_ConductionLosses_P_con_I_P_con_D.png")
     plt.close(fig16)
 
-
 def Plotting_thermal(df_thermal, Figures_dir):
 
     # -------------------------------------------------
     # Figure 17: Junction Temperatures (Tj_igbt, Tj_diode)
     # -------------------------------------------------
 
-
-    print("Tj_igbt",np.sqrt(np.mean((df_thermal["Tj_igbt"]-273.15) ** 2)))
-    print("Tj_diode", np.sqrt(np.mean((df_thermal["Tj_diode"]-273.15) ** 2)))
+    #print("Tj_igbt",np.sqrt(np.mean((df_thermal["Tj_igbt"]-273.15) ** 2)))
+    #print("Tj_diode", np.sqrt(np.mean((df_thermal["Tj_diode"]-273.15) ** 2)))
 
     fig17, ax = plt.subplots(figsize=(6.4, 4.8))
 
@@ -419,8 +444,8 @@ def Plotting_thermal(df_thermal, Figures_dir):
     # Figure 18: Case and Heat Sink Temperatures (T_case, T_sink)
     # -------------------------------------------------
 
-    print("T_case",np.sqrt(np.mean((df_thermal["T_case"]-273.15) ** 2)))
-    print("T_sink", np.sqrt(np.mean((df_thermal["T_sink"]-273.15) ** 2)))
+    #print("T_case",np.sqrt(np.mean((df_thermal["T_case"]-273.15) ** 2)))
+    #print("T_sink", np.sqrt(np.mean((df_thermal["T_sink"]-273.15) ** 2)))
 
     fig18, ax = plt.subplots(figsize=(6.4, 4.8))
 
@@ -437,3 +462,132 @@ def Plotting_thermal(df_thermal, Figures_dir):
     plt.tight_layout()
     plt.savefig(Figures_dir / "18_Tcase_Tsink.png")
     plt.close(fig18)
+
+def Plotting_IGBT_MC(df_lifetime_igbt_MC, df_lifetime_diode_MC, Figures_dir):
+
+    # -------------------------------------------------
+    # Figure 19: Weibull PDF for IGBT Lifetime
+    # -------------------------------------------------
+
+    lifetimes_igbt = df_lifetime_igbt_MC["Lifetime_igbt_MC"].values
+
+    # If all values are identical → add tiny variation (0.1%)
+    if np.std(lifetimes_igbt) < 1e-12:
+        lifetimes_igbt = lifetimes_igbt + np.random.normal(loc=0.0, scale=0.0001 * lifetimes_igbt[0], size=len(lifetimes_igbt))
+
+    # --- Fit Weibull distribution (IGBT) ---
+    beta_igbt, _, eta_igbt = weibull_min.fit(lifetimes_igbt, floc=0.0)
+
+    # --- x-range (use full lifetime range for IGBT) ---
+    t_min_igbt, t_max_igbt = np.quantile(lifetimes_igbt, [0.0, 1.0])
+    t_vals_igbt = np.linspace(t_min_igbt, t_max_igbt, 500)
+
+    # --- Weibull PDF for IGBT ---
+    pdf_vals_igbt = ((beta_igbt / eta_igbt) * (t_vals_igbt / eta_igbt) ** (beta_igbt - 1) * np.exp(-(t_vals_igbt / eta_igbt) ** beta_igbt))
+
+    # --- Build the plot (IGBT) ---
+    fig19, ax19 = plt.subplots(figsize=(6.4, 4.8))
+
+    # Histogram (PDF-normalized)
+    ax19.hist(lifetimes_igbt, bins=40, range=(t_min_igbt, t_max_igbt), density=True, alpha=0.75, color="salmon", edgecolor="black")
+
+    # Overlay Weibull PDF
+    ax19.plot(t_vals_igbt, pdf_vals_igbt, 'k-', linewidth=2, label="Weibull PDF")
+
+    ax19.set_xlabel("Lifetime of IGBT [years]")
+    ax19.set_ylabel("Lifetime distribution f(x)  (PDF)")
+    ax19.set_title("IGBT – Lifetime Distribution and Weibull PDF")
+    ax19.grid(True)
+    ax19.legend(loc="best")
+
+    ax19.set_xlim(t_min_igbt, t_max_igbt)
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "19_weibull_pdf_hist_IGBT.png")
+    plt.close(fig19)
+
+    # -------------------------------------------------
+    # Figure 20: Weibull PDF for Diode Lifetime
+    # -------------------------------------------------
+
+    lifetimes_diode = df_lifetime_diode_MC["Lifetime_diode_MC"].values
+
+    # If all values are identical → add tiny variation (0.1%)
+    if np.std(lifetimes_diode) < 1e-12:
+        lifetimes_diode = lifetimes_diode + np.random.normal(loc=0.0, scale=0.0001 * lifetimes_diode[0], size=len(lifetimes_diode))
+
+    # --- Fit Weibull: shape = beta_diode, scale = eta_diode ---
+    beta_diode, _, eta_diode = weibull_min.fit(lifetimes_diode, floc=0.0)
+
+    # --- x-range for plotting (same idea as for IGBT) ---
+    t_min_diode, t_max_diode = np.quantile(lifetimes_diode, [0, 1])
+    t_vals_diode = np.linspace(t_min_diode, t_max_diode, 500)
+
+    # --- Weibull PDF ---
+    pdf_vals_diode = ((beta_diode / eta_diode) * (t_vals_diode / eta_diode) ** (beta_diode - 1) * np.exp(-(t_vals_diode / eta_diode) ** beta_diode))
+
+    # --- Build the plot (Fig. 20 style) ---
+    fig20, ax = plt.subplots(figsize=(6.4, 4.8))
+
+    # Histogram of lifetimes, normalized (PDF)
+    ax.hist(lifetimes_diode, bins=40, range=(t_min_diode, t_max_diode), density=True, alpha=0.75, color="salmon", edgecolor="black")
+
+    # Overlay Weibull PDF
+    ax.plot(t_vals_diode, pdf_vals_diode, "k-", linewidth=2, label="Weibull PDF")
+
+    ax.set_xlabel("Lifetime [years]")
+    ax.set_ylabel("Lifetime distribution f(x)  (PDF)")
+    ax.set_title("Diode – Lifetime Distribution and Weibull PDF")
+    ax.grid(True)
+    ax.legend(loc="best")
+
+    ax.set_xlim(t_min_diode, t_max_diode)
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "20_weibull_pdf_hist_diode.png")
+    plt.close(fig20)
+
+    # -------------------------------------------------
+    # Figure 21: Weibull PDF for Switch Lifetime
+    # -------------------------------------------------
+
+    # Element-wise minimum: switch fails when either IGBT or Diode fails
+    lifetimes_igbt_MC = df_lifetime_igbt_MC["Lifetime_igbt_MC"].values
+    lifetimes_diode_MC = df_lifetime_diode_MC["Lifetime_diode_MC"].values
+
+    lifetimes_switch = np.minimum(lifetimes_igbt_MC, lifetimes_diode_MC)
+
+    # If all values are identical → add tiny variation (0.01%)
+    if np.std(lifetimes_switch) < 1e-12:
+        lifetimes_switch = lifetimes_switch + np.random.normal(loc=0.0, scale=0.0001 * lifetimes_switch[0], size=len(lifetimes_switch))
+
+    # --- Fit Weibull distribution (Switch) ---
+    beta_switch, _, eta_switch = weibull_min.fit(lifetimes_switch, floc=0.0)
+
+    # --- x-range (use full lifetime range for Switch) ---
+    t_min_switch, t_max_switch = np.quantile(lifetimes_switch, [0.0, 1.0])
+    t_vals_switch = np.linspace(t_min_switch, t_max_switch, 500)
+
+    # --- Weibull PDF for Switch ---
+    pdf_vals_switch = ((beta_switch / eta_switch) * (t_vals_switch / eta_switch) ** (beta_switch - 1) * np.exp(-(t_vals_switch / eta_switch) ** beta_switch))
+
+    # --- Build the plot (Switch) ---
+    fig21, ax21 = plt.subplots(figsize=(6.4, 4.8))
+
+    # Histogram (PDF-normalized)
+    ax21.hist(lifetimes_switch, bins=40, range=(t_min_switch, t_max_switch), density=True, alpha=0.75, color="salmon", edgecolor="black")
+
+    # Overlay Weibull PDF
+    ax21.plot(t_vals_switch, pdf_vals_switch, 'k-', linewidth=2, label="Weibull PDF")
+
+    ax21.set_xlabel("Lifetime of Switch [years]")
+    ax21.set_ylabel("Lifetime distribution f(x)  (PDF)")
+    ax21.set_title("Switch – Lifetime Distribution and Weibull PDF")
+    ax21.grid(True)
+    ax21.legend(loc="best")
+
+    ax21.set_xlim(t_min_switch, t_max_switch)
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "21_weibull_pdf_hist_switch.png")
+    plt.close(fig21)

@@ -1,12 +1,12 @@
+from scipy.optimize import brentq
 from Input_parameters import Input_parameters_class
 import numpy as np
 from Calculation_functions import Calculation_functions_class
-import matplotlib.pyplot as plt
 from Electrical_model import compute_IGBT_and_Diode_power_losses
 import time
 from Thermal_model import simulate_igbt_diode_cauer
 import pandas as pd
-from Plotting_results import Plotting_lifetime,Plotting_electrical,Plotting_electrical_loss,Plotting_thermal
+from Plotting_results import Plotting_lifetime,Plotting_electrical,Plotting_electrical_loss,Plotting_thermal, Plotting_IGBT_MC
 
 Calculation_functions = Calculation_functions_class()
 
@@ -25,7 +25,7 @@ A0 = params.A0; A1 = params.A1; T0_K =  params.T0_K; lambda_K = params.lambda_K;
 
 max_IGBT_temperature = params.max_IGBT_temperature; max_Diode_temperature = params.max_Diode_temperature
 
-f = params.f; omega = params.omega; T0_init = params.T0_init
+f = params.f; omega = params.omega; T0_init = params.T0_init; IGBT_max_life = params.IGBT_max_life; Diode_max_life = params.Diode_max_life
 
 Cauer_model_accuracy = params.Cauer_model_accuracy; deltaT_min = params.deltaT_min; T_env = params.T_env
 r_I =params.r_I; cap_I = params.cap_I; r_D = params.r_D; cap_D = params.cap_D; r_paste = params.r_paste; cap_paste = params.cap_paste; r_sink = params.r_sink; cap_sink = params.cap_sink
@@ -35,7 +35,7 @@ R_IGBT = params.R_IGBT; V_0_IGBT = params.V_0_IGBT; R_D = params.R_D; V_0_D = pa
 
 S = params.S; P = params.P; Q = params.Q; pf = params.pf; Vs = params.Vs; Is = params.Is; V_dc = params.V_dc; phi = params.phi; M = params.M
 
-sim_dir, df_electrical_loss_dir, df_thermal_dir, df_lifetime_IGBT_dir, df_lifetime_Diode_dir, df_electrical_dir, Figures_dir = Calculation_functions.create_simulation_folders()
+sim_dir, df_electrical_loss_dir, df_thermal_dir, df_lifetime_IGBT_dir, df_lifetime_Diode_dir, df_electrical_dir, Figures_dir, df_lifetime_IGBT_MC_dir, df_lifetime_Diode_MC_dir = Calculation_functions.create_simulation_folders()
 
 # ----------------------------------------#
 # Chunking setup
@@ -53,7 +53,7 @@ for chunk_idx in range(n_chunks):
     if sec_start >= sec_end:
         break  # safety
 
-    print(f"\n--- Chunk {chunk_idx+1}/{n_chunks} ---")
+    #print(f"\n--- Chunk {chunk_idx+1}/{n_chunks} ---")
 
     Is_chunk   = Is[sec_start:sec_end]
     phi_chunk = phi[sec_start:sec_end]
@@ -134,14 +134,18 @@ for chunk_idx in range(n_chunks):
     # Delete time arrays
     del time_local, time_global
 
-    deltaT_igbt, Tmean_igbt, thermal_cycle_period_igbt,count_igbt = Calculation_functions.rainflow_algorithm(Tj_igbt,dt)
+    deltaT_igbt, Tmean_igbt, thermal_cycle_period_igbt, count_igbt = Calculation_functions.rainflow_algorithm(Tj_igbt,dt)
     deltaT_diode, Tmean_diode, thermal_cycle_period_diode, count_diode = Calculation_functions.rainflow_algorithm(Tj_diode, dt)
 
     #deltaT_igbt = np.clip(deltaT_igbt, 20,200)
     #deltaT_diode = np.clip(deltaT_diode, 20,200)
 
     # Delete thermal arrays
-    del Tj_igbt,Tj_diode
+    del Tj_igbt, Tj_diode
+
+    # ----------------------------------------#
+    # Lifetime calculations
+    # ----------------------------------------#
 
     Nf_igbt = Calculation_functions.cycles_to_failure_lesit(deltaT=deltaT_igbt, Tmean=Tmean_igbt,
                                                                   thermal_cycle_period=thermal_cycle_period_igbt, A0=A0,
@@ -165,43 +169,131 @@ for chunk_idx in range(n_chunks):
 
     del deltaT_diode, Tmean_diode, thermal_cycle_period_diode, Nf_diode, count_diode, df_lifetime_Diode_chunk
 
-Plotting_electrical(S=S,P=P,Q=Q,Vs=Vs,Is=Is,V_dc=V_dc,pf=pf,phi=phi,T_env=T_env,Figures_dir=Figures_dir)
+# ----------------------------------------#
+# Electrical saving and plotting
+# ----------------------------------------#
 
+Plotting_electrical(S=S,P=P,Q=Q,Vs=Vs,Is=Is,V_dc=V_dc,pf=pf,phi=phi,T_env=T_env,Figures_dir=Figures_dir)
 df_electrical = pd.DataFrame({ "S":S, "P":P, "Q":Q, "pf":pf, "Vs":Vs, "Is": Is, "V_dc":V_dc, "phi":phi, "T_env":T_env})
 df_electrical.to_parquet(df_electrical_dir / f"df.parquet", index=False,engine="pyarrow")
 del S, P, Q, pf, Vs , V_dc, phi, T_env, df_electrical
 
+# ----------------------------------------#
+# Lifetime saving and plotting
+# ----------------------------------------#
+
 df_IGBT = Calculation_functions.read_datafames(df_dir=df_lifetime_IGBT_dir)
 Nf_igbt = df_IGBT["Nf_igbt"].to_numpy()
 count_igbt = df_IGBT["count_igbt"].to_numpy()
-Nf_igbt_eq, lifetime_years_igbt = Calculation_functions.miners_rule(Nf=Nf_igbt, count=count_igbt, Is=Is)
-print("lifetime_years_igbt",lifetime_years_igbt)
+Nf_igbt_eq, lifetime_years_igbt, Nf_target_igbt_MC = Calculation_functions.miners_rule(Nf=Nf_igbt, count=count_igbt, Is=Is)
+lifetime_years_igbt = np.minimum(lifetime_years_igbt, IGBT_max_life)
+
+df_IGBT["Nf_igbt_eq"] = 0.0
+df_IGBT["lifetime_years_igbt"] = 0.0
+df_IGBT["Nf_target_igbt_MC"] = 0.0
+target_index = df_IGBT.index[0]
+df_IGBT.loc[target_index, "Nf_igbt_eq"] = float(Nf_igbt_eq)
+df_IGBT.loc[target_index, "lifetime_years_igbt"] = float(lifetime_years_igbt)
+df_IGBT.loc[target_index, "Nf_target_igbt_MC"] = float(Nf_target_igbt_MC)
+df_IGBT.to_parquet(df_lifetime_IGBT_dir / "df_IGBT_final.parquet",index=False,engine="pyarrow")
 
 df_Diode = Calculation_functions.read_datafames(df_dir=df_lifetime_Diode_dir)
 Nf_diode = df_Diode["Nf_diode"].to_numpy()
 count_diode = df_Diode["count_diode"].to_numpy()
-Nf_diode_eq, lifetime_years_diode = Calculation_functions.miners_rule(Nf=Nf_diode, count=count_diode, Is=Is)
-print("lifetime_years_diode",lifetime_years_diode)
+Nf_diode_eq, lifetime_years_diode, Nf_target_diode_MC = Calculation_functions.miners_rule(Nf=Nf_diode, count=count_diode, Is=Is)
+lifetime_years_diode = np.minimum(lifetime_years_diode, Diode_max_life)
+
+df_Diode["Nf_diode_eq"] = 0.0
+df_Diode["lifetime_years_diode"] = 0.0
+df_Diode["Nf_target_diode_MC"] = 0.0
+target_index = df_Diode.index[0]
+df_Diode.loc[target_index, "Nf_diode_eq"] = float(Nf_diode_eq)
+df_Diode.loc[target_index, "lifetime_years_diode"] = float(lifetime_years_diode)
+df_Diode.loc[target_index, "Nf_target_diode_MC"] = float(Nf_target_diode_MC)
+df_Diode.to_parquet(df_lifetime_Diode_dir / "df_Diode_final.parquet",index=False,engine="pyarrow")
+
 del Is
 
 Plotting_lifetime(df_IGBT=df_IGBT, df_Diode=df_Diode, Nf_igbt_eq=Nf_igbt_eq, lifetime_years_igbt=lifetime_years_igbt, Nf_diode_eq=Nf_diode_eq, lifetime_years_diode=lifetime_years_diode,Figures_dir=Figures_dir)
 del lifetime_years_igbt,lifetime_years_diode,Nf_igbt_eq,Nf_diode_eq,df_IGBT,df_Diode,Nf_igbt,count_igbt,Nf_diode,count_diode
 
+# ----------------------------------------#
+# Electrical loss plotting
+# ----------------------------------------#
+
 df_electrical_loss = Calculation_functions.read_datafames(df_dir=df_electrical_loss_dir)
 Plotting_electrical_loss(df_electrical_loss=df_electrical_loss, Figures_dir=Figures_dir)
 del df_electrical_loss
 
+# ----------------------------------------#
+# Thermal plotting
+# ----------------------------------------#
+
 df_thermal = Calculation_functions.read_datafames(df_dir=df_thermal_dir)
-Plotting_thermal(df_thermal=df_thermal,Figures_dir=Figures_dir)
+Plotting_thermal(df_thermal=df_thermal, Figures_dir=Figures_dir)
+
+# ----------------------------------------#
+# Monte carlo calculations
+# ----------------------------------------#
+
+Tj_igbt_mean_MC = np.mean(df_thermal["Tj_igbt"])
+thermal_cycle_period_igbt_MC = 1/f
+Tj_diode_mean_MC = np.mean(df_thermal["Tj_diode"])
+thermal_cycle_period_diode_MC = 1/f
 del df_thermal
 
+deltaT_igbt_MC = brentq(Calculation_functions.residual_deltaT_MC,1.0, 150.0, args=(Nf_target_igbt_MC, Tj_igbt_mean_MC, thermal_cycle_period_igbt_MC,A0, A1, T0_K, lambda_K, alpha, Ea_J, kB_J_per_K,C, gamma, k_thickness["IGBT"]))
+deltaT_diode_MC = brentq(Calculation_functions.residual_deltaT_MC,1.0, 150.0, args=(Nf_target_diode_MC, Tj_diode_mean_MC, thermal_cycle_period_diode_MC,A0, A1, T0_K, lambda_K, alpha, Ea_J, kB_J_per_K,C, gamma, k_thickness["Diode"]))
 
+Igbt_MC_distribution_MC = Calculation_functions.normal_distributio_MC(Tj_mean_MC=Tj_igbt_mean_MC, deltaT_MC=deltaT_igbt_MC,
+                                                thermal_cycle_period_MC = thermal_cycle_period_igbt_MC,
+                                                A0=A0, A1=A1, T0_K=T0_K, lambda_K=lambda_K, alpha=alpha, Ea_J=Ea_J,
+                                                kB_J_per_K=kB_J_per_K, C= C, gamma=gamma, k_thickness=k_thickness["IGBT"],
+                                                normal_distribution = 0.01, number_of_samples=10000)
 
+Diode_MC_distribution_MC = Calculation_functions.normal_distributio_MC(Tj_mean_MC=Tj_diode_mean_MC, deltaT_MC=deltaT_diode_MC,
+                                                thermal_cycle_period_MC = thermal_cycle_period_diode_MC,
+                                                A0=A0, A1=A1, T0_K=T0_K, lambda_K=lambda_K, alpha=alpha, Ea_J=Ea_J,
+                                                kB_J_per_K=kB_J_per_K, C= C, gamma=gamma, k_thickness=k_thickness["Diode"],
+                                                normal_distribution = 0.01, number_of_samples=10000)
 
+Nf_igbt_MC = Calculation_functions.cycles_to_failure_lesit(deltaT=Igbt_MC_distribution_MC["deltaT"], Tmean=Igbt_MC_distribution_MC["Tj_mean"],
+                                                           thermal_cycle_period=Igbt_MC_distribution_MC["thermal_period"],
+                                                           A0=Igbt_MC_distribution_MC["A0"], A1=Igbt_MC_distribution_MC["A1"],
+                                                           T0_K=Igbt_MC_distribution_MC["T0_K"], lambda_K=Igbt_MC_distribution_MC["lambda_K"],
+                                                           alpha=Igbt_MC_distribution_MC["alpha"], Ea_J=Igbt_MC_distribution_MC["Ea_J"],
+                                                           kB_J_per_K=Igbt_MC_distribution_MC["kB_J_per_K"],
+                                                           C=Igbt_MC_distribution_MC["C"], gamma=Igbt_MC_distribution_MC["gamma"],
+                                                           k_thickness=Igbt_MC_distribution_MC["k_thickness"])
 
+Nf_Diode_MC = Calculation_functions.cycles_to_failure_lesit(deltaT=Diode_MC_distribution_MC["deltaT"], Tmean=Diode_MC_distribution_MC["Tj_mean"],
+                                                           thermal_cycle_period=Diode_MC_distribution_MC["thermal_period"],
+                                                           A0=Diode_MC_distribution_MC["A0"], A1=Diode_MC_distribution_MC["A1"],
+                                                           T0_K=Diode_MC_distribution_MC["T0_K"], lambda_K=Diode_MC_distribution_MC["lambda_K"],
+                                                           alpha=Diode_MC_distribution_MC["alpha"], Ea_J=Diode_MC_distribution_MC["Ea_J"],
+                                                           kB_J_per_K=Diode_MC_distribution_MC["kB_J_per_K"],
+                                                           C=Diode_MC_distribution_MC["C"], gamma=Diode_MC_distribution_MC["gamma"],
+                                                           k_thickness=Diode_MC_distribution_MC["k_thickness"])
 
+Lifetime_igbt_MC  = Nf_igbt_MC/(3600*24*365*f)
+Lifetime_igbt_MC = np.minimum(Lifetime_igbt_MC, IGBT_max_life)
 
+df_lifetime_igbt_MC = pd.DataFrame(Igbt_MC_distribution_MC)
+df_lifetime_igbt_MC["Nf_igbt_MC"] = Nf_igbt_MC
+df_lifetime_igbt_MC["Lifetime_igbt_MC"] = Lifetime_igbt_MC
+df_lifetime_igbt_MC.to_parquet( df_lifetime_IGBT_MC_dir / f"df.parquet", index=False,engine="pyarrow")
 
+Lifetime_diode_MC  = Nf_Diode_MC/(3600*24*365*f)
+Lifetime_diode_MC = np.minimum(Lifetime_diode_MC, Diode_max_life)
+
+df_lifetime_diode_MC = pd.DataFrame(Diode_MC_distribution_MC)
+df_lifetime_diode_MC["Nf_Diode_MC"] = Nf_Diode_MC
+df_lifetime_diode_MC["Lifetime_diode_MC"] = Lifetime_diode_MC
+df_lifetime_diode_MC.to_parquet( df_lifetime_Diode_MC_dir/ f"df.parquet", index=False,engine="pyarrow")
+
+Plotting_IGBT_MC(df_lifetime_igbt_MC=df_lifetime_igbt_MC,df_lifetime_diode_MC=df_lifetime_diode_MC, Figures_dir=Figures_dir)
+
+del df_lifetime_igbt_MC, Igbt_MC_distribution_MC, Nf_igbt_MC, Lifetime_igbt_MC, df_lifetime_diode_MC, Diode_MC_distribution_MC, Nf_Diode_MC, Lifetime_diode_MC
 
 end_time = time.time()
 print("Execution time all code:", end_time - start_time, "seconds")
