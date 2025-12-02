@@ -5,7 +5,7 @@ class Input_parameters_class:
 
     def __init__(self,P,Q,T_env):
 
-        #Profile_size = 1000  # This is just to make a profile , one should put its own profile. # 31536000
+        #Profile_size = 000  # This is just to make a profile , one should put its own profile. # 31536000
 
 
 

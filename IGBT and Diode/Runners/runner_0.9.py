@@ -11,13 +11,13 @@ from mother_function import mother_function
 import numpy as np
 
 S_in = 50000
-pf_in = 1
+pf_in = 0.9
 
 P_in = abs(S_in*pf_in)
 Q_in = np.sqrt(S_in**2 - P_in**2)
-
 if pf_in<0:
     Q_in = Q_in*-1
+
 
 Profile_size = 3600
 P = np.full(Profile_size,P_in)
