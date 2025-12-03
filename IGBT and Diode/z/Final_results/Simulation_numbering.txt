@@ -1,0 +1,83 @@
+E:\Python_environments\PEARL_environment\Scripts\python.exe "E:\PEARL\IGBT and Diode\main.py" 
+pf 1
+Simulation number Results\Simulation_1
+Execution time all code: 659.0091257095337 seconds
+##################################
+pf 0
+Simulation number Results\Simulation_2
+Execution time all code: 899.0996577739716 seconds
+##################################
+pf 0.9
+Simulation number Results\Simulation_3
+Execution time all code: 619.1700177192688 seconds
+##################################
+pf -0.9
+Simulation number Results\Simulation_4
+Execution time all code: 755.7299966812134 seconds
+##################################
+pf 0.8
+Simulation number Results\Simulation_5
+Execution time all code: 639.7917063236237 seconds
+##################################
+pf -0.8
+Simulation number Results\Simulation_6
+Execution time all code: 724.3883953094482 seconds
+##################################
+pf 0.7
+Simulation number Results\Simulation_7
+Execution time all code: 610.8656051158905 seconds
+##################################
+pf -0.7
+Simulation number Results\Simulation_8
+Execution time all code: 737.2646524906158 seconds
+##################################
+pf 0.6
+Simulation number Results\Simulation_9
+Execution time all code: 635.1523501873016 seconds
+##################################
+pf -0.6
+Simulation number Results\Simulation_10
+Execution time all code: 694.9921667575836 seconds
+##################################
+pf 0.5
+Simulation number Results\Simulation_11
+Execution time all code: 700.646478176117 seconds
+##################################
+pf -0.5
+Simulation number Results\Simulation_12
+Execution time all code: 680.6446664333344 seconds
+##################################
+pf 0.4
+Simulation number Results\Simulation_13
+Execution time all code: 710.7827887535095 seconds
+##################################
+pf -0.4
+Simulation number Results\Simulation_14
+Execution time all code: 678.015212059021 seconds
+##################################
+pf 0.3
+Simulation number Results\Simulation_15
+Execution time all code: 762.0275869369507 seconds
+##################################
+pf -0.3
+Simulation number Results\Simulation_16
+Execution time all code: 724.4194378852844 seconds
+##################################
+pf 0.2
+Simulation number Results\Simulation_17
+Execution time all code: 782.3207013607025 seconds
+##################################
+pf -0.2
+Simulation number Results\Simulation_18
+Execution time all code: 804.8173623085022 seconds
+##################################
+pf 0.1
+Simulation number Results\Simulation_19
+Execution time all code: 860.9452755451202 seconds
+##################################
+pf -0.1
+Simulation number Results\Simulation_20
+Execution time all code: 823.5673162937164 seconds
+##################################
+
+Process finished with exit code 0

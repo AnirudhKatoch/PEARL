@@ -6,20 +6,17 @@ class Input_parameters_class:
     def __init__(self,P,Q,T_env):
 
         #Profile_size = 000  # This is just to make a profile , one should put its own profile. # 31536000
-
-
-
         # ----------------------------------------#
         # Model Parameters
         # ----------------------------------------#
 
         self.dt = 0.001                 # Simulation step size
         self.chunk_seconds = int(86400)   # chunking to reduce the RAM usage
-        self.Plotting_electrical_flag = True # True False
-        self.Plotting_lifetime_flag = True
-        self.Plotting_electrical_loss_flag = True
-        self.Plotting_thermal_flag = True
-        self.Plotting_Monte_Carlo_flag = True
+        self.Plotting_electrical_flag = False # True False
+        self.Plotting_lifetime_flag = False
+        self.Plotting_electrical_loss_flag = False
+        self.Plotting_thermal_flag = False
+        self.Plotting_Monte_Carlo_flag = False
 
 
         # -----------------------------

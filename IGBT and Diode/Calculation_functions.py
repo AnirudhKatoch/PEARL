@@ -640,11 +640,20 @@ class Calculation_functions_class:
     @staticmethod
     def read_datafames(df_dir):
         df_dir = Path(df_dir)
-        all_files = sorted(df_dir.glob("df_*.parquet"))  # all chunk files
-        df_list = []
-        for f in all_files:
-            df = pd.read_parquet(f)
-            df_list.append(df)
+
+        # If df_dir is relative, make it relative to this file's directory
+        if not df_dir.is_absolute():
+            base_dir = Path(__file__).resolve().parent
+            df_dir = base_dir / df_dir
+
+        if not df_dir.exists():
+            raise FileNotFoundError(f"Directory does not exist: {df_dir}")
+
+        all_files = sorted(df_dir.glob("df_*.parquet"))
+        if not all_files:
+            raise ValueError(f"No parquet files matching 'df_*.parquet' in {df_dir}")
+
+        df_list = [pd.read_parquet(f) for f in all_files]
         full_df = pd.concat(df_list, ignore_index=True)
         return full_df
 

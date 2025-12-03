@@ -40,7 +40,6 @@ def mother_function(P,Q,T_env):
     sim_dir, df_electrical_loss_dir, df_thermal_dir, df_lifetime_IGBT_dir, df_lifetime_Diode_dir, df_electrical_dir, Figures_dir, df_lifetime_IGBT_MC_dir, df_lifetime_Diode_MC_dir = Calculation_functions.create_simulation_folders()
 
 
-    print("Simulation number",sim_dir)
     # ----------------------------------------#
     # Chunking setup
     # ----------------------------------------#
@@ -190,31 +189,24 @@ def mother_function(P,Q,T_env):
     df_IGBT = Calculation_functions.read_datafames(df_dir=df_lifetime_IGBT_dir)
     Nf_igbt = df_IGBT["Nf_igbt"].to_numpy()
     count_igbt = df_IGBT["count_igbt"].to_numpy()
-    Nf_igbt_eq, lifetime_years_igbt, Nf_target_igbt_MC = Calculation_functions.miners_rule(Nf=Nf_igbt, count=count_igbt, Is=Is)
-    lifetime_years_igbt = np.minimum(lifetime_years_igbt, IGBT_max_life)
+    Nf_igbt_eq, lifetime_years_igbt_actual, Nf_target_igbt_MC = Calculation_functions.miners_rule(Nf=Nf_igbt, count=count_igbt, Is=Is)
+    lifetime_years_igbt = np.minimum(lifetime_years_igbt_actual, IGBT_max_life)
 
-    df_IGBT["Nf_igbt_eq"] = 0.0
-    df_IGBT["lifetime_years_igbt"] = 0.0
-    df_IGBT["Nf_target_igbt_MC"] = 0.0
-    target_index = df_IGBT.index[0]
-    df_IGBT.loc[target_index, "Nf_igbt_eq"] = float(Nf_igbt_eq)
-    df_IGBT.loc[target_index, "lifetime_years_igbt"] = float(lifetime_years_igbt)
-    df_IGBT.loc[target_index, "Nf_target_igbt_MC"] = float(Nf_target_igbt_MC)
+    print("lifetime_years_igbt_actual",lifetime_years_igbt_actual)
+
+    df_IGBT.loc[df_IGBT.index[0], ["Nf_igbt_eq","lifetime_years_igbt", "Nf_target_igbt_MC", "lifetime_years_igbt_actual"]] \
+        = [float(Nf_igbt_eq),float(lifetime_years_igbt),float(Nf_target_igbt_MC),float(lifetime_years_igbt_actual),]
     df_IGBT.to_parquet(df_lifetime_IGBT_dir / "df_IGBT_final.parquet",index=False,engine="pyarrow")
+
 
     df_Diode = Calculation_functions.read_datafames(df_dir=df_lifetime_Diode_dir)
     Nf_diode = df_Diode["Nf_diode"].to_numpy()
     count_diode = df_Diode["count_diode"].to_numpy()
-    Nf_diode_eq, lifetime_years_diode, Nf_target_diode_MC = Calculation_functions.miners_rule(Nf=Nf_diode, count=count_diode, Is=Is)
-    lifetime_years_diode = np.minimum(lifetime_years_diode, Diode_max_life)
+    Nf_diode_eq, lifetime_years_diode_actual, Nf_target_diode_MC = Calculation_functions.miners_rule(Nf=Nf_diode, count=count_diode, Is=Is)
+    lifetime_years_diode = np.minimum(lifetime_years_diode_actual, Diode_max_life)
 
-    df_Diode["Nf_diode_eq"] = 0.0
-    df_Diode["lifetime_years_diode"] = 0.0
-    df_Diode["Nf_target_diode_MC"] = 0.0
-    target_index = df_Diode.index[0]
-    df_Diode.loc[target_index, "Nf_diode_eq"] = float(Nf_diode_eq)
-    df_Diode.loc[target_index, "lifetime_years_diode"] = float(lifetime_years_diode)
-    df_Diode.loc[target_index, "Nf_target_diode_MC"] = float(Nf_target_diode_MC)
+    df_Diode.loc[df_Diode.index[0], ["Nf_diode_eq", "lifetime_years_diode", "Nf_target_diode_MC", "lifetime_years_diode_actual"]] \
+        = [float(Nf_diode_eq), float(lifetime_years_diode), float(Nf_target_diode_MC), float(lifetime_years_diode_actual),]
     df_Diode.to_parquet(df_lifetime_Diode_dir / "df_Diode_final.parquet",index=False,engine="pyarrow")
 
     del Is
@@ -283,20 +275,22 @@ def mother_function(P,Q,T_env):
                                                                C=Diode_MC_distribution_MC["C"], gamma=Diode_MC_distribution_MC["gamma"],
                                                                k_thickness=Diode_MC_distribution_MC["k_thickness"])
 
-    Lifetime_igbt_MC  = Nf_igbt_MC/(3600*24*365*f)
-    Lifetime_igbt_MC = np.minimum(Lifetime_igbt_MC, IGBT_max_life)
+    Lifetime_igbt_MC_actual  = Nf_igbt_MC/(3600*24*365*f)
+    Lifetime_igbt_MC = np.minimum(Lifetime_igbt_MC_actual, IGBT_max_life)
 
     df_lifetime_igbt_MC = pd.DataFrame(Igbt_MC_distribution_MC)
     df_lifetime_igbt_MC["Nf_igbt_MC"] = Nf_igbt_MC
     df_lifetime_igbt_MC["Lifetime_igbt_MC"] = Lifetime_igbt_MC
+    df_lifetime_igbt_MC["Lifetime_igbt_MC_actual"] = Lifetime_igbt_MC_actual
     df_lifetime_igbt_MC.to_parquet( df_lifetime_IGBT_MC_dir / f"df.parquet", index=False,engine="pyarrow")
 
-    Lifetime_diode_MC  = Nf_Diode_MC/(3600*24*365*f)
-    Lifetime_diode_MC = np.minimum(Lifetime_diode_MC, Diode_max_life)
+    Lifetime_diode_MC_actual  = Nf_Diode_MC/(3600*24*365*f)
+    Lifetime_diode_MC = np.minimum(Lifetime_diode_MC_actual, Diode_max_life)
 
     df_lifetime_diode_MC = pd.DataFrame(Diode_MC_distribution_MC)
     df_lifetime_diode_MC["Nf_Diode_MC"] = Nf_Diode_MC
     df_lifetime_diode_MC["Lifetime_diode_MC"] = Lifetime_diode_MC
+    df_lifetime_diode_MC["Lifetime_diode_MC_actual"] = Lifetime_diode_MC_actual
     df_lifetime_diode_MC.to_parquet( df_lifetime_Diode_MC_dir/ f"df.parquet", index=False,engine="pyarrow")
 
     if Plotting_Monte_Carlo_flag == True:

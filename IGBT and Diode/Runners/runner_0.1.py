@@ -19,7 +19,7 @@ Q_in = np.sqrt(S_in**2 - P_in**2)
 if pf_in<0:
     Q_in = Q_in*-1
 
-Profile_size = 3600
+Profile_size = 900
 P = np.full(Profile_size,P_in)
 Q = np.full(Profile_size, Q_in)
 T_env = np.full(Profile_size, 298.15)
