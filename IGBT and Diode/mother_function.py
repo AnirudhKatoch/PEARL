@@ -4,7 +4,7 @@ import numpy as np
 from Calculation_functions import Calculation_functions_class
 from Electrical_model import compute_IGBT_and_Diode_power_losses
 import time
-from Thermal_model import simulate_igbt_diode_cauer, simulate_igbt_diode_cauer_new
+from Thermal_model import simulate_igbt_diode_cauer
 import pandas as pd
 from Plotting_results import Plotting_lifetime,Plotting_electrical,Plotting_electrical_loss,Plotting_thermal, Plotting_Monte_Carlo
 
@@ -191,8 +191,6 @@ def mother_function(P,Q,T_env):
     count_igbt = df_IGBT["count_igbt"].to_numpy()
     Nf_igbt_eq, lifetime_years_igbt_actual, Nf_target_igbt_MC = Calculation_functions.miners_rule(Nf=Nf_igbt, count=count_igbt, Is=Is)
     lifetime_years_igbt = np.minimum(lifetime_years_igbt_actual, IGBT_max_life)
-
-    print("lifetime_years_igbt_actual",lifetime_years_igbt_actual)
 
     df_IGBT.loc[df_IGBT.index[0], ["Nf_igbt_eq","lifetime_years_igbt", "Nf_target_igbt_MC", "lifetime_years_igbt_actual"]] \
         = [float(Nf_igbt_eq),float(lifetime_years_igbt),float(Nf_target_igbt_MC),float(lifetime_years_igbt_actual),]

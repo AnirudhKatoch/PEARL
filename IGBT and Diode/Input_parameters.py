@@ -6,6 +6,7 @@ class Input_parameters_class:
     def __init__(self,P,Q,T_env):
 
         #Profile_size = 000  # This is just to make a profile , one should put its own profile. # 31536000
+
         # ----------------------------------------#
         # Model Parameters
         # ----------------------------------------#
@@ -17,6 +18,8 @@ class Input_parameters_class:
         self.Plotting_electrical_loss_flag = False
         self.Plotting_thermal_flag = False
         self.Plotting_Monte_Carlo_flag = False
+        self.T0_init = None  # None for first chunk
+        self.Cauer_model_accuracy = 1e-3  # 1e-3 is the optimum balance between accuracy and computation
 
 
         # -----------------------------
@@ -56,13 +59,12 @@ class Input_parameters_class:
 
         self.f = 50                                                          # [Hz] Grid frequency
         self.omega = 2 * np.pi * self.f                                           # [rad/s] Angular frequency of the grid (ω = 2πf)
-        self.T0_init = None  # None for first chunk
 
         # ----------------------------------------#
         # Thermal Parameters
         # ----------------------------------------#
 
-        self.Cauer_model_accuracy = 1e-3 # 1e-3 is the optimum balance between accuracy and computation
+
         self.deltaT_min = 30             # As LESIT model is invalid below 30 K hence we are going to clamp any value below 30 K as 30 K
         #self.T_env = np.full(Profile_size, 298.15, dtype=np.float64)  # [K] Ambient Temperature
         self.T_env = T_env
@@ -82,6 +84,7 @@ class Input_parameters_class:
         self.r_D = np.array([4.915956e-2, 2.254532e-1, 3.125229e-1, 2.677344e-1, 1.951733e-1])  # [K/W] Thermal resistance
         self.tau_D = np.array([7.5e-6, 2.2e-4, 2.3e-3, 1.546046e-2, 1.078904e-1])               # [s]   Thermal time constant
         self.cap_D = self.tau_D / self.r_D                            # [J/K] Thermal capacitance
+
 
         # Thermal Paste
 
