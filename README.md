@@ -15,7 +15,7 @@ reliability evaluation.
 **Anirudh Katoch**  
 PhD Candidate, Technical University of Munich (TUM)  
 Chair of Renewable and Sustainable Energy Systems (ENS), CoSES Team  
-Supervisor: **Prof. Thomas Hamacher**  
+Supervisor: **Prof. Dr. Thomas Hamacher**  
 Mentor: **Prashant Pant**  
 📧 anirudh.katoch@tum.de  
 
