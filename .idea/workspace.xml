@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest">
-      <change afterPath="$PROJECT_DIR$/IGBT and Diode/z/trial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/PEARL.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PEARL.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Calculation_functions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Input_parameters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/Input_parameters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Results explanation.docx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Thermal_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/Thermal_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/mother_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/mother_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Plotting_final_results.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Plotting_final_results.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/trial.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/trial.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

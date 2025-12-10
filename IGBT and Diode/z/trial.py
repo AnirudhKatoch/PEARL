@@ -1,104 +1,107 @@
 
-def IGBT_and_Diode_Current():
+import numpy as np
+import numexpr as ne
+from pathlib import Path
+import rainflow
+import pandas as pd
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  # needed to register 3D projection
 
-    pf_values = [1, 0, 0.9, -0.9, 0.8, -0.8, 0.7, -0.7, 0.6, -0.6,
-                 0.5, -0.5, 0.4, -0.4, 0.3, -0.3, 0.2, -0.2, 0.1, -0.1]
+def cycles_to_failure_lesit(deltaT,  # ΔT_j   : array or scalar
+                            Tmean,  # T_jm   : array or scalar (K)
+                            thermal_cycle_period,  # : array or scalar (s)
+                            A0,
+                            A1,
+                            T0_K,
+                            lambda_K,  # T0_K, λ
+                            alpha,
+                            Ea_J,
+                            kB_J_per_K,  # activation energy, Boltzmann
+                            C,
+                            gamma,
+                            k_thickness):  # k_thickness for IGBT or diode
 
-    Power_losses_dict = {}
+    # Make sure inputs are float64 and contiguous (good for numexpr)
+    deltaT = np.ascontiguousarray(deltaT, dtype=np.float64)
+    Tmean = np.ascontiguousarray(Tmean, dtype=np.float64)
+    thermal_cycle_period = np.ascontiguousarray(thermal_cycle_period, dtype=np.float64)
 
-    # --- Fill dictionary from simulations ---
-    for i, pf in enumerate(pf_values, start=1):
-        folder = f"z/Final_results/Simulation_{i}/df_electrical_loss"
+    if np.any(Tmean <= 0):
+        raise ValueError("Tmean contains 0 K or negative values, which is not physically possible.")
 
-        df = Calculation_functions.read_datafames(df_dir=folder)
+    # Arrhenius temperature factor: exp(Ea / (kB * Tmean))
+    c_arrhenius = ne.evaluate("exp(Ea_J / (kB_J_per_K * Tmean))",
+                              local_dict=dict(Ea_J=Ea_J, kB_J_per_K=kB_J_per_K, Tmean=Tmean))
 
-        if pf < 0:
-            key_prefix = f"pf__{abs(pf)}"   # inductive (negative)
-        else:
-            key_prefix = f"pf_{pf}"         # capacitive (positive or 0)
+    # exp_low = exp( - (ΔT - T0_K) / λ )
+    exp_low = ne.evaluate("exp(-(deltaT - T0_K) / lambda_K)",
+                          local_dict=dict(deltaT=deltaT, T0_K=T0_K, lambda_K=lambda_K))
 
-        Power_losses_dict[f"{key_prefix}_P_I"] = float(df["is_I"].mean())
-        Power_losses_dict[f"{key_prefix}_P_D"] = float(df["is_D"].mean())
-
-        del df  # free memory
-
-    # --- Add synthetic inductive values at pf = 0 and pf = 1 ---
-    for pf in (1, 0):
-        cap_prefix = f"pf_{pf}"   # capacitive key
-        ind_prefix = f"pf__{pf}"  # inductive key
-
-        cap_key_I = f"{cap_prefix}_P_I"
-        cap_key_D = f"{cap_prefix}_P_D"
-        ind_key_I = f"{ind_prefix}_P_I"
-        ind_key_D = f"{ind_prefix}_P_D"
-
-        # If we have capacitive data but no inductive for this pf, copy it
-        if cap_key_I in Power_losses_dict and ind_key_I not in Power_losses_dict:
-            Power_losses_dict[ind_key_I] = Power_losses_dict[cap_key_I]
-            Power_losses_dict[ind_key_D] = Power_losses_dict[cap_key_D]
-
-
-    # ---- Extract pf values and losses for plotting ----
-    pf_abs = []
-    P_I_list = []
-    P_D_list = []
-    is_inductive_list = []  # True if pf__ (inductive), False if pf_ (capacitive)
-
-    # Work only on P_I keys to avoid duplication
-    for key in Power_losses_dict:
-        if key.endswith("_P_I"):
-            if key.startswith("pf__"):
-                # negative (inductive)
-                pf_str = key.split("__")[1].replace("_P_I", "")
-                is_inductive = True
-            else:
-                # positive or zero (capacitive)
-                pf_str = key.split("pf_")[1].replace("_P_I", "")
-                is_inductive = False
-
-            pf_val_abs = float(pf_str)
-            pf_abs.append(pf_val_abs)
-            is_inductive_list.append(is_inductive)
-
-            # IGBT
-            P_I_list.append(Power_losses_dict[key])
-
-            # Diode
-            diode_key = key.replace("_P_I", "_P_D")
-            P_D_list.append(Power_losses_dict[diode_key])
-
-    # Convert to numpy arrays and sort by |pf|
-    pf_abs = np.array(pf_abs)
-    P_I_arr = np.array(P_I_list)
-    P_D_arr = np.array(P_D_list)
-    is_inductive_arr = np.array(is_inductive_list)
-
-    idx = np.argsort(pf_abs)
-    pf_abs = pf_abs[idx]
-    P_I_arr = P_I_arr[idx]
-    P_D_arr = P_D_arr[idx]
-    is_inductive_arr = is_inductive_arr[idx]
-
-    # ---- Split by inductive vs capacitive (by key prefix, not numeric sign) ----
-    ind = is_inductive_arr
-    cap = ~is_inductive_arr
-
-    plt.figure(figsize=(6.4, 4.8))
-
-    # IGBT
-    plt.plot(pf_abs[cap], P_I_arr[cap], "-",  marker="o", color="blue",   label="IGBT (capacitive)", linewidth=2.5, markersize=10)
-    plt.plot(pf_abs[ind], P_I_arr[ind], "--", marker="o", color="orange", label="IGBT (inductive)")
-
-    # Diode
-    plt.plot(pf_abs[cap], P_D_arr[cap], "-",  marker="s", color="green",  label="Diode (capacitive)", linewidth=2.5, markersize=10)
-    plt.plot(pf_abs[ind], P_D_arr[ind], "--", marker="s", color="red",    label="Diode (inductive)")
+    Nf = ne.evaluate(
+        "A0 * (A1 ** exp_low) * "
+        "(deltaT ** (alpha - exp_low)) * "
+        "c_arrhenius * "
+        "((C + thermal_cycle_period**gamma) / (C + 2.0**gamma)) * "
+        "k_thickness",
+        local_dict=dict(A0=A0, A1=A1, alpha=alpha, C=C,
+                        gamma=gamma, k_thickness=k_thickness, deltaT=deltaT, exp_low=exp_low,
+                        c_arrhenius=c_arrhenius, thermal_cycle_period=thermal_cycle_period))
+    return Nf
 
 
-    plt.xlabel("Current [A]")
-    plt.ylabel("Power losses [W]")
-    #plt.title("Average power losses vs power factor")
-    plt.xlim(0, 1)
-    plt.grid(True)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig("Final_results/Figures/IGBT_and_Diode_current.pdf")
+A0 = 2.9e9  # Technology Coefficient
+A1 = 60  # Factor of Low ΔTj Extension
+T0_K = 40  # Initial Temperature for Low ΔTj Extension [K]
+lambda_K = 17  # Drop Constant of Low ΔTj Extension [K]
+alpha = -4.3  # Coffin-Manson Exponent
+Ea_J = 4.50e-20  # Activation Energy [J]
+kB_J_per_K = 1.38e-23  # Boltzmann Constant [J/K]
+C = 1  # Time Coefficient
+gamma = -0.75  # Time Exponent
+k_thickness = 1
+
+deltaT = np.linspace(0, 10, 100)
+Tmean = np.linspace(273.15+0, 273.15+50, 100)
+thermal_cycle_period = np.linspace(0.005, 1, 100)
+
+# ---- compute Nf ----
+Nf = cycles_to_failure_lesit(
+    deltaT=deltaT,
+    Tmean=Tmean,
+    thermal_cycle_period=thermal_cycle_period,
+    A0=A0,
+    A1=A1,
+    T0_K=T0_K,
+    lambda_K=lambda_K,
+    alpha=alpha,
+    Ea_J=Ea_J,
+    kB_J_per_K=kB_J_per_K,
+    C=C,
+    gamma=gamma,
+    k_thickness=k_thickness
+)
+
+# ---- 3D scatter: z = thermal cycle period,
+#      color = Nf ----
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+from matplotlib.colors import LogNorm
+sc = ax.scatter(
+    deltaT,
+    Tmean,
+    thermal_cycle_period,
+    c=Nf,
+    norm=LogNorm(),     # <<< log scale
+    cmap='viridis',
+    s=25
+)
+
+
+ax.set_xlabel(r'$\Delta T$')
+ax.set_ylabel(r'$T_{\mathrm{mean}}$ [K]')
+ax.set_zlabel('Thermal cycle period [s]')
+
+cbar = plt.colorbar(sc, label=r'$N_f$')
+
+
+plt.show()
