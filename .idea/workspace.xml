@@ -5,11 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest">
-      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Calculation_functions.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Input_parameters.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/trial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/trial.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/trial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Calculation_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Calculation_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Input_parameters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Research papers/1d2d3d925d652eb559222bfbffc7abcd.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
