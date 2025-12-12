@@ -25,7 +25,7 @@ class Input_parameters_class:
         # ----------------------------------------#
 
         S_in = 49250
-        pf_in = 1
+        pf_in = 0.5
 
         P_in = abs(S_in*pf_in)
         Q_in = np.sqrt(S_in**2 - P_in**2)
@@ -59,14 +59,15 @@ class Input_parameters_class:
         # Ambient temperatures
         # ----------------------------------------#
 
-        self.T_amb = np.full(Profile_size, 298.15+10)
+        self.T_env = np.full(Profile_size, 298.15+10)
 
         # ----------------------------------------#
         # Number of capacitors in parallel and series
         # ----------------------------------------#
 
-        self.N_parallel = 1  # Number of Capacitors in parallel
         self.N_series = 1  # Number of Capacitors in series
+        self.N_parallel = 1  # Number of Capacitors in parallel
+
 
         # Capacitor chosen : B32778J8806K000
 
@@ -131,18 +132,6 @@ class Input_parameters_class:
         # ----------------------------------------#
         # Lifetime Model Parameters
         # ----------------------------------------#
-
-
-
-
-
-
-
-
-
-
-
-
 
         # Graph-Based  Lifetime model
 

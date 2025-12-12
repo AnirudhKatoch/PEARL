@@ -274,7 +274,7 @@ class Calculation_functions_class:
         return Idcl
 
     @staticmethod
-    def core_temperature_calibration_factor(I_per_cap, ESR_eff, V_per_cap, minimum_insulation_resistance, T_core,T_amb,Thermal_resistance):
+    def core_temperature_calibration_factor(I_per_cap, ESR_eff, V_per_cap, minimum_insulation_resistance, T_core,T_env,Thermal_resistance):
 
         """
         Compute calibration factor for capacitor core-temperature model.
@@ -292,14 +292,14 @@ class Calculation_functions_class:
             Leakage resistance used to estimate leakage current [Ω].
         T_core : float
             Desired capacitor core/case temperature at rated conditions [°C].
-        T_amb : float
+        T_env : float
             Ambient temperature used in calibration [°C].
 
         Returns
         -------
         calibration_factor : float
             Scaling factor 'k' in the core-temperature model:
-                T_core = T_amb + k * Thermal_resistance * P_losses
+                T_core = T_env + k * Thermal_resistance * P_losses
 
         """
 
@@ -310,12 +310,12 @@ class Calculation_functions_class:
 
         P_losses = P_ripple + P_leak  # total losses per cap
 
-        calibration_factor_core_temp = (T_core - T_amb) / (Thermal_resistance * P_losses)
+        calibration_factor_core_temp = (T_core - T_env) / (Thermal_resistance * P_losses)
 
         return calibration_factor_core_temp
 
     @staticmethod
-    def core_temperature_calculationsI_cap(I_per_cap, ESR_eff, V_per_cap, minimum_insulation_resistance, T_amb,
+    def core_temperature_calculationsI_cap(I_per_cap, ESR_eff, V_per_cap, minimum_insulation_resistance, T_env,
                                                Thermal_resistance, calibration_factor_core_temp):
         """
             Compute capacitor core temperature using calibrated thermal model.
@@ -330,13 +330,13 @@ class Calculation_functions_class:
                 Per-capacitor operating DC voltage [V].
             minimum_insulation_resistance : float
                 Leakage resistance used to estimate leakage current [Ω].
-            T_amb : float or array
+            T_env : float or array
                 Ambient temperature [°C].
             Thermal_resistance : float
                 Thermal resistance of the capacitor [°C/W].
             calibration_factor_core_temp : float
                 Temperature scaling factor 'k' obtained from calibration:
-                    T_core = T_amb + k * Thermal_resistance * P_losses
+                    T_core = T_env + k * Thermal_resistance * P_losses
 
             Returns
             -------
@@ -352,7 +352,7 @@ class Calculation_functions_class:
 
         P_losses = P_ripple + P_leak  # total losses per cap
 
-        T_core = T_amb + calibration_factor_core_temp * Thermal_resistance * P_losses  # Capacitor temperature
+        T_core = T_env + calibration_factor_core_temp * Thermal_resistance * P_losses  # Capacitor temperature
 
         return T_core
 
@@ -661,7 +661,49 @@ class Calculation_functions_class:
 
         return D, lifetime_equiv_h
 
+    @staticmethod
+    def create_simulation_folders(base="Results"):
+        """
+        Creates:
+            Dataframes/
+                Simulation_N/
+                    df_electrical_loss/
+                    df_thermal/
 
+        Automatically increments Simulation_N.
+        Returns:
+            sim_dir, df_electrical_loss_dir, df_thermal_dir
+        """
+
+        base_dir = Path(base)
+        base_dir.mkdir(exist_ok=True)
+
+        # --- detect existing Simulation_N folders ---
+        existing = []
+        for p in base_dir.iterdir():
+            if p.is_dir() and p.name.startswith("Simulation_"):
+                try:
+                    n = int(p.name.split("_")[1])
+                    existing.append(n)
+                except (IndexError, ValueError):
+                    pass
+
+        # --- choose next folder number ---
+        next_n = max(existing) + 1 if existing else 1
+
+        # --- create Simulation_N folder ---
+        sim_dir = base_dir / f"Simulation_{next_n}"
+        sim_dir.mkdir(exist_ok=True)
+
+        # --- create subfolders ---
+        dataframes_dir = sim_dir / "Dataframes"
+        dataframes_dir.mkdir(exist_ok=True)
+
+        Figures_dir = sim_dir / "Figures"
+        Figures_dir.mkdir(exist_ok=True)
+
+
+        return sim_dir, dataframes_dir, Figures_dir
 
 
 
