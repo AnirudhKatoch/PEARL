@@ -615,7 +615,6 @@ class Calculation_functions_class:
 
         return L_out
 
-
     @staticmethod
     def miners_rule_lifetime(L_hours, Simulation_durations):
         """
@@ -704,6 +703,46 @@ class Calculation_functions_class:
 
 
         return sim_dir, dataframes_dir, Figures_dir
+
+    @staticmethod
+    def normal_distribution_function(variable, normal_distribution, number_of_samples):
+        sigma = normal_distribution * abs(variable)
+        samples = np.random.normal(variable, sigma, number_of_samples)
+        return samples
+
+    @staticmethod
+    def validate_lifetime_model(capacitor_type, model_name):
+
+        ALLOWED_LIFETIME_MODELS = {
+            "electrolytic": {
+                "Nichion_lifetime",
+                "Rubycon_lifetime",
+                "Panasonic_lifetime",
+                "Generic_Arrhenius_lifetime",
+                "Graph_Based_lifetime",
+            },
+            "film": {
+                "Cornell_Dubilier_lifetime",
+                "Faratronic_lifetime",
+                "Generic_Arrhenius_lifetime",
+                "Graph_Based_lifetime",
+            },
+        }
+
+        if capacitor_type not in ALLOWED_LIFETIME_MODELS:
+            raise ValueError(
+                f"Unknown capacitor_type '{capacitor_type}'. "
+                f"Expected one of {list(ALLOWED_LIFETIME_MODELS.keys())}."
+            )
+
+        if model_name not in ALLOWED_LIFETIME_MODELS[capacitor_type]:
+            raise ValueError(
+                f"Lifetime model '{model_name}' is not valid for "
+                f"capacitor type '{capacitor_type}'. "
+                f"Allowed models are: "
+                f"{sorted(ALLOWED_LIFETIME_MODELS[capacitor_type])}."
+            )
+
 
 
 

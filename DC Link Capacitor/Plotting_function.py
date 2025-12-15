@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import weibull_min
 
 plt.rcParams.update({"font.size": 15, "font.family": "Times New Roman", "axes.labelsize": 15, "axes.titlesize": 15,
                      "xtick.labelsize": 15, "ytick.labelsize": 15, "legend.fontsize": 15})
@@ -237,6 +238,65 @@ def Plotting(df,Figures_dir):
     plt.tight_layout()
     plt.savefig(Figures_dir / "10_Lifetime_capacitor.png")
     plt.close(fig10)
+
+
+def Plotting_MC(df_MC,Figures_dir):
+    # -------------------------------------------------
+    # Figure XX: Weibull PDF for Capacitor Lifetime
+    # -------------------------------------------------
+
+    lifetimes_cap = df_MC["Life_cap"].values
+
+    # If all values are identical → add tiny variation (0.1%)
+    if np.std(lifetimes_cap) < 1e-12:
+        lifetimes_cap = lifetimes_cap + np.random.normal(
+            loc=0.0,
+            scale=0.0001 * lifetimes_cap[0],
+            size=len(lifetimes_cap)
+        )
+
+    # --- Fit Weibull distribution (Capacitor) ---
+    beta_cap, _, eta_cap = weibull_min.fit(lifetimes_cap, floc=0.0)
+
+    # --- x-range (use full lifetime range for capacitor) ---
+    t_min_cap, t_max_cap = np.quantile(lifetimes_cap, [0.0, 1.0])
+    t_vals_cap = np.linspace(t_min_cap, t_max_cap, 500)
+
+    # --- Weibull PDF for Capacitor ---
+    pdf_vals_cap = (
+            (beta_cap / eta_cap)
+            * (t_vals_cap / eta_cap) ** (beta_cap - 1)
+            * np.exp(-(t_vals_cap / eta_cap) ** beta_cap)
+    )
+
+    # --- Build the plot (Capacitor) ---
+    fig_cap, ax_cap = plt.subplots(figsize=(6.4, 4.8))
+
+    # Histogram (PDF-normalized)
+    ax_cap.hist(
+        lifetimes_cap,
+        bins=40,
+        range=(t_min_cap, t_max_cap),
+        density=True,
+        alpha=0.75,
+        color="salmon",
+        edgecolor="black"
+    )
+
+    # Overlay Weibull PDF
+    ax_cap.plot(t_vals_cap, pdf_vals_cap, "k-", linewidth=2, label="Weibull PDF")
+
+    ax_cap.set_xlabel("Lifetime of Capacitor [years]")
+    ax_cap.set_ylabel("Lifetime distribution f(x)  (PDF)")
+    ax_cap.set_title("Capacitor – Lifetime Distribution and Weibull PDF")
+    ax_cap.grid(True)
+    ax_cap.legend(loc="best")
+    ax_cap.set_xlim(t_min_cap, t_max_cap)
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "10_weibull_pdf_hist_Capacitor.png")
+    plt.close(fig_cap)
+
 
 
 

@@ -39,7 +39,6 @@ def mother_function(P,Q,T_env):
 
     sim_dir, df_electrical_loss_dir, df_thermal_dir, df_lifetime_IGBT_dir, df_lifetime_Diode_dir, df_electrical_dir, Figures_dir, df_lifetime_IGBT_MC_dir, df_lifetime_Diode_MC_dir = Calculation_functions.create_simulation_folders()
 
-
     # ----------------------------------------#
     # Chunking setup
     # ----------------------------------------#

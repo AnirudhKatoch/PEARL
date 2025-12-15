@@ -2,6 +2,120 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import weibull_min
 
+def Plotting_electrical(S,P,Q,Vs,Is,V_dc,pf,phi,T_env, Figures_dir):
+
+    time_axis = np.arange(len(Is))
+
+    # -------------------------------------------------
+    # Figure 1: Apparent, Active, Reactive Power (S, P, Q)
+    # -------------------------------------------------
+
+    fig1, ax1 = plt.subplots(3, 1, figsize=(6.4, 6), sharex=True)
+
+    ax1[0].plot(time_axis,S)
+    ax1[0].set_ylabel("S [VA]")
+    ax1[0].set_title("Apparent Power (S)")
+    ax1[0].grid(True)
+    ax1[0].set_xlim(min(time_axis),max(time_axis))
+
+    ax1[1].plot(time_axis,P)
+    ax1[1].set_ylabel("P [W]")
+    ax1[1].set_title("Active Power (P)")
+    ax1[1].grid(True)
+    ax1[1].set_xlim(min(time_axis), max(time_axis))
+
+    ax1[2].plot(time_axis,Q)
+    ax1[2].set_ylabel("Q [VAR]")
+    ax1[2].set_xlabel("Time [s]")
+    ax1[2].set_title("Reactive Power (Q)")
+    ax1[2].grid(True)
+    ax1[2].set_xlim(min(time_axis), max(time_axis))
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "1_S_P_Q.png")
+    plt.close(fig1)
+
+    # -------------------------------------------------
+    # Figure 2: Voltage and Current (Vs, Is)
+    # -------------------------------------------------
+
+    fig2, ax2 = plt.subplots(2, 1, figsize=(6.4, 6), sharex=True)
+
+    ax2[0].plot(time_axis,Vs)
+    ax2[0].set_ylabel("Vs [V]")
+    ax2[0].set_title("Supply Voltage (Vs)")
+    ax2[0].grid(True)
+    ax2[0].set_xlim(min(time_axis), max(time_axis))
+
+    ax2[1].plot(time_axis,Is)
+    ax2[1].set_ylabel("Is [A]")
+    ax2[1].set_xlabel("Time [s]")
+    ax2[1].set_title("Supply Current (Is)")
+    ax2[1].grid(True)
+    ax2[1].set_xlim(min(time_axis), max(time_axis))
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "2_Vs_Is.png")
+    plt.close(fig2)
+
+    # -------------------------------------------------
+    # Figure 3: Power Factor and Phase Angle (pf, phi)
+    # -------------------------------------------------
+
+    fig3, ax3 = plt.subplots(2, 1, figsize=(6.4, 6), sharex=True)
+
+    ax3[0].plot(time_axis,pf)
+    ax3[0].set_ylabel("pf [-]")
+    ax3[0].set_title("Power Factor")
+    ax3[0].grid(True)
+    ax3[0].set_xlim(min(time_axis), max(time_axis))
+
+    ax3[1].plot(time_axis,phi)
+    ax3[1].set_ylabel("phi [rad]")
+    ax3[1].set_xlabel("Time [s]")
+    ax3[1].set_title("Phase Angle (phi)")
+    ax3[1].grid(True)
+    ax3[1].set_xlim(min(time_axis), max(time_axis))
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "3_pf_phi.png")
+    plt.close(fig3)
+
+    # -------------------------------------------------
+    # Figure 4: DC Link Voltage (V_dc)
+    # -------------------------------------------------
+
+    fig4, ax4 = plt.subplots(figsize=(6.4, 4.8))
+
+    ax4.plot(time_axis,V_dc)
+    ax4.set_ylabel("V_dc [V]")
+    ax4.set_xlabel("Time [s]")
+    ax4.set_title("DC Link Voltage (V_dc)")
+    ax4.grid(True)
+    ax4.set_xlim(min(time_axis), max(time_axis))
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "4_Vdc.png")
+    plt.close(fig4)
+
+    # -------------------------------------------------
+    # Figure 5: Ambient Temperature (T_env)
+    # -------------------------------------------------
+
+    fig5, ax5 = plt.subplots(figsize=(6.4, 4.8))
+
+    ax5.plot(time_axis,T_env-273.15)
+    ax5.set_ylabel("T_env [C]")
+    ax5.set_xlabel("Time [s]")
+    ax5.set_title("Ambient Temperature (T_env)")
+    ax5.grid(True)
+    ax5.set_xlim(min(time_axis), max(time_axis))
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "5_T_env.png")
+    plt.close(fig5)
+
+
 def Plotting_lifetime(df_IGBT, df_Diode, Nf_igbt_eq, lifetime_years_igbt, Nf_diode_eq, lifetime_years_diode, Figures_dir):
 
     # -------------------------------------------------
@@ -212,119 +326,6 @@ def Plotting_lifetime(df_IGBT, df_Diode, Nf_igbt_eq, lifetime_years_igbt, Nf_dio
     plt.tight_layout()
     plt.savefig(Figures_dir / "12a_Lifetime_Switch.png")
     plt.close(fig12a)
-
-def Plotting_electrical(S,P,Q,Vs,Is,V_dc,pf,phi,T_env, Figures_dir):
-
-    time_axis = np.arange(len(Is))
-
-    # -------------------------------------------------
-    # Figure 1: Apparent, Active, Reactive Power (S, P, Q)
-    # -------------------------------------------------
-
-    fig1, ax1 = plt.subplots(3, 1, figsize=(6.4, 6), sharex=True)
-
-    ax1[0].plot(time_axis,S)
-    ax1[0].set_ylabel("S [VA]")
-    ax1[0].set_title("Apparent Power (S)")
-    ax1[0].grid(True)
-    ax1[0].set_xlim(min(time_axis),max(time_axis))
-
-    ax1[1].plot(time_axis,P)
-    ax1[1].set_ylabel("P [W]")
-    ax1[1].set_title("Active Power (P)")
-    ax1[1].grid(True)
-    ax1[1].set_xlim(min(time_axis), max(time_axis))
-
-    ax1[2].plot(time_axis,Q)
-    ax1[2].set_ylabel("Q [VAR]")
-    ax1[2].set_xlabel("Time [s]")
-    ax1[2].set_title("Reactive Power (Q)")
-    ax1[2].grid(True)
-    ax1[2].set_xlim(min(time_axis), max(time_axis))
-
-    plt.tight_layout()
-    plt.savefig(Figures_dir / "1_S_P_Q.png")
-    plt.close(fig1)
-
-    # -------------------------------------------------
-    # Figure 2: Voltage and Current (Vs, Is)
-    # -------------------------------------------------
-
-    fig2, ax2 = plt.subplots(2, 1, figsize=(6.4, 6), sharex=True)
-
-    ax2[0].plot(time_axis,Vs)
-    ax2[0].set_ylabel("Vs [V]")
-    ax2[0].set_title("Supply Voltage (Vs)")
-    ax2[0].grid(True)
-    ax2[0].set_xlim(min(time_axis), max(time_axis))
-
-    ax2[1].plot(time_axis,Is)
-    ax2[1].set_ylabel("Is [A]")
-    ax2[1].set_xlabel("Time [s]")
-    ax2[1].set_title("Supply Current (Is)")
-    ax2[1].grid(True)
-    ax2[1].set_xlim(min(time_axis), max(time_axis))
-
-    plt.tight_layout()
-    plt.savefig(Figures_dir / "2_Vs_Is.png")
-    plt.close(fig2)
-
-    # -------------------------------------------------
-    # Figure 3: Power Factor and Phase Angle (pf, phi)
-    # -------------------------------------------------
-
-    fig3, ax3 = plt.subplots(2, 1, figsize=(6.4, 6), sharex=True)
-
-    ax3[0].plot(time_axis,pf)
-    ax3[0].set_ylabel("pf [-]")
-    ax3[0].set_title("Power Factor")
-    ax3[0].grid(True)
-    ax3[0].set_xlim(min(time_axis), max(time_axis))
-
-    ax3[1].plot(time_axis,phi)
-    ax3[1].set_ylabel("phi [rad]")
-    ax3[1].set_xlabel("Time [s]")
-    ax3[1].set_title("Phase Angle (phi)")
-    ax3[1].grid(True)
-    ax3[1].set_xlim(min(time_axis), max(time_axis))
-
-    plt.tight_layout()
-    plt.savefig(Figures_dir / "3_pf_phi.png")
-    plt.close(fig3)
-
-    # -------------------------------------------------
-    # Figure 4: DC Link Voltage (V_dc)
-    # -------------------------------------------------
-
-    fig4, ax4 = plt.subplots(figsize=(6.4, 4.8))
-
-    ax4.plot(time_axis,V_dc)
-    ax4.set_ylabel("V_dc [V]")
-    ax4.set_xlabel("Time [s]")
-    ax4.set_title("DC Link Voltage (V_dc)")
-    ax4.grid(True)
-    ax4.set_xlim(min(time_axis), max(time_axis))
-
-    plt.tight_layout()
-    plt.savefig(Figures_dir / "4_Vdc.png")
-    plt.close(fig4)
-
-    # -------------------------------------------------
-    # Figure 5: Ambient Temperature (T_env)
-    # -------------------------------------------------
-
-    fig5, ax5 = plt.subplots(figsize=(6.4, 4.8))
-
-    ax5.plot(time_axis,T_env-273.15)
-    ax5.set_ylabel("T_env [C]")
-    ax5.set_xlabel("Time [s]")
-    ax5.set_title("Ambient Temperature (T_env)")
-    ax5.grid(True)
-    ax5.set_xlim(min(time_axis), max(time_axis))
-
-    plt.tight_layout()
-    plt.savefig(Figures_dir / "5_T_env.png")
-    plt.close(fig5)
 
 def Plotting_electrical_loss(df_electrical_loss, Figures_dir):
 

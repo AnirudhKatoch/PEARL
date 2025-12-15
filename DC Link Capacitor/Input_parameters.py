@@ -25,7 +25,7 @@ class Input_parameters_class:
         # ----------------------------------------#
 
         S_in = 49250
-        pf_in = 0.5
+        pf_in = 1
 
         P_in = abs(S_in*pf_in)
         Q_in = np.sqrt(S_in**2 - P_in**2)
@@ -54,6 +54,10 @@ class Input_parameters_class:
                                                                                                     Vs=self.Vs, M=self.M,
                                                                                                     modulation_scheme=modulation_scheme)
 
+        # ----------------------------------------#
+        # Ambient temperatures
+        # ----------------------------------------#
+        self.Plotting_flag = True  # True for plotting and False for not plotting
 
         # ----------------------------------------#
         # Ambient temperatures
