@@ -4,43 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Calculation_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Calculation_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Input_parameters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Plotting_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Plotting_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/10_Lifetime_capacitor.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/1_power.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/3_power_factor_and_phase_angle.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/3_power_factor_and_phase_angle.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_3/Figures/10_Lifetime_capacitor.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_3/Figures/1_power.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_3/Figures/2_inverter_voltage_and_current.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_3/Figures/3_power_factor_and_phase_angle.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_3/Figures/4_DC_side_voltage.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_3/Figures/5_Ambient_temperature.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_3/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_3/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_3/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_3/Figures/9_Capacitor_core_temperature.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_4/Figures/10_Lifetime_capacitor.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_4/Figures/1_power.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_4/Figures/2_inverter_voltage_and_current.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_4/Figures/3_power_factor_and_phase_angle.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_4/Figures/4_DC_side_voltage.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_4/Figures/5_Ambient_temperature.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_4/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_4/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_4/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_4/Figures/9_Capacitor_core_temperature.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Plotting_final_results.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Plotting_final_results.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Model_documentation_PEARL_IGBT_and_Diode.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/Model_documentation_PEARL_IGBT_and_Diode.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Plotting_results.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/Plotting_results.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/mother_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/mother_function.py" afterDir="false" />
-    </list>
+    <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
