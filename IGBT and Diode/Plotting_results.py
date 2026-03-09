@@ -115,7 +115,6 @@ def Plotting_electrical(S,P,Q,Vs,Is,V_dc,pf,phi,T_env, Figures_dir):
     plt.savefig(Figures_dir / "5_T_env.png")
     plt.close(fig5)
 
-
 def Plotting_lifetime(df_IGBT, df_Diode, Nf_igbt_eq, lifetime_years_igbt, Nf_diode_eq, lifetime_years_diode, Figures_dir):
 
     # -------------------------------------------------

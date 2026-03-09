@@ -1,0 +1,63 @@
+E:\Python_environments\PEARL_environment\Scripts\python.exe "E:\PEARL\IGBT and Diode\main.py" 
+runner_02U_1: Simulation_1
+Execution time all code: 578.3498146533966 seconds
+##################################
+runner_02U_2: Simulation_2
+Execution time all code: 540.723726272583 seconds
+##################################
+runner_02U_3: Simulation_3
+Execution time all code: 568.8647453784943 seconds
+##################################
+runner_02U_4: Simulation_4
+Execution time all code: 580.3649883270264 seconds
+##################################
+runner_04U_1: Simulation_5
+Execution time all code: 559.8475561141968 seconds
+##################################
+runner_04U_2: Simulation_6
+Execution time all code: 613.9616632461548 seconds
+##################################
+runner_04U_3: Simulation_7
+Execution time all code: 639.0307650566101 seconds
+##################################
+runner_04U_4: Simulation_8
+Execution time all code: 636.6034705638885 seconds
+##################################
+runner_06U_1: Simulation_9
+Execution time all code: 613.8425719738007 seconds
+##################################
+runner_06U_2: Simulation_10
+Execution time all code: 621.4677035808563 seconds
+##################################
+runner_06U_3: Simulation_11
+Execution time all code: 672.9355478286743 seconds
+##################################
+runner_06U_4: Simulation_12
+Execution time all code: 685.916342496872 seconds
+##################################
+runner_08U_1: Simulation_13
+Execution time all code: 627.4839725494385 seconds
+##################################
+runner_08U_2: Simulation_14
+Execution time all code: 646.1155910491943 seconds
+##################################
+runner_08U_3: Simulation_15
+Execution time all code: 581.5842833518982 seconds
+##################################
+runner_08U_4: Simulation_16
+Execution time all code: 697.2095181941986 seconds
+##################################
+runner_10U_1: Simulation_17
+Execution time all code: 619.4490506649017 seconds
+##################################
+runner_10U_2: Simulation_18
+Execution time all code: 665.8827533721924 seconds
+##################################
+runner_10U_3: Simulation_19
+Execution time all code: 699.2169997692108 seconds
+##################################
+runner_10U_4: Simulation_20
+Execution time all code: 726.4669547080994 seconds
+##################################
+
+Process finished with exit code 0

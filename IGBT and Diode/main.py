@@ -7,84 +7,100 @@ def run_once(entry_script: str) -> None:
 
 if __name__ == "__main__":
 
-    print("pf", 1)
+
+    print("runner_1: Simulation_1")
     run_once("Runners/runner_1.py")
     print('##################################')
 
-    print("pf", 0)
+    print("runner_0: Simulation_2")
     run_once("Runners/runner_0.py")
     print('##################################')
 
-    print("pf", 0.9)
-    run_once("Runners/runner_0.9.py")
+    '''
+
+    print("runner_02U_1: Simulation_1")
+    run_once("Runners/runner_02U_1.py")
     print('##################################')
 
-    print("pf", -0.9)
-    run_once("Runners/runner_-0.9.py")
+    print("runner_02U_2: Simulation_2")
+    run_once("Runners/runner_02U_2.py")
     print('##################################')
 
-    print("pf", 0.8)
-    run_once("Runners/runner_0.8.py")
+    print("runner_02U_3: Simulation_3")
+    run_once("Runners/runner_02U_3.py")
     print('##################################')
 
-    print("pf", -0.8)
-    run_once("Runners/runner_-0.8.py")
+    print("runner_02U_4: Simulation_4")
+    run_once("Runners/runner_02U_4.py")
     print('##################################')
 
-    print("pf", 0.7)
-    run_once("Runners/runner_0.7.py")
+    print("runner_04U_1: Simulation_5")
+    run_once("Runners/runner_04U_1.py")
     print('##################################')
 
-    print("pf", -0.7)
-    run_once("Runners/runner_-0.7.py")
+    print("runner_04U_2: Simulation_6")
+    run_once("Runners/runner_04U_2.py")
     print('##################################')
 
-    print("pf", 0.6)
-    run_once("Runners/runner_0.6.py")
+    print("runner_04U_3: Simulation_7")
+    run_once("Runners/runner_04U_3.py")
     print('##################################')
 
-    print("pf", -0.6)
-    run_once("Runners/runner_-0.6.py")
+    print("runner_04U_4: Simulation_8")
+    run_once("Runners/runner_04U_4.py")
     print('##################################')
 
-    print("pf", 0.5)
-    run_once("Runners/runner_0.5.py")
+    print("runner_06U_1: Simulation_9")
+    run_once("Runners/runner_06U_1.py")
     print('##################################')
 
-    print("pf", -0.5)
-    run_once("Runners/runner_-0.5.py")
+    print("runner_06U_2: Simulation_10")
+    run_once("Runners/runner_06U_2.py")
     print('##################################')
 
-    print("pf", 0.4)
-    run_once("Runners/runner_0.4.py")
+    print("runner_06U_3: Simulation_11")
+    run_once("Runners/runner_06U_3.py")
     print('##################################')
 
-    print("pf", -0.4)
-    run_once("Runners/runner_-0.4.py")
+    print("runner_06U_4: Simulation_12")
+    run_once("Runners/runner_06U_4.py")
     print('##################################')
 
-    print("pf", 0.3)
-    run_once("Runners/runner_0.3.py")
+    print("runner_08U_1: Simulation_13")
+    run_once("Runners/runner_08U_1.py")
     print('##################################')
 
-    print("pf", -0.3)
-    run_once("Runners/runner_-0.3.py")
+    print("runner_08U_2: Simulation_14")
+    run_once("Runners/runner_08U_2.py")
     print('##################################')
 
-    print("pf", 0.2)
-    run_once("Runners/runner_0.2.py")
+    print("runner_08U_3: Simulation_15")
+    run_once("Runners/runner_08U_3.py")
     print('##################################')
 
-    print("pf", -0.2)
-    run_once("Runners/runner_-0.2.py")
+    print("runner_08U_4: Simulation_16")
+    run_once("Runners/runner_08U_4.py")
     print('##################################')
 
-    print("pf", 0.1)
-    run_once("Runners/runner_0.1.py")
+    print("runner_10U_1: Simulation_17")
+    run_once("Runners/runner_10U_1.py")
     print('##################################')
 
-    print("pf", -0.1)
-    run_once("Runners/runner_-0.1.py")
+    print("runner_10U_2: Simulation_18")
+    run_once("Runners/runner_10U_2.py")
+    print('##################################')
+
+    print("runner_10U_3: Simulation_19")
+    run_once("Runners/runner_10U_3.py")
+    print('##################################')
+
+    print("runner_10U_4: Simulation_20")
+    run_once("Runners/runner_10U_4.py")
     print('##################################')
     
+    '''
+
+
+
+
 

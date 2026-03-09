@@ -11,13 +11,13 @@ class Input_parameters_class:
         # Model Parameters
         # ----------------------------------------#
 
-        self.dt = 0.001                 # Simulation step size
+        self.dt = 0.0002                 # Simulation step size
         self.chunk_seconds = int(86400)   # chunking to reduce the RAM usage
-        self.Plotting_electrical_flag = False # True False
-        self.Plotting_lifetime_flag = False
-        self.Plotting_electrical_loss_flag = False
-        self.Plotting_thermal_flag = False
-        self.Plotting_Monte_Carlo_flag = False
+        self.Plotting_electrical_flag = True # True False
+        self.Plotting_lifetime_flag = True
+        self.Plotting_electrical_loss_flag = True
+        self.Plotting_thermal_flag = True
+        self.Plotting_Monte_Carlo_flag = True
         self.T0_init = None  # None for first chunk
         self.Cauer_model_accuracy = 1e-3  # 1e-3 is the optimum balance between accuracy and computation
 
@@ -98,14 +98,17 @@ class Input_parameters_class:
         # Heat Sink
 
         # Sink-to-ambient heat sink
-        # Source: Cooling Innovation 3-121208U
-        r_sink_dic = {1:2.72,2:1.55,3:1.11,4:0.88}  # These are different thermal resistance values at different air flows in m/s
-        Weight = 0.015      # kg
+        # Source: Cooling Innovation 3-121211U
+        r_sink_dic = {1:2.0, 2:1.14, 3:0.83, 4:0.66}  # These are different thermal resistance values at different air flows in m/s
+        #r_sink = [r_sink_dic[1]]
+        r_sink = 2
+        Weight = 19/1000 # kg
+
         specific_heat = 900 # J/kg K
         Thermal_capacitance = Weight * specific_heat
 
-        self.r_sink = np.array([r_sink_dic[2]])  # [K/W] Thermal resistance
-        self.tau_sink = np.array([Thermal_capacitance * r_sink_dic[2]])  # [s]   Thermal time constant
+        self.r_sink = np.array(r_sink)  # [K/W] Thermal resistance
+        self.tau_sink = np.array([Thermal_capacitance * r_sink])  # [s]   Thermal time constant
         self.cap_sink = np.array([Thermal_capacitance])    # [J/K] Thermal capacitance
 
         # ----------------------------------------#

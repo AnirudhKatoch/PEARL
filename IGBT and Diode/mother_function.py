@@ -81,7 +81,7 @@ def mother_function(P,Q,T_env):
             P_sw_I_list.append(P_sw_I_sec); P_sw_D_list.append(P_sw_D_sec); P_con_I_list.append(P_con_I_sec); P_con_D_list.append(P_con_D_sec)
 
         # Concatenate into final full length arrays of power losses and electrical outputs
-        P_I = np.concatenate(P_I_list); P_D = np.concatenate(P_D_list); is_I = np.concatenate(is_I_list); is_D     = np.concatenate(is_D_list)
+        P_I = np.concatenate(P_I_list); P_D = np.concatenate(P_D_list); is_I = np.concatenate(is_I_list); is_D = np.concatenate(is_D_list)
         P_sw_I = np.concatenate(P_sw_I_list); P_sw_D = np.concatenate(P_sw_D_list); P_con_I = np.concatenate(P_con_I_list); P_con_D = np.concatenate(P_con_D_list)
 
         # ----------------------------------------#
@@ -289,6 +289,7 @@ def mother_function(P,Q,T_env):
     df_lifetime_diode_MC["Lifetime_diode_MC"] = Lifetime_diode_MC
     df_lifetime_diode_MC["Lifetime_diode_MC_actual"] = Lifetime_diode_MC_actual
     df_lifetime_diode_MC.to_parquet( df_lifetime_Diode_MC_dir/ f"df.parquet", index=False,engine="pyarrow")
+
 
     if Plotting_Monte_Carlo_flag == True:
         Plotting_Monte_Carlo(df_lifetime_igbt_MC=df_lifetime_igbt_MC,df_lifetime_diode_MC=df_lifetime_diode_MC, Figures_dir=Figures_dir)
