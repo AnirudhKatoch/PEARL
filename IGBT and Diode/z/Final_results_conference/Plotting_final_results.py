@@ -1627,7 +1627,7 @@ def plot_case_study1_summary_4x1():
 
     draw(axes[0], Icap, Iind, Dcap, Dind, "Current [A]","(a) Average IGBT and diode current")
     draw(axes[1], Pcap, Pind, PDcap, PDind, "Power losses [W]","(b) Average IGBT and diode total power losses")
-    draw(axes[2], Tcap, Tind, TDcap, TDind, "Temperature [°C]","(c) Average IGBT and diode junction Temperature")
+    draw(axes[2], Tcap, Tind, TDcap, TDind, "Temperature [°C]","(c) Average IGBT and diode junction temperature")
 
     # lifetime uses pf_grid_L (same set, but keep robust)
     axes[3].plot(pf_grid_L, LI_cap, "-",  marker="o", linewidth=2.5, markersize=9, color="tab:blue",   label="IGBT (capacitive)")

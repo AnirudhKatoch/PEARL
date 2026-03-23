@@ -5,7 +5,7 @@ Calculation_functions = Calculation_functions_class()
 
 class Input_parameters_class:
 
-    def __init__(self):
+    def __init__(self, P_in, Q_in , T_env_in):
 
         '''
 
@@ -21,27 +21,16 @@ class Input_parameters_class:
         '''
 
         # ----------------------------------------#
-        # Development of mission profile
-        # ----------------------------------------#
-
-        S_in = 49250
-        pf_in = 1
-
-        P_in = abs(S_in*pf_in)
-        Q_in = np.sqrt(S_in**2 - P_in**2)
-        if pf_in<0:
-            Q_in = Q_in*-1
-        Profile_size = 10
-
-        # ----------------------------------------#
         # Inverter setup
         # ----------------------------------------#
 
+        self.P = P_in
+        self.Q = Q_in
 
-        self.P = np.full(Profile_size, P_in)
-        self.Q = np.full(Profile_size, Q_in)
+        Profile_size = len(P_in)
+
         self.Vs = np.full(Profile_size, 230)   # [V] Inverter phase RMS AC side voltage
-        self.V_dc = np.full(Profile_size, 740) # [V] Inverter DC side voltage
+        self.V_dc = np.full(Profile_size, 800*0.7043) # [V] Inverter DC side voltage  #  800*0.9 for Case Study 1 , 800*0.7043 Case Study 2
 
         self.M = np.full(Profile_size, 1) # [-] Inverter modulation index # Modulation cannot be above 1 as model does not take into account. +
 
@@ -57,23 +46,25 @@ class Input_parameters_class:
         # ----------------------------------------#
         # Ambient temperatures
         # ----------------------------------------#
-        self.Plotting_flag = True  # True for plotting and False for not plotting
+
+        self.Plotting_flag = False  # True for plotting and False for not plotting
 
         # ----------------------------------------#
         # Ambient temperatures
         # ----------------------------------------#
 
-        self.T_env = np.full(Profile_size, 298.15+10)
+        self.T_env = np.full(Profile_size, T_env_in) # use this for case study 1
+
+        #self.T_env = np.full(Profile_size, 298.15 + 13.661)  # use this for case study 1
 
         # ----------------------------------------#
         # Number of capacitors in parallel and series
         # ----------------------------------------#
 
         self.N_series = 1  # Number of Capacitors in series
-        self.N_parallel = 1  # Number of Capacitors in parallel
+        self.N_parallel = 11  # Number of Capacitors in parallel
 
-
-        # Capacitor chosen : B32778J8806K000
+        # Capacitor chosen : B32778J8277K000
 
         # ----------------------------------------#
         # Capacitor Type
@@ -86,41 +77,44 @@ class Input_parameters_class:
         # ----------------------------------------#
 
         self.Max_voltage_datasheet_cap = 800   # [V]
-        self.Max_current_datasheet_cap  = 37.5 # [A]
-        self.Max_temperature_cap_dict = { 1.0:343.15, 0.89:358.15, 0.83:363.15, 0.775:368.15, 0.725:373.15, 0.65:378.15} # V/V_r [V]: Max temperature[K]
-
+        self.Max_current_datasheet_cap  = 70.5 # [A]
+        self.Max_temperature_cap_dict = { 1.0:343.15,
+                                          0.89:358.15,
+                                          0.83:363.15,
+                                          0.775:368.15,
+                                          0.725:373.15,
+                                          0.65:378.15} # V/V_r [V]: Max temperature[K]
 
         # ----------------------------------------#
         # Rated values of capacitor
         # ----------------------------------------#
 
         self.Rated_voltage_datasheet_cap = 800   # [V]
-        self.Rated_current_datasheet_cap  = 37.5 # [A]
-        self.Rated_temperature_cap = 343.15    # [K]
-        self.Rated_lifetime = 1e5             # [hours]
+        self.Rated_current_datasheet_cap  = 70.5 # [A]
+        self.Rated_temperature_cap = 343.15      # [K]
+        self.Rated_lifetime = 1e5                # [hours]
 
         # ----------------------------------------#
         # Capacitor dimensions
         # ----------------------------------------#
 
         Width = 130e-3    # [m]
-        Height = 24e-3   # [m]
+        Height = 58e-3   # [m]
         Length = 57.5e-3 # [m]
 
         # ----------------------------------------#
         # Thermal resistance of capacitor
         # ----------------------------------------#
 
-        Heat_coefficient = 200e-3  # [W/°C]
+        Heat_coefficient = 300e-3  # [W/°C]
         self.Thermal_resistance = 1/Heat_coefficient # [°C/W] or [K/W]
-
 
         # ----------------------------------------#
         # Effective capacitor ESR at inverter switching frequency
         # ----------------------------------------#
 
         f_sw = 10 * 1000  # [Hz] Inverter switching frequency
-        self.ESR_eff = 3.6e-3 # [Ohm]
+        self.ESR_eff = 1.2e-3 # [Ohm]
 
         # ----------------------------------------#
         # Minimum insulation resistance of capacitor (from RC time constant)
@@ -128,8 +122,8 @@ class Input_parameters_class:
 
         #Insulation resistance via a time constant
         Time_constant = 10000
-        Capacitance_cap = 100e-6 # F
-        #We know that Time_constant = Capacitance_cap * minimum_insulation_resistance
+        Capacitance_cap = 270e-6 # F
+        #We know that Time_constant = Capacitance_cap * m   inimum_insulation_resistance
         self.minimum_insulation_resistance = Time_constant/Capacitance_cap # Value needs to calculate leakage current,
         # If available leakage current can be given directly as an input at different voltage levels
 

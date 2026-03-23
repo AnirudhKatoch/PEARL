@@ -315,7 +315,7 @@ class Calculation_functions_class:
         return calibration_factor_core_temp
 
     @staticmethod
-    def core_temperature_calculationsI_cap(I_per_cap, ESR_eff, V_per_cap, minimum_insulation_resistance, T_env,
+    def core_temperature_and_power_losses_calculations(I_per_cap, ESR_eff, V_per_cap, minimum_insulation_resistance, T_env,
                                                Thermal_resistance, calibration_factor_core_temp):
         """
             Compute capacitor core temperature using calibrated thermal model.
@@ -347,6 +347,7 @@ class Calculation_functions_class:
 
         P_ripple = (I_per_cap ** 2) * ESR_eff  # ripple-loss per cap
 
+
         I_leak = V_per_cap / minimum_insulation_resistance
         P_leak = I_leak * V_per_cap  # leakage-loss per cap
 
@@ -354,7 +355,7 @@ class Calculation_functions_class:
 
         T_core = T_env + calibration_factor_core_temp * Thermal_resistance * P_losses  # Capacitor temperature
 
-        return T_core
+        return T_core, P_ripple, P_leak, P_losses
 
     @staticmethod
     def Nichion_lifetime_model(L_r, T_r, T, Delta_t_r, I_r, K):

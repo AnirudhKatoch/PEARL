@@ -5,49 +5,260 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest">
-      <change afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_conference.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_heat_sink.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/trial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_-0.1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_-0.2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_-0.3.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_-0.4.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_-0.5.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_-0.6.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_-0.7.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_-0.8.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_-0.9.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_0.1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_0.2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_0.3.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_0.4.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_0.5.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_0.6.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_0.7.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_0.8.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_0.9.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/Runners/runner_1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/main_temp.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DC Link Capacitor/mother_function.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Calculation_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Calculation_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Input_parameters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Plotting_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Plotting_function.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/10_Lifetime_capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/10_weibull_pdf_hist_Capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/1_power.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/2_inverter_voltage_and_current.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/3_power_factor_and_phase_angle.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/4_DC_side_voltage.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/5_Ambient_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_1/Figures/9_Capacitor_core_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_2/Figures/10_Lifetime_capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_2/Figures/1_power.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_2/Figures/2_inverter_voltage_and_current.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_2/Figures/3_power_factor_and_phase_angle.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_2/Figures/4_DC_side_voltage.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_2/Figures/5_Ambient_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_2/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_2/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_2/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_2/Figures/9_Capacitor_core_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_6/Figures/10_Lifetime_capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_6/Figures/1_power.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_6/Figures/2_inverter_voltage_and_current.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_6/Figures/3_power_factor_and_phase_angle.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_6/Figures/4_DC_side_voltage.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_6/Figures/5_Ambient_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_6/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_6/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_6/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_6/Figures/9_Capacitor_core_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/10_Lifetime_capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/10_weibull_pdf_hist_Capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/1_power.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/2_inverter_voltage_and_current.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/3_power_factor_and_phase_angle.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/4_DC_side_voltage.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/5_Ambient_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Results/Simulation_7/Figures/9_Capacitor_core_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/trial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/a_Current_per_capacitor.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/a_Current_per_capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/aa_Capacitor_current_difference.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/aa_Capacitor_current_difference.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/b_DC_ripple_RMS_Current.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/b_DC_ripple_RMS_Current.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/c_Capacitor_core_temperature.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/c_Capacitor_core_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/d_Voltage_per_capacitor.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/d_Voltage_per_capacitor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/e_Total_lifetime.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/e_Total_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/f1_Inverter_phase_current_difference.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/f1_Inverter_phase_current_difference.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/f_Inverter_phase_current.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Figures/f_Inverter_phase_current.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_1/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_10/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_11/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_12/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_13/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_14/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_15/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_16/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_17/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_18/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_19/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_2/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_20/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_3/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_4/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_5/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_6/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_7/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_8/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/10_Lifetime_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/10_Lifetime_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/1_power.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/1_power.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/2_inverter_voltage_and_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/2_inverter_voltage_and_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/4_DC_side_voltage.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/4_DC_side_voltage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/6_Number_of_capacitors_in_series_and_parallel.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/6_Number_of_capacitors_in_series_and_parallel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/7_DC_link_capacitor_RMS_ripple_current.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/7_DC_link_capacitor_RMS_ripple_current.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/8_Voltage_and_Current_per_capacitor.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/8_Voltage_and_Current_per_capacitor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/9_Capacitor_core_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_9/Figures/9_Capacitor_core_temperature.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Final_results/Simulation_numbering.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/z/Plotting_final_results.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/z/Plotting_final_results.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/IGBT and Diode/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/Input_parameters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Plotting_results.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/Plotting_results.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Research papers/LESIT Model.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_-0.1.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_-0.2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_-0.3.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_-0.4.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_-0.5.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_-0.6.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_-0.7.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_-0.8.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_-0.9.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.1.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.3.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.4.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.5.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.6.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.7.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.8.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.9.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_0.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Runners/runner_1.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/mother_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/mother_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/Conduction_power_losses.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/DeltaT_IGBT_Diode_vs_pf.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/Junction_temperature_vs_pf.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/Lifetime_IGBT_Diode_vs_pf.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/Lifetime_Switch_vs_pf.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/Switching_power_losses.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/T_mean_IGBT_Diode_vs_pf.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/Thermal_pad_and_sink_vs_pf.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/Thermal_period_IGBT_Diode_vs_pf.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/Total_power_losses.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/Weibull_PDF_IGBT_Diode_inductive_single_plot.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_ohne_diode/Figures/Weibull_PDF_Switch_bottleneck_inductive.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Model architect.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/trial.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/trial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/CaseStudy1_summary_4x1.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/CaseStudy1_summary_4x1.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_case_study_2.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_case_study_2.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_life.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_life.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_final_results.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_final_results.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_heat_sink.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_heat_sink.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Simulation_results_heat_sink/dict_heat_sink_life.txt" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Simulation_results_heat_sink/dict_heat_sink_life.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,37 +298,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.Calculation_functions.executor": "Run",
-    "Python.Causer model.executor": "Run",
-    "Python.Electrical_model.executor": "Run",
-    "Python.Input_parameters.executor": "Run",
-    "Python.Inverter_calculations.executor": "Run",
-    "Python.Plotting_conference.executor": "Run",
-    "Python.Plotting_final_results.executor": "Run",
-    "Python.Plotting_function.executor": "Run",
-    "Python.Plotting_heat_sink.executor": "Run",
-    "Python.Plotting_results.executor": "Run",
-    "Python.Thermal_model_idea_2.executor": "Run",
-    "Python.main - Copy.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.runner.executor": "Run",
-    "Python.runner_0.1.executor": "Run",
-    "Python.runner_02U_1.executor": "Run",
-    "Python.trial.executor": "Run",
-    "Python.trial_2.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "E:/PEARL",
-    "settings.editor.selected.configurable": "Errors",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.Calculation_functions.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Causer model.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Electrical_model.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Input_parameters.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Inverter_calculations.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Plotting_conference.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Plotting_final_results.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Plotting_function.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Plotting_heat_sink.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Plotting_results.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Thermal_model_idea_2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main - Copy.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main_temp.executor&quot;: &quot;Run&quot;,
+    &quot;Python.mother_function.executor&quot;: &quot;Run&quot;,
+    &quot;Python.runner.executor&quot;: &quot;Run&quot;,
+    &quot;Python.runner_0.1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.runner_0.executor&quot;: &quot;Run&quot;,
+    &quot;Python.runner_02U_1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.trial.executor&quot;: &quot;Run&quot;,
+    &quot;Python.trial_2.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/PEARL&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;Errors&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

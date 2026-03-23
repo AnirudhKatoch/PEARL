@@ -1,0 +1,43 @@
+EPython_environmentsPEARL_environmentScriptspython.exe EPEARLDC Link Capacitormain.py 
+runner_1 Simulation_1
+##################################
+runner_0 Simulation_2
+##################################
+runner_0.9 Simulation_3
+##################################
+runner_-0.9 Simulation_4
+##################################
+runner_0.8 Simulation_5
+##################################
+runner_-0.8 Simulation_6
+##################################
+runner_0.7 Simulation_7
+##################################
+runner_-0.7 Simulation_8
+##################################
+runner_0.6 Simulation_9
+##################################
+runner_-0.6 Simulation_10
+##################################
+runner_0.5 Simulation_11
+##################################
+runner_-0.5 Simulation_12
+##################################
+runner_0.4 Simulation_13
+##################################
+runner_-0.4 Simulation_14
+##################################
+runner_0.3 Simulation_15
+##################################
+runner_-0.3 Simulation_16
+##################################
+runner_0.2 Simulation_17
+##################################
+runner_-0.2 Simulation_18
+##################################
+runner_0.1 Simulation_19
+##################################
+runner_-0.1 Simulation_20
+##################################
+
+Process finished with exit code 0

@@ -239,6 +239,58 @@ def Plotting(df,Figures_dir):
     plt.savefig(Figures_dir / "10_Lifetime_capacitor.png")
     plt.close(fig10)
 
+    # -------------------------------------------------
+    # Figure 11: Total Power losses (P_losses)
+    # -------------------------------------------------
+
+    fig11, ax11 = plt.subplots(figsize=(6.4, 4.8))
+
+    ax11.plot(time_axis, df["P_losses"])
+    ax11.set_ylabel("Power [W]")
+    ax11.set_xlabel("Time [s]")
+    ax11.set_title("Capacitor total power losses")
+    ax11.grid(True)
+    ax11.set_xlim(min(time_axis), max(time_axis))
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "11_Total_power_losses.png")
+    plt.close(fig11)
+
+    # -------------------------------------------------
+    # Figure 12: Ripple losses (P_ripple)
+    # -------------------------------------------------
+
+    fig12, ax12 = plt.subplots(figsize=(6.4, 4.8))
+
+    ax12.plot(time_axis, df["P_ripple"])
+    ax12.set_ylabel("Power [W]")
+    ax12.set_xlabel("Time [s]")
+    ax12.set_title("Capacitor ripple losses")
+    ax12.grid(True)
+    ax12.set_xlim(min(time_axis), max(time_axis))
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "12_Ripple_losses.png")
+    plt.close(fig12)
+
+    # -------------------------------------------------
+    # Figure 13: Ripple losses (P_ripple)
+    # -------------------------------------------------
+
+    fig13, ax13 = plt.subplots(figsize=(6.4, 4.8))
+
+    ax13.plot(time_axis, df["P_leak"])
+    ax13.set_ylabel("Power [W]")
+    ax13.set_xlabel("Time [s]")
+    ax13.set_title("Capacitor leakage losses")
+    ax13.grid(True)
+    ax13.set_xlim(min(time_axis), max(time_axis))
+
+    plt.tight_layout()
+    plt.savefig(Figures_dir / "13_Leakage_losses.png")
+    plt.close(fig13)
+
+
 
 def Plotting_MC(df_MC,Figures_dir):
     # -------------------------------------------------

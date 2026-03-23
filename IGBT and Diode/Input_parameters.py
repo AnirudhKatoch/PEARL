@@ -11,7 +11,7 @@ class Input_parameters_class:
         # Model Parameters
         # ----------------------------------------#
 
-        self.dt = 0.0002                 # Simulation step size
+        self.dt = 0.001                 # Simulation step size
         self.chunk_seconds = int(86400)   # chunking to reduce the RAM usage
         self.Plotting_electrical_flag = True # True False
         self.Plotting_lifetime_flag = True
@@ -39,7 +39,7 @@ class Input_parameters_class:
         #  k_thickness = 1.00   → Standard IGBT chips (600 V / 1200 V classes)
         #  k_thickness = 0.65   → Thick-chip IGBT (1700 V class)
         #  k_thickness = 0.50   → Rectifier / diode chips (typically thicker silicon)
-        #   k_thickness = 0.33   → SiC MOSFET / SiC diode chips (much thinner)
+        #  k_thickness = 0.33   → SiC MOSFET / SiC diode chips (much thinner)
 
         # ----------------------------------------#
         # Package max limits
@@ -57,7 +57,7 @@ class Input_parameters_class:
         # Miscellaneous
         # ----------------------------------------#
 
-        self.f = 50                                                          # [Hz] Grid frequency
+        self.f = 50                                                               # [Hz] Grid frequency
         self.omega = 2 * np.pi * self.f                                           # [rad/s] Angular frequency of the grid (ω = 2πf)
 
         # ----------------------------------------#

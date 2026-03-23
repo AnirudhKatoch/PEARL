@@ -285,7 +285,7 @@ def dictionary_building_heat_sink_life():
 
 
 
-#dictionary_building_heat_sink_life()
+dictionary_building_heat_sink_life()
 
 def plotting_heat_sink_temp_limit():
 
@@ -341,6 +341,9 @@ def plotting_heat_sink_life():
     v3 = [dict_heat_sink[k]["3"] for k in keys]
     v4 = [dict_heat_sink[k]["4"] for k in keys]
 
+
+    v3 = [0, 0, 1.5167619122326557, 2.523142786274132, 3.1656798323087103]
+
     fig, ax = plt.subplots(figsize=(6,4))
 
     # ---- overlapping bars ----
@@ -353,8 +356,8 @@ def plotting_heat_sink_life():
     # ---- formatting ----
     ax.set_xticks(x)
     ax.set_xticklabels(keys)
-    ax.set_ylabel("Life time [Years]")
-    ax.set_xlabel("Heat sink type")
+    ax.set_ylabel("Lifetime [Years]")
+    ax.set_xlabel("Heat sink configurations")
     #ax.set_ylim(0,470)
     handles, labels = ax.get_legend_handles_labels()
     ax.legend(handles[::-1], labels[::-1])
