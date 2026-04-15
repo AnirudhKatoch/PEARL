@@ -62,9 +62,6 @@ def mother_function(P_in,Q_in,T_env_in):
                                                     minimum_insulation_resistance=minimum_insulation_resistance, T_env= T_env,
                                                    Thermal_resistance=Thermal_resistance, calibration_factor_core_temp=calibration_factor_core_temp)
 
-    print("calibration_factor_core_temp",calibration_factor_core_temp)
-
-
     Calculation_functions_class.check_max_capacitor_temperature_limit(Max_temperature_cap_dict=Max_temperature_cap_dict,
                                                                       T_core=T_core,
                                                                       Rated_voltage_datasheet_cap=Rated_voltage_datasheet_cap,
