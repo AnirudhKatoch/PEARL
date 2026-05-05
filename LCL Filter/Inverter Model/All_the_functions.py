@@ -328,6 +328,150 @@ class All_the_functions_class:
 
         return V_L1, I_L1, V_C, I_C, V_L2, I_L2
 
+
+    @staticmethod
+    def Solving_LCL_Filter_Grid_Connected_Known_IL2(t, V_s, V_g, I_L2_known, L1, C, R1, R2, L2=None):
+
+        """
+        Solve the time-domain response of an LCL filter when grid-side current I_L2 is known.
+
+        In this formulation, I_L2 is treated as a known input rather than a state.
+        The solved states are:
+            - I_L1
+            - V_C
+
+        Governing equations
+        -------------------
+        dI_L1/dt = (V_s - V_C - R1*I_L1) / L1
+        dV_C/dt  = (I_L1 - I_L2_known) / C
+
+        Derived quantities
+        ------------------
+        I_C  = I_L1 - I_L2_known
+        V_L1 = V_s - V_C - R1*I_L1
+        V_L2 = V_C - V_g - R2*I_L2_known
+
+        If L2 is provided, an optional consistency check is also performed:
+            V_L2 ?= L2 * dI_L2_known/dt
+
+        Parameters
+        ----------
+        t : array
+            Time vector [s]
+        V_s : array
+            Inverter output voltage [V]
+        V_g : array
+            Grid voltage [V]
+        I_L2_known : array
+            Known grid-side inductor current [A]
+        L1 : float
+            Inverter-side inductance [H]
+        C : float
+            Filter capacitance [F]
+        R1 : float
+            Series resistance of inverter-side inductor [Ohm]
+        R2 : float
+            Series resistance of grid-side inductor [Ohm]
+        L2 : float or None, optional
+            Grid-side inductance [H]. Only needed for optional consistency check.
+
+        Returns
+        -------
+        V_L1 : array
+            Voltage across inverter-side inductor [V]
+        I_L1 : array
+            Current through inverter-side inductor [A]
+        V_C : array
+            Capacitor voltage [V]
+        I_C : array
+            Capacitor current [A]
+        V_L2 : array
+            Voltage across grid-side inductor [V]
+        I_L2 : array
+            Known grid-side inductor current [A]
+        """
+
+        import numpy as np
+        from scipy.integrate import solve_ivp
+
+        t = np.asarray(t, dtype=float)
+        V_s = np.asarray(V_s, dtype=float)
+        V_g = np.asarray(V_g, dtype=float)
+        I_L2_known = np.asarray(I_L2_known, dtype=float)
+
+        if t.ndim != 1 or V_s.ndim != 1 or V_g.ndim != 1 or I_L2_known.ndim != 1:
+            raise ValueError("t, V_s, V_g, and I_L2_known must be 1D arrays.")
+
+        if not (len(t) == len(V_s) == len(V_g) == len(I_L2_known)):
+            raise ValueError("t, V_s, V_g, and I_L2_known must have the same length.")
+
+        if len(t) < 2:
+            raise ValueError("t must contain at least two time points.")
+
+        if L1 <= 0 or C <= 0:
+            raise ValueError("L1 and C must be positive.")
+
+        if np.any(np.diff(t) <= 0):
+            raise ValueError("t must be strictly increasing.")
+
+        def lcl_reduced_ode(t_now, x, t_grid, V_s_grid, I_L2_grid, L1, C, R1):
+            I_L1, V_C = x
+
+            V_s_now = np.interp(t_now, t_grid, V_s_grid)
+            I_L2_now = np.interp(t_now, t_grid, I_L2_grid)
+
+            dI_L1_dt = (V_s_now - V_C - (R1 * I_L1)) / L1
+            dV_C_dt = (I_L1 - I_L2_now) / C
+
+            return [dI_L1_dt, dV_C_dt]
+
+        # Initial conditions: [I_L1(0), V_C(0)]
+        x0 = [0.0, 0.0]
+
+        sol = solve_ivp(
+            fun=lambda t_now, x: lcl_reduced_ode(t_now, x, t, V_s, I_L2_known, L1, C, R1),
+            t_span=(t[0], t[-1]),
+            y0=x0,
+            t_eval=t,
+            method="RK45"
+        )
+
+        if not sol.success:
+            raise RuntimeError(f"ODE solver failed: {sol.message}")
+
+        # State variables
+        I_L1 = sol.y[0]
+        V_C = sol.y[1]
+
+        # Known / derived quantities
+        I_L2 = I_L2_known
+        I_C = I_L1 - I_L2
+        V_L1 = V_s - V_C - R1 * I_L1
+        V_L2 = V_C - V_g - R2 * I_L2
+
+        # Optional consistency checks
+        kcl_ok = np.allclose(I_L1, I_C + I_L2)
+
+        kvl_left_ok = np.allclose(V_s, R1 * I_L1 + V_L1 + V_C)
+
+        kvl_right_ok = np.allclose(V_C, R2 * I_L2 + V_L2 + V_g)
+
+        if not (kcl_ok and kvl_left_ok and kvl_right_ok):
+            print("Warning: one or more KCL/KVL checks are not within tolerance.")
+
+        if L2 is not None:
+            dI_L2_dt = np.gradient(I_L2, t)
+            v_l2_from_inductor_law = L2 * dI_L2_dt
+            l2_ok = np.allclose(V_L2, v_l2_from_inductor_law, rtol=1e-3, atol=1e-3)
+
+            if not l2_ok:
+                #print("Warning: V_L2 is not fully consistent with L2 * dI_L2/dt for the prescribed I_L2.")
+                None
+
+        return V_L1, I_L1, V_C, I_C, V_L2, I_L2
+
+
+
     @staticmethod
     def Plotting_Grid_Connected_LCL_filter(t, V_L1, I_L1, V_C, I_C, V_L2, I_L2, f):
 
@@ -349,8 +493,8 @@ class All_the_functions_class:
         plt.close()
 
         plt.figure(figsize=(6.4 * 2, 4.8))
-        plt.plot(t[mask], I_L1[mask], label="I_L1", linewidth=1.5)
-        plt.plot(t[mask], I_C[mask], label="I_C", linewidth=1.2)
+        #plt.plot(t[mask], I_L1[mask], label="I_L1", linewidth=1.5)
+        #plt.plot(t[mask], I_C[mask], label="I_C", linewidth=1.2)
         plt.plot(t[mask], I_L2[mask], label="I_L2", linewidth=1.2)
         plt.title("Currents in L-C-L filter")
         plt.xlabel("Time [s]")
@@ -382,3 +526,53 @@ class All_the_functions_class:
         plt.xlim(t_start, t_end)
         plt.grid()
         plt.savefig("Figures/PWM Output Voltage.png")
+
+    @staticmethod
+    def THD_and_harmonics(signal, t_ss):
+
+        N = len(signal)
+        dt = t_ss[1] - t_ss[0]
+        fs = 1 / dt
+
+        fft_vals = np.fft.fft(signal)
+        fft_vals = np.abs(fft_vals) / N
+
+        freqs = np.fft.fftfreq(N, d=dt)
+
+        # keep only positive frequencies
+        mask = freqs > 0
+        freqs = freqs[mask]
+        fft_vals = fft_vals[mask]
+
+        f0 = 50  # or 60 depending on your setup
+
+        fund_idx = np.argmin(np.abs(freqs - f0))
+        I1 = fft_vals[fund_idx]
+
+        harmonics = np.copy(fft_vals)
+        harmonics[fund_idx] = 0
+
+        THD = np.sqrt(np.sum(harmonics ** 2)) / I1
+
+        print("THD (%):", THD * 100)
+
+        num_harmonics = 20
+
+        harmonic_numbers = np.arange(1, num_harmonics + 1)
+        harmonic_amplitudes = []
+
+        for n in harmonic_numbers:
+            target_freq = n * f0
+            idx = np.argmin(np.abs(freqs - target_freq))
+            harmonic_amplitudes.append(fft_vals[idx])
+
+        harmonic_amplitudes = np.array(harmonic_amplitudes)
+
+        plt.figure(figsize=(10, 5))
+        plt.bar(harmonic_numbers, harmonic_amplitudes)
+
+        plt.title("Harmonic Spectrum of Output Current i1(t)")
+        plt.xlabel("Harmonic Number (n × f0)")
+        plt.ylabel("Amplitude")
+        plt.grid(True)
+        plt.savefig("Figures/Harmonic_Spectrum.png")

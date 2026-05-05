@@ -409,54 +409,5 @@ def Plotting_Grid_Connected_LCL_filter():
 
 Plotting_Grid_Connected_LCL_filter()
 
-def THD_and_harmonics(signal,t_ss):
-
-    N = len(signal)
-    dt = t_ss[1] - t_ss[0]
-    fs = 1 / dt
-
-    fft_vals = np.fft.fft(signal)
-    fft_vals = np.abs(fft_vals) / N
-
-    freqs = np.fft.fftfreq(N, d=dt)
-
-    # keep only positive frequencies
-    mask = freqs > 0
-    freqs = freqs[mask]
-    fft_vals = fft_vals[mask]
-
-    f0 = 50   # or 60 depending on your setup
-
-    fund_idx = np.argmin(np.abs(freqs - f0))
-    I1 = fft_vals[fund_idx]
-
-    harmonics = np.copy(fft_vals)
-    harmonics[fund_idx] = 0
-
-    THD = np.sqrt(np.sum(harmonics**2)) / I1
-
-    print("THD (%):", THD * 100)
-
-    num_harmonics = 20
-
-    harmonic_numbers = np.arange(1, num_harmonics + 1)
-    harmonic_amplitudes = []
-
-    for n in harmonic_numbers:
-        target_freq = n * f0
-        idx = np.argmin(np.abs(freqs - target_freq))
-        harmonic_amplitudes.append(fft_vals[idx])
-
-    harmonic_amplitudes = np.array(harmonic_amplitudes)
-
-
-    plt.figure(figsize=(10,5))
-    plt.bar(harmonic_numbers, harmonic_amplitudes)
-
-    plt.title("Harmonic Spectrum of Output Current i1(t)")
-    plt.xlabel("Harmonic Number (n × f0)")
-    plt.ylabel("Amplitude")
-    plt.grid(True)
-    plt.savefig("Figures/Harmonic_Spectrum.png")
 
 THD_and_harmonics(signal=I_L2,t_ss=t)

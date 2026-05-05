@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 from All_the_functions import All_the_functions_class
 
@@ -34,8 +34,10 @@ Vs_RMS_max_theoretical = Functions.compute_theoretical_fundamental_rms_limit(Vdc
 
 Profile_size = 1
 Vdc = np.full(Profile_size, 800)  # [V] Mission profile of DC bus voltage at a resolution of 1 sec
-M = np.full(Profile_size, 1)    # [-] Mission profile of modulation index at a resolution of 1 sec
-Vo = np.full(Profile_size, 400)
+M = np.full(Profile_size, 1)      # [-] Mission profile of modulation index at a resolution of 1 sec
+Vo = np.full(Profile_size, 400)   # [V] PWM pulse amplitude
+Pref_profile = np.array([1000.0])   # [W] active power reference, 1-second resolution
+Qref_profile = np.array([0.0])      # [var] reactive power reference, 1-second resolution
 
 # -------------------------
 # Time vector for simulation
@@ -47,19 +49,27 @@ points_per_cycle = 3000           # resolution per cycle  # This looks optimum f
 t = np.linspace(0, mission_profile_size, mission_profile_size * f * points_per_cycle )
 
 
+
+
 # -------------------------
 # PWM output voltage waveform
 # -------------------------
 
 V_s = Functions.Sinusoidal_Pulse_Width_Modulation_One_Phase(t=t ,M=M ,f=f ,Tsw=Tsw ,Vo=Vo ,T=T ,Vdc=Vdc )
 
-Functions.Plotting_PWM_Output_Voltage(t=t, V_s=V_s)
+#Functions.Plotting_PWM_Output_Voltage(t=t, V_s=V_s)
 
 ########################################################################################################################
 # LCL filter simulation
 ########################################################################################################################
 
-V_g = 230 * np.sqrt(2) * np.sin(2 * np.pi * f * t)           # Instantaneous Voltage of the grid
+V_g = 230 * np.sqrt(2) * np.sin(2 * np.pi * f * t)      # Instantaneous Voltage of the grid
+Vg_rms = np.sqrt(np.mean(V_g**2))
+Ig_rms = Pref_profile/Vg_rms
+Ig_rms_t = np.repeat(Ig_rms, points_per_cycle*f)
+I_g = Ig_rms_t * np.sqrt(2) * np.sin(2 * np.pi * f * t)      # Instantaneous Voltage of the grid
+
+
 
 t   = t
 V_s = V_s
@@ -68,57 +78,10 @@ L2  = 100e-6
 C   = 50e-6
 R1 = 0.05
 R2 = 0.05
+I_L2_known = I_g
 
-V_L1, I_L1, V_C, I_C, V_L2, I_L2 = Functions.Solving_LCL_Filter_Grid_Connected(t=t ,V_s=V_s ,V_g=V_g ,L1=L1 ,L2=L2 ,C=C,R1=R1 ,R2=R2)
+V_L1, I_L1, V_C, I_C, V_L2, I_L2 = Functions.Solving_LCL_Filter_Grid_Connected_Known_IL2(t=t, V_s=V_s, V_g=V_g, I_L2_known=I_L2_known, L1=L1, C=C, R1=R1, R2=R2, L2=L2)
 
 Functions.Plotting_Grid_Connected_LCL_filter(t=t ,V_L1=V_L1 ,I_L1=I_L1 ,V_C=V_C ,I_C=I_C ,V_L2=V_L2 ,I_L2=I_L2 , f=f)
 
 Functions.THD_and_harmonics(signal=I_L2,t_ss=t)
-
-
-
-
-'''
-# Last two cycles mask
-mask = t >= (t[-1] - (2 / f))
-
-
-
-
-# Means (last 2 cycles)
-print("mean(V_s) last 2 cycles  =", np.mean(V_s[mask]))
-print("mean(V_g) last 2 cycles  =", np.mean(V_g[mask]))
-print("mean(I_L1) last 2 cycles =", np.mean(I_L1[mask]))
-print("mean(I_L2) last 2 cycles =", np.mean(I_L2[mask]))
-print("mean(I_C) last 2 cycles  =", np.mean(I_C[mask]))
-
-# KCL / KVL errors (last 2 cycles)
-print("KCL error max (last 2 cycles) =",
-      np.max(np.abs(I_L1[mask] - I_C[mask] - I_L2[mask])))
-
-print("KVL left max (last 2 cycles) =",
-      np.max(np.abs(V_s[mask] - R1 * I_L1[mask] - V_L1[mask] - V_C[mask])))
-
-print("KVL right max (last 2 cycles) =",
-      np.max(np.abs(V_C[mask] - R2 * I_L2[mask] - V_L2[mask] - V_g[mask])))
-
-# Peak currents (last 2 cycles)
-print("I_L1 peak (last 2 cycles) =", np.max(np.abs(I_L1[mask])))
-print("I_L2 peak (last 2 cycles) =", np.max(np.abs(I_L2[mask])))
-'''
-
-'''
-mask = t >= t[-1] - 2*(1/f)
-
-print("mean(V_s) last 2 cycles  =", np.mean(V_s[mask]))
-print("mean(I_L1) last 2 cycles =", np.mean(I_L1[mask]))
-print("mean(I_L2) last 2 cycles =", np.mean(I_L2[mask]))
-print("mean(I_C) last 2 cycles  =", np.mean(I_C[mask]))
-'''
-
-# Improve the formation of V_s
-# I think when you are flipping the V_s from positive cycle to negative there are some un symmetries
-# First fix that then we can look at optimum LCL and what to do with damping.
-# Once this is done we will look for controlling the AC power of the whole inverter
-# Then we will change it to Three phase
-# Then we will look into phase changing
