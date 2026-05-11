@@ -25,7 +25,7 @@ class Input_parameters_class:
         # ----------------------------------------#
 
         self.P = P_in
-        self.Q = Q_in
+        self.Q = Q_in    # Negative is inductive and Positive is capacitive
 
         Profile_size = len(P_in)
 

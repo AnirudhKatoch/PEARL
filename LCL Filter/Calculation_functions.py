@@ -1,246 +1,605 @@
+import matplotlib.pyplot as plt
 import numpy as np
-import numexpr as ne
-from pathlib import Path
-import rainflow
-import pandas as pd
+from scipy.signal import cont2discrete
+
+
+plt.rcParams.update({"font.size": 15, "font.family": "Times New Roman", "axes.labelsize": 15, "axes.titlesize": 15,
+                     "xtick.labelsize": 15, "ytick.labelsize": 15, "legend.fontsize": 15})
 
 class Calculation_functions_class:
 
     @staticmethod
-    def compute_power_flow(P,
-                           Q,
-                           V_dc,
-                           Vs,
-                           M,
-                           modulation_scheme,
-                           inverter_phases,
-                           single_phase_inverter_topology):
+    def validate_pwm_pulse_amplitude(Vdc_rated, inverter_phases, single_phase_inverter_topology,waveform_voltage_definition, Vo):
 
         """
-        Compute apparent power S, RMS current Is, and phase angle phi
+        Validate the instantaneous PWM pulse amplitude Vo from Vdc_rated depending on the inverter configuration.
 
         Parameters
         ----------
-        P : array
-            Active power per sec [W]
-        Q : array
-            Reactive power per sec [VAr]
-        V_dc : array
-             DC-side phase voltage per sec [V]
-        Vs : array
-             RMS AC-side phase voltage per sec [V]
-        M : float
-            Modulation index [-]
-        modulation_scheme : {"spwm","svm"}
-            Modulation strategy used for generating inverter switching signals.
-        inverter_phases  : {"1","3"}
-            Number of phases. If 3, Vs is interpreted as PHASE RMS (i.e., V_ll/sqrt(3)).
-        single_phase_inverter_topology : {"half","full"}
-            Inverter topology (affects Vs limit for single-phase).
+        Vdc_rated : float
+            Rated DC bus voltage [V]
+        inverter_phases : {1, 3}
+            Number of inverter phases.
+        single_phase_inverter_topology : {"half", "full"}, optional
+            Required when inverter_phases == 1.
+        waveform_voltage_definition : {"switched_output", "pole_voltage"}
+            Meaning of the waveform being generated.
 
-        Vs, Is, phi, V_dc, pf, M, S
-        Returns
-        -------
+            For single-phase:
+            - "switched_output":
+                half-bridge  -> max |Vo| = Vdc_rated/2
+                full-bridge  -> max |Vo| = Vdc_rated
+            - "pole_voltage":
+                max |Vo| = Vdc_rated/2
 
-        Vs : array
-             RMS AC-side phase voltage per sec [V]
-        Is : array
-            RMS current per sample [A].
-        phi : array
-            Phase angle between voltage and current per sample [rad]
-        V_dc : array
-            DC-side  voltage per sec [V]
-        pf : array
-            Power factor per sec [-].
-        M : float
-            Modulation index [-]
-        S : array
-            Apparent power per sample [VA].
+            For three-phase:
+            - "pole_voltage":
+                max |Vo| = Vdc_rated/2
+            - "switched_output":
+                "Not Supported".
 
+        Vo : Array
+            Requested pulse amplitude [V].
 
         """
 
-        pf = np.zeros_like(P, dtype=float)
-        Is = np.zeros_like(P, dtype=float)  # [A] Inverter RMS current
-        phi = np.zeros_like(P, dtype=float)  # [rad] Phase angle
+        if Vdc_rated <= 0:
+            raise ValueError("Vdc_rated must be positive.")
 
-        S = np.sqrt(P ** 2 + Q ** 2)  # [VA] Inverter RMS apparent power
+        if inverter_phases not in (1, 3):
+            raise ValueError("inverter_phases must be 1 or 3.")
 
-        # Case 1: P = 0 AND Q != 0 → pf = 0
-        m_P0_Qnz = (P == 0) & (Q != 0)
-        pf[m_P0_Qnz] = 0.0
-
-        # Case 2: P != 0 AND Q = 0 → pf = ±1
-        m_Pnz_Q0 = (P != 0) & (Q == 0)
-        pf[m_Pnz_Q0] = np.sign(P[m_Pnz_Q0]) * 1.0
-
-        # Case 3: General case (both P and Q nonzero)
-        m_general = (P != 0) & (Q != 0)
-        pf[m_general] = np.abs(P[m_general] / S[m_general])
-        pf[(m_general & (Q < 0))] *= -1
+        if waveform_voltage_definition not in ("switched_output", "pole_voltage"):
+            raise ValueError("waveform_voltage_definition must be 'switched_output' or 'pole_voltage'.")
 
         if inverter_phases == 1:
+            if single_phase_inverter_topology not in ("half", "full"):
+                raise ValueError("For single-phase inverter, single_phase_inverter_topology must be 'half' or 'full'.")
+
+            if waveform_voltage_definition == "pole_voltage":
+                Vo_theoretical_max = Vdc_rated / 2.0
+            else:  # switched_output
+                if single_phase_inverter_topology == "half":
+                    Vo_theoretical_max = Vdc_rated / 2.0
+                else:  # full bridge
+                    Vo_theoretical_max = Vdc_rated
+
+        else:  # inverter_phases == 3
+            if waveform_voltage_definition == "pole_voltage":
+                # For standard 2-level three-phase leg voltages
+                Vo_theoretical_max = Vdc_rated / 2.0
+            else:
+                raise ValueError(f"waveform_voltage_definition='switched_output' is not supported "
+                    f"for inverter_phases={inverter_phases}.Three-phase inverters currently support only 'pole_voltage' definition.")
+
+        if np.any(Vo < 0):
+            raise ValueError(f"Invalid Vo detected. All values in Vo must be non-negative. "
+                             f"Minimum detected value is {np.min(Vo):.3f} V.")
+
+        if np.any(Vo > Vo_theoretical_max):
+            raise ValueError(f"Invalid Vo detected. All values in Vo must be less than or equal to "
+                             f"Vo_theoretical_max={Vo_theoretical_max:.3f} V. "
+                             f"Maximum detected value is {np.max(Vo):.3f} V.")
+
+    @staticmethod
+    def validate_ac_rms_voltage_limit(Vdc_rated, M, inverter_phases, modulation_scheme,single_phase_inverter_topology, Vg_RMS):
+
+        """
+        Validate that the requested inverter AC RMS output voltage does not exceed
+        the theoretical maximum achievable RMS voltage for the selected inverter
+        configuration.
+
+        Parameters
+        ----------
+        Vdc_rated : float
+            Rated DC bus voltage [V]
+
+        M : float
+            Modulation index [-]
+
+        inverter_phases : {1, 3}
+            Number of inverter phases
+
+        modulation_scheme : {"spwm", "svm"}
+            PWM modulation scheme
+
+        single_phase_inverter_topology : {"half", "full"}, optional
+            Required when inverter_phases == 1
+
+        Vg_RMS : array_like
+            Requested inverter AC RMS output voltage profile [V]
+
+        """
+
+        if Vdc_rated <= 0:
+            raise ValueError("Vdc_rated must be positive.")
+
+        if np.any(Vg_RMS < 0):
+            raise ValueError("M must be non-negative.")
+
+        if inverter_phases not in (1, 3):
+            raise ValueError("inverter_phases must be 1 or 3.")
+
+        if modulation_scheme not in ("spwm", "svm"):
+            raise ValueError("modulation_scheme must be 'spwm' or 'svm'.")
+        
+        if modulation_scheme == "svm":
+            raise ValueError(f"Current framework only supports 'spwm' modulation. ")
+
+        if inverter_phases == 1:
+
+            if single_phase_inverter_topology not in ("half", "full"):
+                raise ValueError("For single-phase inverter, "
+                    "single_phase_inverter_topology must be 'half' or 'full'.")
+
             if single_phase_inverter_topology == "full":
-                Vs_theoretical = (M * V_dc) / np.sqrt(2.0)
-            elif single_phase_inverter_topology == "half":
-               Vs_theoretical = (M * V_dc) / (2.0 * np.sqrt(2.0))
-        elif inverter_phases == 3:
+                Vg_RMS_max_theoretical = (M * Vdc_rated) / np.sqrt(2.0)
+
+            else:  # half bridge
+                Vg_RMS_max_theoretical = (M * Vdc_rated) / (2.0 * np.sqrt(2.0))
+
+        else:  # three-phase
+
             if modulation_scheme == "svm":
-                # Space vector PWM (or 3rd harmonic injection)
-                Vs_theoretical = (M * V_dc) / np.sqrt(6.0)  # [V RMS phase]
-            elif modulation_scheme == "spwm":  # "spwm"
-                # Sinusoidal PWM
-                Vs_theoretical = (M * V_dc) / (2.0 * np.sqrt(2.0))
+                Vg_RMS_max_theoretical = (M * Vdc_rated) / np.sqrt(6.0)
 
-        if Vs.size == 0:
-            Vs = Vs_theoretical.copy()
+            else:  # spwm
+                Vg_RMS_max_theoretical = (M * Vdc_rated) / (2.0 * np.sqrt(2.0))
 
-        else:
-            indices = np.where(Vs > Vs_theoretical)[0]
-            if indices.size > 0:
-                raise ValueError(
-                    f"Invalid input: AC phase RMS voltage exceeds the theoretical limit "
-                    f"Vs must not be greater than {np.max(Vs_theoretical)}.")
+        if np.any(Vg_RMS < 0):
+            raise ValueError(f"Invalid Vg_RMS detected. All values must be non-negative. "
+                             f"Minimum detected value is {np.min(Vg_RMS):.3f} V.")
 
-        # masks
-        m0 = pf == 0  # zero power factor
-        mneg = pf < 0  # inductive
-        mpos = pf > 0  # capacitive
+        if np.any(Vg_RMS > Vg_RMS_max_theoretical):
+            violation_idx = np.where(Vg_RMS > Vg_RMS_max_theoretical)[0]
+            raise ValueError(f"Invalid Vg_RMS detected. Vg_RMS must be less than or equal to "
+                             f"Vg_RMS_max_theoretical at every profile second. "
+                             f"First violation at index {violation_idx[0]}: "
+                             f"Vg_RMS={Vg_RMS[violation_idx[0]]:.3f} V, "
+                             f"Vg_RMS_max_theoretical={Vg_RMS_max_theoretical[violation_idx[0]]:.3f} V.")
 
-        # ---- pf == 0 branch ----
-        # P[i] = 0
-        P[m0] = 0.0
+    @staticmethod
+    def validate_simulation_resolution(samples_per_switching_period, Minimum_required_samples_per_switching_period):
 
-        # S[i] = sqrt(P[i]^2 + Q[i]^2)  (with P already zeroed where m0)
-        S[m0] = np.sqrt(P[m0] ** 2 + Q[m0] ** 2)
+        """
+        Validate that the simulation time resolution is sufficient to accurately
+        resolve PWM switching events.
 
-        # Is[i] = S[i] / Vs[i]
-        with np.errstate(divide='ignore', invalid='ignore'):
-            Is[m0] = S[m0] / (Vs[m0] if inverter_phases == 1 else (3.0 * Vs[m0]))
+        Parameters
+        ----------
+        samples_per_switching_period : float
+            Actual number of simulation samples within one PWM switching period.
 
+        minimum_required_samples_per_switching_period : int or float
+            Minimum required number of samples per switching period.
 
-        # phi: 0 if S==0 else ±pi/2 depending on sign of Q
-        phi[m0] = 0.0
-        nz = m0 & (S != 0)
-        phi[nz] = np.where(Q[nz] > 0, np.pi / 2, -np.pi / 2)
+        Raises
+        ------
+        ValueError
+            Raised when the simulation resolution is too low for accurate PWM
+            waveform representation.
+        """
 
-        # ---- pf != 0 branch ----
-        abspf = np.abs(pf)
-        mnz = ~m0  # pf != 0
+        if samples_per_switching_period < Minimum_required_samples_per_switching_period:
+            raise ValueError(f"Insufficient PWM simulation resolution.\n"
+                             f"Current samples per switching period = {samples_per_switching_period:.2f}\n"
+                             f"At least {Minimum_required_samples_per_switching_period} samples per switching"
+                             f" period are required to accurately resolve PWM switching events."
+                             f" Increase the value of resolution_per_cycle.")
 
-        # S[i] = P[i] / abs(pf[i])
-        S[mnz] = np.abs(P[mnz]) / np.abs(pf[mnz])
+    @staticmethod
+    def validate_required_inverter_voltage(Vs_ref, Vo_available):
 
-        # Is[i] = S[i] / Vs[i]
-        with np.errstate(divide='ignore', invalid='ignore'):
-            Is[mnz] = S[mnz] / (Vs[mnz] if inverter_phases == 1 else (3.0 * Vs[mnz]))
+        """
+        Validate that the required inverter reference voltage does not exceed
+        the available inverter switching voltage capability.
 
-        # phi[i] = ± arccos(abs(pf[i]))
-        phi[mneg] = -np.arccos(abspf[mneg])  # inductive
-        phi[mpos] = np.arccos(abspf[mpos])  # capacitive
+        Parameters
+        ----------
+        Vs_ref : array_like
+            Required inverter reference voltage waveform [V]
 
-        # Q[i] = ± sqrt(S[i]^2 - P[i]^2) for pf != 0
-        # (Note: numerical noise can make the radicand slightly negative; clip at 0.)
-        rad = np.clip(S[mnz] ** 2 - P[mnz] ** 2, 0.0, None)
-        root = np.sqrt(rad)
-        idx_mnz = np.where(mnz)[0]
-        Q[idx_mnz[mneg[mnz]]] = -root[mneg[mnz]]
-        Q[idx_mnz[mpos[mnz]]] = root[mpos[mnz]]
+        Vo_available : float or array_like
+            Available inverter pulse amplitude capability [V]
 
-        return Vs, Is, phi, V_dc, pf, M, S
+        Raises
+        ------
+        ValueError
+            Raised when the required inverter voltage exceeds the available
+            inverter capability.
+        """
 
+        Vs_peak = np.max(np.abs(Vs_ref))
+
+        if np.any(Vs_peak > Vo_available):
+
+            if np.isscalar(Vo_available):
+                available = Vo_available
+            else:
+                available = np.min(Vo_available)
+
+            raise ValueError(
+                "Not feasible: required inverter voltage exceeds capability.\n"
+                f"Required peak = {Vs_peak:.2f} V, "
+                f"Available = {available:.2f} V"
+            )
+
+    @staticmethod
+    def Inverse_LCL_Filter_Grid_Connected_for_Vs(t, V_g, I_L2, L1, L2, C, R1, R2):
+
+        """
+        Reverse-calculate LCL filter quantities from known grid voltage and desired grid current.
+
+        Known:
+        ------
+        V_g  : grid voltage [V]
+        I_L2 : desired grid-side current [A]
+
+        Calculates:
+        -----------
+        V_L2 : grid-side inductor voltage [V]
+        V_C  : capacitor voltage [V]
+        I_C  : capacitor current [A]
+        I_L1 : inverter-side inductor current [A]
+        V_L1 : inverter-side inductor voltage [V]
+        V_s  : required inverter voltage [V]
+
+        Explanation
+
+        LCL Filter Differential Equations (Grid-Connected Inverter)
+
+        This system models the dynamics of an LCL filter connecting an inverter to the grid.
+
+        The circuit structure is:
+            Vs → R1 → L1 → Vc → R2 → L2 → Vg
+                              │
+                              C
+                              │
+                            ground
+
+        Where:
+            Vs   : inverter output voltage
+            Vg   : grid voltage
+            Vc   : capacitor node voltage
+            IL1  : current through inverter-side inductor (L1)
+            IL2  : current through grid-side inductor (L2)
+            Ic   : capacitor current
+            R1,R2: series resistances
+            L1,L2: inductances
+            C    : capacitance
+
+        ------------------------------------------------------------
+        1) LEFT SIDE (Inverter → L1 → Capacitor node)
+
+        Apply KVL:
+            Vs = Vc + R1*IL1 + L1*dIL1/dt
+        Rearranged into differential form:
+            dIL1/dt = (Vs - Vc - R1*IL1) / L1
+
+        ------------------------------------------------------------
+        2) RIGHT SIDE (Capacitor node → L2 → Grid)
+
+        Apply KVL:
+            Vc = Vg + R2*IL2 + L2*dIL2/dt
+        Rearranged into differential form:
+            dIL2/dt = (Vc - Vg - R2*IL2) / L2
+
+        ------------------------------------------------------------
+        3) CAPACITOR NODE (KCL)
+
+        At node Vc:
+            IL1 = Ic + IL2
+        Capacitor equation:
+            Ic = C * dVc/dt
+        Combine:
+            C * dVc/dt = IL1 - IL2
+        Rearranged:
+            dVc/dt = (IL1 - IL2) / C
+
+        ------------------------------------------------------------
+        Summary of state equations:
+        dIL1/dt = (Vs - Vc - R1*IL1) / L1
+        dIL2/dt = (Vc - Vg - R2*IL2) / L2
+        dVc/dt  = (IL1 - IL2) / C
+
+        """
+
+        # Function starts here
+        t = np.asarray(t)
+        V_g = np.asarray(V_g)
+        I_L2 = np.asarray(I_L2)
+
+        if t.ndim != 1 or V_g.ndim != 1 or I_L2.ndim != 1:
+            raise ValueError("t, V_L2, and I_L2 must be 1D arrays.")
+
+        if not (len(t) == len(V_g) == len(I_L2)):
+            raise ValueError("t, V_L2, and I_L2 must have the same length.")
+
+        if len(t) < 2:
+            raise ValueError("t must contain at least two time points.")
+
+        if L1 <= 0 or L2 <= 0 or C <= 0:
+            raise ValueError("L1, L2, and C must be positive.")
+
+        # From: Right Side
+        dI_L2_dt = np.gradient(I_L2, t)  # Taking derivative of L2 inductor current
+        V_C = V_g + (R2 * I_L2) + (L2 * dI_L2_dt)
+
+        # From: Middle
+        # I_C = C*dV_C/dt
+        dV_C_dt = np.gradient(V_C, t)  # Taking derivative of C capacitor Voltage
+        I_C = C * dV_C_dt
+        # KCL: I_L1 = I_C + I_L2
+        I_L1 = I_C + I_L2
+
+        # From: Left
+        # dIL1/dt
+        dI_L1_dt = np.gradient(I_L1, t)  # Taking derivative of L1 inductor current
+        # Required inverter voltage:
+        # V_s = V_C + R1*I_L1 + V_L1
+        V_s = V_C + (R1 * I_L1) + (L1 * dI_L1_dt)
+
+        return V_s
+
+    @staticmethod
+    def Sinusoidal_Pulse_Width_Modulation_One_Phase(P_RMS, t, Vo, Vs_ref, Tsw):
+
+        """
+        Generate single-phase sinusoidal PWM (SPWM) voltage waveform.
+
+        Parameters
+        ----------
+        P_RMS : array
+        RMS Active Power [s]
+        t : array
+        Time vector [s]
+        Vo : array
+        PWM pulse amplitude [V]
+        Tsw : float
+        Switching period [s]
+        Vs_ref : array
+        Reference voltage for inverter PMW output[V]
+
+        Returns
+        -------
+        V_s : array
+        PWM output voltage waveform [V]
+        """
+
+        t_profile = np.arange(len(P_RMS))
+        Vo_t = np.interp(t, t_profile, Vo)
+        m_ref = Vs_ref / Vo_t
+
+        def v_carrier(t, Tsw):
+            tau = (t % Tsw) / Tsw
+            return 4.0 * np.abs(tau - 0.5) - 1.0
+
+        carrier = v_carrier(t, Tsw)
+
+        Vs = np.where(m_ref >= carrier, Vo_t, -Vo_t)
+
+        return Vs
+
+    @staticmethod
+    def LCL_Filter_Grid_Connected(t, Vs, Vg, L1, L2, C, R1, R2):
+
+        """
+        Solve the time-domain response of an LCL filter connected between an inverter and the grid.
+
+        The function computes the inductor currents, capacitor voltage, and related voltages
+        based on the differential equations of the LCL filter.
+
+        Differential equations
+        ----------------------
+        dI_L1_dt = (Vs - V_C - (R1 * I_L1)) / L1
+        dI_L2_dt = (V_C - V_g - R2 * I_L2) / L2
+        dV_C_dt = (I_L1 - I_L2) / C
+
+        Naming convention
+        -----------------
+        Vs  : inverter voltage input
+        Vg  : known grid voltage
+        I_L1 : current through left inductor
+        V_L1 : voltage across left inductor
+        I_L2 : current through right inductor
+        V_L2 : voltage across right inductor
+        V_C  : capacitor voltage
+        I_C  : capacitor current
+        R1  : Series resistance of inverter-side inductor
+        R2  : Series resistance of grid-side inductor
+
+        Parameters
+        ----------
+        t : array
+        Time vector [s]
+        Vs : array
+        Inverter output voltage [V]
+        Vg : array
+        Grid voltage [V]
+        L1 : float
+        Inverter-side inductance [H]
+        L2 : float
+        Grid-side inductance [H]
+        C : float
+        Filter capacitance [F]
+        R1 : float
+        Series resistance of inverter-side inductor [Ohm]
+        R2 : float
+        Series resistance of grid-side inductor [Ohm]
+
+        Returns
+        -------
+        V_L1 : array
+        Voltage across inverter-side inductor [V]
+        I_L1 : array
+        Current through inverter-side inductor [A]
+        V_C : array
+        Capacitor voltage [V]
+        I_C : array
+        Capacitor current [A]
+        V_L2 : array
+        Voltage across grid-side inductor [V]
+        I_L2 : array
+        Current through grid-side inductor [A]
+        """
+
+        t = np.asarray(t)
+        Vs = np.asarray(Vs)
+        Vg = np.asarray(Vg)
+
+        if len(t) != len(Vs) or len(t) != len(Vg):
+            raise ValueError("t, Vs, and Vg must have the same length.")
+
+        dt_array = np.diff(t)
+        if not np.allclose(dt_array, dt_array[0]):
+            raise ValueError("This discrete state-space method requires a fixed time step.")
+
+        dt = dt_array[0]
+        n = len(t)
+
+        # State vector:
+        # x = [I_L1, I_L2, V_C]
+        A = np.array([[-R1 / L1, 0.0, -1.0 / L1],
+                      [0.0, -R2 / L2, 1.0 / L2],
+                      [1.0 / C, -1.0 / C, 0.0]])
+
+        # Input vector:
+        # u = [Vs, Vg]
+        B = np.array([[1.0 / L1, 0.0],
+                      [0.0, -1.0 / L2],
+                      [0.0, 0.0]])
+
+        # Discretize continuous-time system
+        Ad, Bd, _, _, _ = cont2discrete((A, B, np.eye(3), np.zeros((3, 2))), dt, method="zoh")
+
+        # Allocate state array
+        x = np.zeros((3, n))
+
+        # Time-domain simulation
+        for k in range(n - 1):
+            u_k = np.array([Vs[k], Vg[k]])
+            x[:, k + 1] = Ad @ x[:, k] + Bd @ u_k
+
+        # State variables
+        I_L1 = x[0, :]
+        I_L2 = x[1, :]
+        V_C = x[2, :]
+
+        # Derived quantities
+        I_C = I_L1 - I_L2
+        V_L1 = Vs - V_C - R1 * I_L1
+        V_L2 = V_C - Vg - R2 * I_L2
+
+        # Optional consistency checks
+        kcl_ok = np.allclose(I_L1, I_C + I_L2)
+        kvl_left_ok = np.allclose(Vs, R1 * I_L1 + V_L1 + V_C)
+        kvl_right_ok = np.allclose(V_C, R2 * I_L2 + V_L2 + Vg)
+
+        if not (kcl_ok and kvl_left_ok and kvl_right_ok):
+            print("Warning: one or more KCL/KVL checks are not within tolerance.")
+
+        return V_L1, I_L1, V_C, I_C, V_L2, I_L2
 
 
     @staticmethod
-    def synthetic_profile(THD_input, dt, rms_values, phi, omega,
-                          harmonic_orders=None,
-                          harmonic_weights=None,
-                          harmonic_phases=None):
-        """
-        Generic synthetic waveform generator for voltage or current.
+    def compute_THD(t, signal, f, Location, IL2_THD_plotting, max_plot_harmonic, cycle_start=None):
 
+        """
         Parameters
         ----------
-        THD_input : float or array_like
-            THD of the waveform [-]
-        dt : float
-            Time step [s]
-        rms_values : array_like
-            RMS values per sample (current or voltage)
-        phi : array_like
-            Fundamental phase angle per sample [rad]
-        omega : float
-            Fundamental angular frequency [rad/s]
-        harmonic_orders : array_like, optional
-            Harmonic orders
-        harmonic_weights : array_like, optional
-            Relative harmonic RMS weights
-        harmonic_phases : array_like, optional
-            Harmonic phase angles [rad]
+        t : array
+            Time vector [s]
+        signal : array
+            Signal waveform to be analyzed, usually grid-side current I_L2 [A]
+        f : float
+            Fundamental frequency [Hz]
+        Location : str
+            File path where the harmonic spectrum plot is saved
+        IL2_THD_plotting : bool
+            If True, plot and save the harmonic RMS spectrum
+        max_plot_harmonic : int
+            Maximum harmonic order shown in the plot
+        cycle_start : float, optional
+            Start time of the cycle used for THD calculation [s].
+            If None, the last full fundamental cycle is used.
 
         Returns
         -------
-        waveform_final : ndarray
-            Synthetic instantaneous waveform
+        THD : float
+            Total Harmonic Distortion in per-unit [-]
+        THD_percent : float
+            Total Harmonic Distortion in percent [%]
+        I1_rms : float
+            RMS value of the fundamental component [A]
+        freqs : array
+            FFT frequency vector [Hz]
+        mag_rms : array
+            RMS magnitude spectrum of the signal
         """
 
-        if harmonic_orders is None:
-            harmonic_orders = np.array([5, 7, 11, 13])
+        t = np.asarray(t)
+        signal = np.asarray(signal)
 
-        if harmonic_weights is None:
-            harmonic_weights = np.array([0.50, 0.30, 0.15, 0.05], dtype=float)
+        T = 1 / f
+        dt = t[1] - t[0]
 
-        harmonic_weights = np.asarray(harmonic_weights, dtype=float)
-        harmonic_weights = harmonic_weights / np.sum(harmonic_weights)
+        if cycle_start is None:
+            cycle_start = t[-1] - T
 
-        if harmonic_phases is None:
-            harmonic_phases = np.zeros(len(harmonic_orders))
+        cycle_end = cycle_start + T
 
-        rms_values = np.asarray(rms_values)
-        phi = np.asarray(phi)
+        mask = (t >= cycle_start) & (t < cycle_end)
 
-        samples_per_main_sample = int(round(1 / dt))
-        t = np.arange(0, len(rms_values), dt)
+        y = signal[mask]
 
-        rms_expanded = np.repeat(rms_values, samples_per_main_sample)
-        phi_expanded = np.repeat(phi, samples_per_main_sample)
+        # Remove DC offset
+        y = y - np.mean(y)
 
-        n = min(len(t), len(rms_expanded), len(phi_expanded))
-        t = t[:n]
-        rms_expanded = rms_expanded[:n]
-        phi_expanded = phi_expanded[:n]
+        N = len(y)
 
-        # Fundamental
-        waveform_fundamental = np.sqrt(2) * rms_expanded * np.sin(omega * t + phi_expanded)
+        # FFT
+        Y = np.fft.rfft(y)
 
-        # THD expansion
-        if np.isscalar(THD_input):
-            THD_expanded = np.full_like(rms_expanded, THD_input, dtype=float)
-        else:
-            THD_input = np.asarray(THD_input)
-            THD_expanded = np.repeat(THD_input, samples_per_main_sample)[:n]
+        # RMS spectrum
+        mag_rms = np.abs(Y) * np.sqrt(2) / N
+        mag_rms[0] = np.abs(Y[0]) / N
+        freqs = np.fft.rfftfreq(N, d=dt)
 
-        # Harmonics
-        h_total_rms = THD_expanded * rms_expanded
-        h_rms = h_total_rms[:, np.newaxis] * np.sqrt(harmonic_weights)[np.newaxis, :]
+        # ----------------------------------------
+        # Harmonic extraction WITHOUT for-loops
+        # ----------------------------------------
+        max_harmonic = int(freqs[-1] // f)
+        harmonic_orders = np.arange(1, max_harmonic + 1)
+        harmonic_freqs = harmonic_orders * f
 
-        waveform_harmonics_total = np.zeros_like(t, dtype=float)
+        # Find nearest FFT bin for each harmonic
+        indices = np.abs(freqs[:, None] - harmonic_freqs).argmin(axis=0)
 
-        for k, (h, ph) in enumerate(zip(harmonic_orders, harmonic_phases)):
-            component = np.sqrt(2) * h_rms[:, k] * np.sin(h * omega * t + ph)
-            waveform_harmonics_total += component
+        # Extract harmonic RMS values
+        harmonic_rms = mag_rms[indices]
 
-        waveform_total = waveform_fundamental + waveform_harmonics_total
+        # Fundamental RMS
+        I1_rms = harmonic_rms[0]
 
-        def rms_per_main_sample(signal):
-            n_full = len(signal) // samples_per_main_sample
-            trimmed = signal[:n_full * samples_per_main_sample]
-            reshaped = trimmed.reshape(n_full, samples_per_main_sample)
-            return np.sqrt(np.mean(reshaped ** 2, axis=1))
+        # THD calculation
+        harmonic_rms_sq = np.sum(harmonic_rms[1:] ** 2)
+        THD = np.sqrt(harmonic_rms_sq) / I1_rms
+        THD_percent = THD * 100
 
-        waveform_total_rms = rms_per_main_sample(waveform_total)
-        ratio = waveform_total_rms / rms_values[:len(waveform_total_rms)]
-        ratio_expanded = np.repeat(ratio, samples_per_main_sample)
+        # ----------------------------------------
+        # Plotting
+        # ----------------------------------------
 
-        waveform_final = waveform_total[:len(ratio_expanded)] / ratio_expanded
-        return waveform_final
+        harmonic_orders_plot = harmonic_orders[:max_plot_harmonic]
+        harmonic_rms_plot = harmonic_rms[:max_plot_harmonic]
+
+        if IL2_THD_plotting:
+            plt.figure(figsize=(6.4, 4.8))
+            plt.bar(harmonic_orders_plot, harmonic_rms_plot)
+            plt.xlabel("Harmonic Order")
+            plt.ylabel("RMS Current [A]")
+            plt.title(f"THD = {THD_percent:.2f}%")
+            plt.grid(True)
+            plt.savefig(Location)
+
+        return THD, THD_percent, I1_rms, freqs, mag_rms

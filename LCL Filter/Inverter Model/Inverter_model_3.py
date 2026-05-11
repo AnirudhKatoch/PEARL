@@ -17,7 +17,7 @@ single_phase_inverter_topology = "full"          # ["full" or "half"] Single-pha
 waveform_voltage_definition = "switched_output"  # ["switched_output" or "pole_voltage"] Voltage meaning: "switched_output" = load voltage, "pole_voltage" = single leg voltage (±Vdc/2)
 modulation_scheme = "spwm"                       # ["spwm" or "svm"] # PWM strategy used to generate switching signals; "spwm" = Sinusoidal PWM , "svm" = Space Vector Modulation; NOTE: current system supports only "spwm" and does NOT support "svm"
 f = 50                                           # [Hz] Fundamental frequency, desired AC output frequency of the inverter (e.g., grid frequency 50 Hz)
-fsw = 10000                                      # [Hz] Switching frequency, frequency at which PWM switches turn ON/OFF (carrier frequency)
+fsw = 1000000                                      # [Hz] Switching frequency, frequency at which PWM switches turn ON/OFF (carrier frequency)
 T = 1 / f                                        # [s] Fundamental period, time for one full AC cycle (e.g., 20 ms for 50 Hz)
 Tsw = 1 / fsw                                    # [s] Switching period, time for one PWM switching cycle (e.g., 100 µs for 10 kHz)
 
@@ -44,7 +44,7 @@ Qref_profile = np.array([0.0])      # [var] reactive power reference, 1-second r
 # -------------------------
 
 mission_profile_size = len(Vdc)
-points_per_cycle = 3000           # resolution per cycle  # This looks optimum for the time being change that later on with some more iteration
+points_per_cycle = 1000           # resolution per cycle  # This looks optimum for the time being change that later on with some more iteration
 
 t = np.linspace(0, mission_profile_size, mission_profile_size * f * points_per_cycle )
 
@@ -55,7 +55,19 @@ t = np.linspace(0, mission_profile_size, mission_profile_size * f * points_per_c
 # PWM output voltage waveform
 # -------------------------
 
-V_s = Functions.Sinusoidal_Pulse_Width_Modulation_One_Phase(t=t ,M=M ,f=f ,Tsw=Tsw ,Vo=Vo ,T=T ,Vdc=Vdc )
+V_s = Functions.Sinusoidal_Pulse_Width_Modulation_One_Phase_old(t=t ,M=M ,f=f ,Tsw=Tsw ,Vo=Vo ,T=T ,Vdc=Vdc )
+
+# Time window
+t_start = 0.00
+t_end = 1
+mask = (t >= t_start) & (t <= t_end)
+
+
+plt.plot(t[mask], V_s[mask])
+plt.show()
+
+
+'''
 
 #Functions.Plotting_PWM_Output_Voltage(t=t, V_s=V_s)
 
@@ -85,3 +97,4 @@ V_L1, I_L1, V_C, I_C, V_L2, I_L2 = Functions.Solving_LCL_Filter_Grid_Connected_K
 Functions.Plotting_Grid_Connected_LCL_filter(t=t ,V_L1=V_L1 ,I_L1=I_L1 ,V_C=V_C ,I_C=I_C ,V_L2=V_L2 ,I_L2=I_L2 , f=f)
 
 Functions.THD_and_harmonics(signal=I_L2,t_ss=t)
+'''
