@@ -5,30 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest">
+      <change afterPath="$PROJECT_DIR$/LCL Filter/Inductor_Inputs.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/LCL_filter_design.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/trial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Input_parameters.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Figures/I_L2_Harmonics.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Figures/I_L2_Harmonics.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/All_the_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Inverter Model/All_the_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/01_slack_voltages_abc_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/02_inverter_voltages_abc_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/03_pcc_voltages_abc_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/04_grid_currents_abc_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/05_pll_vq_and_filtered_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/06_pll_pi_states_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/07_pll_frequency_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/10_closedloop_dq_currents_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/14_active_power_and_filtered_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/15_reactive_power_and_filtered_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/16_power_controller_current_refs_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/17_dynamic_power_references_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/8_pll_angle_states_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/9_closedloop_dq_voltages_2s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/Current.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/Harmonic_Spectrum.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Figures/Voltage.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Inverter_model_3.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Inverter Model/Inverter_model_3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter Model/Inverter_model_5.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Inverter Model/Inverter_model_5.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Inverter_model_5.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/mother_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/mother_function.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -76,6 +60,7 @@
     "Python.Calculation_functions.executor": "Run",
     "Python.Causer model.executor": "Run",
     "Python.Electrical_model.executor": "Run",
+    "Python.Inductor_Inputs.executor": "Run",
     "Python.Input_parameters.executor": "Run",
     "Python.Inverter_calculations.executor": "Run",
     "Python.Inverter_model.executor": "Run",
@@ -85,6 +70,7 @@
     "Python.Inverter_model_4.executor": "Run",
     "Python.Inverter_model_5.executor": "Run",
     "Python.LCL_filter_ODE.executor": "Run",
+    "Python.LCL_filter_design.executor": "Run",
     "Python.Plotting_conference.executor": "Run",
     "Python.Plotting_final_results.executor": "Run",
     "Python.Plotting_function.executor": "Run",
