@@ -96,8 +96,6 @@ class Input_parameters_class:
 
         self.R1 = 0.05
 
-
-
         # ----------------------------------------#
         # LCL filter grid side [Inductor properties]
         # ----------------------------------------#

@@ -1,66 +1,65 @@
-def safety_checks(B_peak, B_max,Bsat,lg,le):
-    # ── Check 1: B_peak must be below B_max ──────────────────────────────────────
-    if B_peak >= B_max:
-        raise ValueError(
-            f"\nSAFETY CHECK FAILED: Flux density exceeds maximum operating limit.\n"
-            f"B_peak = {B_peak:.4f} T\n"
-            f"B_max  = {B_max:.4f} T\n"
-            f"\nRecommendation:\n"
-            f"  Increase N by 1 and recalculate lg, or\n"
-            f"  Increase Ae to reduce required N, or\n"
-            f"  Reduce I_peak by using more parallel inductor units."
-        )
-    else:
-        print(f"CHECK 1 PASSED: B_peak = {B_peak:.4f} T < B_max = {B_max:.4f} T")
+@staticmethod
+def calculate_inductor_core_losses(I_peak_harmonics, harmonic_freqs, mu_0, N, lg, le, mu_r, k, a, b, Ve):
 
-    # ── Check 2: B_peak must be below Bsat ───────────────────────────────────────
-    if B_peak >= Bsat:
-        raise ValueError(
-            f"\nSAFETY CHECK FAILED: Flux density exceeds saturation limit.\n"
-            f"B_peak = {B_peak:.4f} T\n"
-            f"Bsat   = {Bsat:.4f} T\n"
-            f"\nRecommendation:\n"
-            f"  Core will saturate and inductance will collapse.\n"
-            f"  Increase N or increase Ae immediately."
-        )
-    else:
-        print(f"CHECK 2 PASSED: B_peak = {B_peak:.4f} T < Bsat  = {Bsat:.4f} T")
+    """
+    Compute the total core loss in the inductor L1 for each second of the mission profile using Steinmetz's equation
+     applied to all harmonics of the inductor current (Eq. 8, Martin-Arroyo et al., ICREPQ 2022).
 
-    # ── Check 3: lg must be positive ─────────────────────────────────────────────
-    if lg <= 0:
-        raise ValueError(
-            f"\nSAFETY CHECK FAILED: Air gap is zero or negative.\n"
-            f"lg = {lg * 1000:.2f} mm\n"
-            f"\nRecommendation:\n"
-            f"  Core is too large for the required inductance.\n"
-            f"  Reduce Ae or reduce N."
-        )
-    else:
-        print(f"CHECK 3 PASSED: lg = {lg * 1000:.2f} mm > 0")
+    Parameters
+    ----------
+    I_peak_harmonics : np.ndarray, shape (Profile_size, N//2)
+        Peak current amplitude [A] at each harmonic order for each second
+        of the mission profile. Row i = second i, column j = harmonic j+1.
+    harmonic_freqs : np.ndarray, shape (N//2,)
+        Frequency [Hz] of each harmonic order.
+    mu_0 : float
+        Permeability of free space [H/m]. Physical constant = 4π × 10⁻⁷.
+    N : int
+        Number of turns in the winding [-].
+    lg : float
+        Air gap length [m].
+    le : float
+        Effective magnetic path length of the core [m].
+    mu_r : float
+        Relative permeability of the core material [-].
+    k : float
+        Steinmetz loss coefficient [W/m³].
+    a : float
+        Steinmetz frequency exponent alpha [-].
+    b : float
+        Steinmetz flux density exponent beta [-].
+    Ve : float
+        Effective core volume [m³].
 
-    # ── Check 4: lg must be less than le ─────────────────────────────────────────
-    if lg >= le:
-        raise ValueError(
-            f"\nSAFETY CHECK FAILED: Air gap is larger than magnetic path length.\n"
-            f"lg = {lg * 1000:.2f} mm\n"
-            f"le = {le * 1000:.2f} mm\n"
-            f"\nRecommendation:\n"
-            f"  This core is far too small for this current level.\n"
-            f"  Increase Ae significantly, or\n"
-            f"  Use multiple cores in parallel, or\n"
-            f"  Use a custom larger core."
-        )
-    else:
-        print(f"CHECK 4 PASSED: lg = {lg * 1000:.2f} mm < le = {le * 1000:.2f} mm")
+    Returns
+    -------
+    P_c : np.ndarray, shape (Profile_size,)
+        Total core loss [W] for each second of the mission profile.
+    P_c_matrix : np.ndarray, shape (Profile_size, N//2)
+        Core loss contribution [W] per second per harmonic.
+    """
 
-    # ── Check 5: lg/le ratio warning ─────────────────────────────────────────────
-    lg_le_ratio = lg / le
-    if lg_le_ratio > 0.10:
-        print(
-            f"\nWARNING CHECK 5: Air gap ratio lg/le = {lg_le_ratio * 100:.1f}%\n"
-            f"  Recommended maximum is 10%.\n"
-            f"  Large air gap causes fringing flux which increases losses.\n"
-            f"  Recommendation: Increase Ae to reduce required air gap."
-        )
-    else:
-        print(f"CHECK 5 PASSED: lg/le = {lg_le_ratio * 100:.1f}% < 10%")
+    # ----------------------------------------#
+    # Step 1 — Peak flux density per harmonic
+    # ----------------------------------------#
+    # Ampere's law for a gapped core:
+    #   B_j = (mu_0 * N * I_j_peak) / (lg + le/mu_r)
+    # Shape: (Profile_size, N//2)
+    B_j = (mu_0 * N * I_peak_harmonics) / (lg + le / mu_r)
+
+    # ----------------------------------------#
+    # Step 2 — Core loss per harmonic
+    # ----------------------------------------#
+    # Steinmetz equation per harmonic:
+    #   P_c_j = k * f_j^alpha * B_j^beta * Ve
+    # harmonic_freqs shape (N//2,) broadcasts across (Profile_size, N//2)
+    # Shape: (Profile_size, N//2)
+    P_c_matrix = k * (harmonic_freqs ** a) * (B_j ** b) * Ve
+
+    # ----------------------------------------#
+    # Step 3 — Sum over all harmonics
+    # ----------------------------------------#
+    # Shape: (Profile_size,)
+    P_c = np.sum(P_c_matrix, axis=1)
+
+    return P_c, P_c_matrix

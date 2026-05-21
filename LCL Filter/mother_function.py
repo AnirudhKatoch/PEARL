@@ -120,6 +120,5 @@ L_capacitor = Calculation_functions.Capacitor_lifetime(T_C= T_C, V_C_RMS=V_C_RMS
 # LCL filter inverter side [L1]
 # ----------------------------------------#
 
-
-
-
+#df = pd.DataFrame({'t': t, 'V_L1': V_L1, 'I_L1': I_L1})
+#df.to_parquet('Figures/L1_signals.parquet', index=False)
