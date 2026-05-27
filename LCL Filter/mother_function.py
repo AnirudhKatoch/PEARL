@@ -55,6 +55,8 @@ L1_optimum, L2_optimum, C_optimum, R3_optimum = LCL_filter_design_function(Vg_ll
 
 L2 = L2_optimum
 
+
+
 # ----------------------------------------#
 # Time profile
 # ----------------------------------------#

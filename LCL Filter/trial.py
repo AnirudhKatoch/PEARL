@@ -1,65 +1,76 @@
-@staticmethod
-def calculate_inductor_core_losses(I_peak_harmonics, harmonic_freqs, mu_0, N, lg, le, mu_r, k, a, b, Ve):
+def calculate_inductor_thermal_resistance(method, R_th_user=None, A_surface=None, heat_transfer_coefficient=None, Ve_m3 =None):
 
     """
-    Compute the total core loss in the inductor L1 for each second of the mission profile using Steinmetz's equation
-     applied to all harmonics of the inductor current (Eq. 8, Martin-Arroyo et al., ICREPQ 2022).
+    Calculate or supply the thermal resistance of the inductor core to ambient.
+
+    Three methods are supported:
+
+    Method 1 — "user":
+        User provides R_th directly from a datasheet or measurement.
+
+    Method 2 — "surface_area":
+        R_th is computed from the core surface area and convective heat
+        transfer coefficient:
+            R_th = 1 / (h * A_surface)
+        Reference: Incropera, F.P., DeWitt, D.P., Bergman, T.L., Lavine, A.S.,
+                   "Fundamentals of Heat and Mass Transfer",
+                   7th Ed., Wiley, 2011, Table 1.1
+
+    Method 3 — "empirical":
+        R_th is estimated from core volume using the Kazimierczuk empirical
+        formula for naturally cooled magnetic cores:
+            R_th = 14.5 / Ve^0.37   [K/W], Ve in cm³
+        Reference: Kazimierczuk, M.K., "High-Frequency Magnetic Components",
+                   2nd Ed., Wiley-IEEE Press, 2014, Chapter 1, Eq. (1.186)
 
     Parameters
     ----------
-    I_peak_harmonics : np.ndarray, shape (Profile_size, N//2)
-        Peak current amplitude [A] at each harmonic order for each second
-        of the mission profile. Row i = second i, column j = harmonic j+1.
-    harmonic_freqs : np.ndarray, shape (N//2,)
-        Frequency [Hz] of each harmonic order.
-    mu_0 : float
-        Permeability of free space [H/m]. Physical constant = 4π × 10⁻⁷.
-    N : int
-        Number of turns in the winding [-].
-    lg : float
-        Air gap length [m].
-    le : float
-        Effective magnetic path length of the core [m].
-    mu_r : float
-        Relative permeability of the core material [-].
-    k : float
-        Steinmetz loss coefficient [W/m³].
-    a : float
-        Steinmetz frequency exponent alpha [-].
-    b : float
-        Steinmetz flux density exponent beta [-].
-    Ve : float
+    method : str
+        Calculation method. One of: "user", "surface_area", "empirical".
+
+    R_th_user : float, optional
+        User-supplied thermal resistance [K/W].
+        Required when method = "user".
+
+    A_surface : float, optional
+        Total exposed surface area of the core [m²].
+        Required when method = "surface_area".
+
+    heat_transfer_coefficient : float, optional
+        Convective heat transfer coefficient [W/(m²·K)].
+        Required when method = "surface_area".
+        Typical values:
+            10  W/(m²·K) — natural convection, still air
+            50  W/(m²·K) — moderate forced air cooling
+            250 W/(m²·K) — high-velocity forced air
+        Source: Incropera et al., Table 1.1
+
+    Ve_m3  : float, optional
         Effective core volume [m³].
+        Required when method = "empirical".
 
     Returns
     -------
-    P_c : np.ndarray, shape (Profile_size,)
-        Total core loss [W] for each second of the mission profile.
-    P_c_matrix : np.ndarray, shape (Profile_size, N//2)
-        Core loss contribution [W] per second per harmonic.
+    R_th : float
+        Thermal resistance from core to ambient [K/W].
     """
 
-    # ----------------------------------------#
-    # Step 1 — Peak flux density per harmonic
-    # ----------------------------------------#
-    # Ampere's law for a gapped core:
-    #   B_j = (mu_0 * N * I_j_peak) / (lg + le/mu_r)
-    # Shape: (Profile_size, N//2)
-    B_j = (mu_0 * N * I_peak_harmonics) / (lg + le / mu_r)
+    if method == "user":
+        if R_th_user is None:
+            raise ValueError("method='user' requires R_th_user to be provided.")
+        R_th = R_th_user
 
-    # ----------------------------------------#
-    # Step 2 — Core loss per harmonic
-    # ----------------------------------------#
-    # Steinmetz equation per harmonic:
-    #   P_c_j = k * f_j^alpha * B_j^beta * Ve
-    # harmonic_freqs shape (N//2,) broadcasts across (Profile_size, N//2)
-    # Shape: (Profile_size, N//2)
-    P_c_matrix = k * (harmonic_freqs ** a) * (B_j ** b) * Ve
+    elif method == "surface_area":
+        if A_surface is None or heat_transfer_coefficient is None:
+            raise ValueError("method='surface_area' requires A_surface and heat_transfer_coefficient.")
+        R_th = 1 / (heat_transfer_coefficient * A_surface)
 
-    # ----------------------------------------#
-    # Step 3 — Sum over all harmonics
-    # ----------------------------------------#
-    # Shape: (Profile_size,)
-    P_c = np.sum(P_c_matrix, axis=1)
+    elif method == "empirical":
+        if Ve_m3  is None:
+            raise ValueError("method='empirical' requires Ve_cm3 to be provided.")
+        Ve_cm3 = Ve_m3  * 1e6  # [cm³]
+        R_th = 14.5 / (Ve_cm3 ** 0.37)
+    else:
+        raise ValueError(f"Unknown method '{method}'. Choose from: 'user', 'surface_area', 'empirical'.")
 
-    return P_c, P_c_matrix
+    return R_th
