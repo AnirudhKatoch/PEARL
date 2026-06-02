@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import cont2discrete
 from scipy.interpolate import interp1d
+from pathlib import Path
 
-plt.rcParams.update({"font.size": 15, "font.family": "Times New Roman", "axes.labelsize": 15, "axes.titlesize": 15,
-                     "xtick.labelsize": 15, "ytick.labelsize": 15, "legend.fontsize": 15})
+
 
 class Calculation_functions_class:
 
@@ -82,8 +82,7 @@ class Calculation_functions_class:
                              f"Maximum detected value is {np.max(Vo):.3f} V.")
 
     @staticmethod
-    def validate_ac_rms_voltage_limit(Vdc_RMS, M, inverter_phases, modulation_scheme,
-                                      single_phase_inverter_topology, Vg_RMS):
+    def validate_ac_rms_voltage_limit(Vdc_RMS, M, inverter_phases, modulation_scheme, single_phase_inverter_topology, Vg_RMS):
         """
         Validate that the requested AC RMS grid-voltage profile does not exceed
         the theoretical maximum AC RMS voltage that the inverter can generate at
@@ -223,7 +222,6 @@ class Calculation_functions_class:
                 f"Vg_RMS_max_theoretical[{first_idx}] = {Vg_RMS_max_theoretical[first_idx]:.3f} V"
             )
 
-
     @staticmethod
     def validate_simulation_resolution(samples_per_switching_period, Minimum_required_samples_per_switching_period):
 
@@ -287,8 +285,6 @@ class Calculation_functions_class:
             raise ValueError("Not feasible: required inverter voltage exceeds capability.\n"
                              f"Required peak = {Vs_peak:.2f} V, "
                              f"Available = {available:.2f} V")
-
-
 
     @staticmethod
     def LCL_Filter_Grid_Connected(t, Vs, Vg, L1, L2, C, R1, R2, R3):
@@ -424,110 +420,6 @@ class Calculation_functions_class:
             
         return V_L1, I_L1, V_C, I_C, V_L2, I_L2
 
-
-    @staticmethod
-    def compute_THD(t, signal, f, Location, IL2_THD_plotting, max_plot_harmonic, cycle_start=None):
-
-        """
-        Parameters
-        ----------
-        t : array
-            Time vector [s]
-        signal : array
-            Signal waveform to be analyzed, usually grid-side current I_L2 [A]
-        f : float
-            Fundamental frequency [Hz]
-        Location : str
-            File path where the harmonic spectrum plot is saved
-        IL2_THD_plotting : bool
-            If True, plot and save the harmonic RMS spectrum
-        max_plot_harmonic : int
-            Maximum harmonic order shown in the plot
-        cycle_start : float, optional
-            Start time of the cycle used for THD calculation [s].
-            If None, the last full fundamental cycle is used.
-
-        Returns
-        -------
-        THD : float
-            Total Harmonic Distortion in per-unit [-]
-        THD_percent : float
-            Total Harmonic Distortion in percent [%]
-        I1_rms : float
-            RMS value of the fundamental component [A]
-        freqs : array
-            FFT frequency vector [Hz]
-        mag_rms : array
-            RMS magnitude spectrum of the signal
-        """
-
-        t = np.asarray(t)
-        signal = np.asarray(signal)
-
-        T = 1 / f
-        dt = t[1] - t[0]
-
-        if cycle_start is None:
-            cycle_start = t[-1] - T
-
-        cycle_end = cycle_start + T
-
-        mask = (t >= cycle_start) & (t < cycle_end)
-
-        y = signal[mask]
-
-        # Remove DC offset
-        y = y - np.mean(y)
-
-        N = len(y)
-
-        # FFT
-        Y = np.fft.rfft(y)
-
-        # RMS spectrum
-        mag_rms = np.abs(Y) * np.sqrt(2) / N
-        mag_rms[0] = np.abs(Y[0]) / N
-        freqs = np.fft.rfftfreq(N, d=dt)
-
-        # ----------------------------------------
-        # Harmonic extraction WITHOUT for-loops
-        # ----------------------------------------
-        max_harmonic = int(freqs[-1] // f)
-        harmonic_orders = np.arange(1, max_harmonic + 1)
-        harmonic_freqs = harmonic_orders * f
-
-        # Find nearest FFT bin for each harmonic
-        indices = np.abs(freqs[:, None] - harmonic_freqs).argmin(axis=0)
-
-        # Extract harmonic RMS values
-        harmonic_rms = mag_rms[indices]
-
-        # Fundamental RMS
-        I1_rms = harmonic_rms[0]
-
-        # THD calculation
-        harmonic_rms_sq = np.sum(harmonic_rms[1:] ** 2)
-        THD = np.sqrt(harmonic_rms_sq) / I1_rms
-        THD_percent = THD * 100
-
-        # ----------------------------------------
-        # Plotting
-        # ----------------------------------------
-
-        harmonic_orders_plot = harmonic_orders[:max_plot_harmonic]
-        harmonic_rms_plot = harmonic_rms[:max_plot_harmonic]
-
-        if IL2_THD_plotting:
-            plt.figure(figsize=(6.4, 4.8))
-            plt.bar(harmonic_orders_plot, harmonic_rms_plot)
-            plt.xlabel("Harmonic Order")
-            plt.ylabel("RMS Current [A]")
-            plt.title(f"THD = {THD_percent:.2f}%")
-            plt.grid(True)
-            plt.savefig(Location)
-            plt.close()
-
-        return THD, THD_percent, I1_rms, freqs, mag_rms
 
     @staticmethod
     def validate_grid_phase_voltage_matches_line_to_line_voltage(Vg_RMS, Vg_ll_RMS, tolerance_percent=1.0):
@@ -709,9 +601,7 @@ class Calculation_functions_class:
             )
 
     @staticmethod
-    def validate_pwm_pulse_amplitude_profile(Vdc_RMS, inverter_phases,
-                                             single_phase_inverter_topology,
-                                             waveform_voltage_definition, Vo):
+    def validate_pwm_pulse_amplitude_profile(Vdc_RMS, inverter_phases, single_phase_inverter_topology, waveform_voltage_definition, Vo):
         """
         Validate the PWM pulse amplitude profile against the available DC-link
         voltage profile at every mission-profile time step.
@@ -788,9 +678,8 @@ class Calculation_functions_class:
                 f"Vo_max[{first_idx}] = {Vo_max[first_idx]:.3f} V")
 
     @staticmethod
-    def compute_Vs_ref_phasor(t, f, Ig_RMS, Vg_RMS, phase_shift,
-                              L1, L2, C, R1, R2, R3,
-                              Profile_size, samples_per_second):
+    def compute_Vs_ref_phasor(t, f, Ig_RMS, Vg_RMS, phase_shift, L1, L2, C, R1, R2, R3, Profile_size, samples_per_second):
+
         """
         Compute the required inverter voltage reference Vs_ref analytically
         using phasor (frequency-domain) analysis of the LCL filter.
@@ -870,110 +759,134 @@ class Calculation_functions_class:
 
         return Vs_ref
 
-################################################################
-# Extra functions
-##################################################################
-
     @staticmethod
-    def compare_I_ref_and_I_L2(t, I_L2, Ig_ref, f, dt, resolution_per_cycle, save_path):
+    def compute_THD_I_L2(t, I_L2, Ig_ref, f, dt, resolution_per_cycle, save_path,printing, n_cycles=1, max_harmonic=None, plot=True,):
         """
-        Compare the reference grid current Ig_ref against the simulated LCL
-        output current I_L2. Prints a summary of key metrics and saves a plot.
+        Compute the THD of the grid-side current I_L2 over the last n_cycles
+        fundamental periods, and report tracking metrics vs the reference Ig_ref.
+
+        The analysis window is selected by integer sample count (not by a
+        float-time mask), so every harmonic lands exactly on an FFT bin and
+        single-bin extraction is leakage-free.
 
         Parameters
         ----------
-        t : array
-            Time vector [s]
-        I_L2 : array
-            Simulated grid-side inductor current [A]
-        Ig_ref : array
-            Reference grid current waveform [A]
-        f : float
-            Fundamental frequency [Hz]
-        dt : float
-            Simulation time step [s]
-        resolution_per_cycle : int
-            Number of samples per fundamental cycle
-        save_path : str, optional
-            File path for the saved figure
+        t : array                  Time vector [s]
+        I_L2 : array               Simulated grid-side current [A]
+        Ig_ref : array             Reference grid current [A]
+        f : float                  Fundamental frequency [Hz]
+        dt : float                 Simulation time step [s]
+        resolution_per_cycle : int Samples per fundamental cycle [-]
+        save_path : str            Path for the saved comparison figure
+        n_cycles : int, optional   Number of trailing cycles to analyse. Default 1.
+        max_harmonic : int, optional
+            Highest harmonic order included in THD. Default None = up to Nyquist.
+        plot : bool, optional      Save the waveform/error plot. Default True.
+
+        Returns
+        -------
+        THD_percent : float        THD of I_L2 [%]
         """
 
-        last = slice(-resolution_per_cycle, None)
+        I_L2 = np.asarray(I_L2)
+        Ig_ref = np.asarray(Ig_ref)
+        t = np.asarray(t)
 
+        # --- exact-integer-cycle window (last n_cycles periods) ---
+        spc = int(round(resolution_per_cycle))  # samples per cycle
+        win = n_cycles * spc
+        if win > len(I_L2):
+            raise ValueError(
+                f"Window of {win} samples exceeds signal length {len(I_L2)}.")
+
+        last = slice(-win, None)
         I_L2_w = I_L2[last]
         Ig_ref_w = Ig_ref[last]
         t_w = t[last]
 
-        # ── 1. RMS ────────────────────────────────────────────────────────────────
+        # ── 1. RMS ────────────────────────────────────────────────
         I_L2_RMS = np.sqrt(np.mean(I_L2_w ** 2))
         Ig_ref_RMS = np.sqrt(np.mean(Ig_ref_w ** 2))
 
-        # ── 2. Tracking error ─────────────────────────────────────────────────────
+        # ── 2. Tracking error ─────────────────────────────────────
         error = I_L2_w - Ig_ref_w
         error_RMS = np.sqrt(np.mean(error ** 2))
         error_peak = np.max(np.abs(error))
         NRMSE = error_RMS / Ig_ref_RMS * 100
 
-        # ── 3. Fundamental amplitude and phase (via FFT) ──────────────────────────
+        # ── 3. FFT (DC removed) ───────────────────────────────────
         N = len(I_L2_w)
         freqs = np.fft.rfftfreq(N, d=dt)
-        idx_f = np.argmin(np.abs(freqs - f))
 
-        fft_L2 = np.fft.rfft(I_L2_w)
-        fft_ref = np.fft.rfft(Ig_ref_w)
+        fft_L2 = np.fft.rfft(I_L2_w - np.mean(I_L2_w))
+        fft_ref = np.fft.rfft(Ig_ref_w - np.mean(Ig_ref_w))
 
-        amp_L2 = 2 * np.abs(fft_L2[idx_f]) / N * np.sqrt(2)
-        amp_ref = 2 * np.abs(fft_ref[idx_f]) / N * np.sqrt(2)
+        # fundamental sits at bin = n_cycles (n_cycles periods in the window)
+        idx_f = n_cycles
+
+        # RMS amplitude of fundamental: (2|X|/N)/sqrt(2) = sqrt(2)|X|/N
+        amp_L2 = np.sqrt(2) * np.abs(fft_L2[idx_f]) / N
+        amp_ref = np.sqrt(2) * np.abs(fft_ref[idx_f]) / N
 
         phase_L2 = np.angle(fft_L2[idx_f], deg=True)
         phase_ref = np.angle(fft_ref[idx_f], deg=True)
-        phase_err = phase_L2 - phase_ref
+        phase_err = (phase_L2 - phase_ref + 180) % 360 - 180  # wrap to ±180
 
-        # ── 4. THD of I_L2 ────────────────────────────────────────────────────────
-        harmonics = np.arange(2, 21) * f
-        harmonic_idxs = [np.argmin(np.abs(freqs - h)) for h in harmonics]
-        P_harmonics = np.sum([np.abs(fft_L2[i]) ** 2 for i in harmonic_idxs])
+        # ── 4. THD of I_L2 (harmonics 2..max up to Nyquist) ───────
+        # harmonic h sits exactly on bin h*n_cycles
+        nyq_order = (len(fft_L2) - 1) // n_cycles  # highest resolvable order
+        top = nyq_order if max_harmonic is None else min(max_harmonic, nyq_order)
+        h_orders = np.arange(2, top + 1)
+        h_bins = h_orders * n_cycles
+
+        P_harmonics = np.sum(np.abs(fft_L2[h_bins]) ** 2)
         P_fundamental = np.abs(fft_L2[idx_f]) ** 2
-        THD = np.sqrt(P_harmonics / P_fundamental) * 100
+        THD = np.sqrt(P_harmonics / P_fundamental)
+        THD_percent = THD * 100
 
-        # ── Print summary ─────────────────────────────────────────────────────────
-        print("=" * 46)
-        print(f"  Ig_ref RMS          : {Ig_ref_RMS:>10.4f}  A")
-        print(f"  I_L2   RMS          : {I_L2_RMS:>10.4f}  A")
-        print("-" * 46)
-        print(f"  Tracking error RMS  : {error_RMS:>10.4f}  A")
-        print(f"  Tracking error peak : {error_peak:>10.4f}  A")
-        print(f"  NRMSE               : {NRMSE:>10.4f}  %")
-        print("-" * 46)
-        print(f"  Fundamental amp ref : {amp_ref:>10.4f}  A (RMS)")
-        print(f"  Fundamental amp L2  : {amp_L2:>10.4f}  A (RMS)")
-        print(f"  Phase ref           : {phase_ref:>10.4f}  deg")
-        print(f"  Phase I_L2          : {phase_L2:>10.4f}  deg")
-        print(f"  Phase error         : {phase_err:>10.4f}  deg")
-        print("-" * 46)
-        print(f"  THD of I_L2         : {THD:>10.4f}  %")
-        print("=" * 46)
+        # ── Print summary (unchanged format) ──────────────────────
+        if printing == True:
+            print("=" * 46)
+            print(f"  Ig_ref RMS          : {Ig_ref_RMS:>10.4f}  A")
+            print(f"  I_L2   RMS          : {I_L2_RMS:>10.4f}  A")
+            print("-" * 46)
+            print(f"  Tracking error RMS  : {error_RMS:>10.4f}  A")
+            print(f"  Tracking error peak : {error_peak:>10.4f}  A")
+            print(f"  NRMSE               : {NRMSE:>10.4f}  %")
+            print("-" * 46)
+            print(f"  Fundamental amp ref : {amp_ref:>10.4f}  A (RMS)")
+            print(f"  Fundamental amp L2  : {amp_L2:>10.4f}  A (RMS)")
+            print(f"  Phase ref           : {phase_ref:>10.4f}  deg")
+            print(f"  Phase I_L2          : {phase_L2:>10.4f}  deg")
+            print(f"  Phase error         : {phase_err:>10.4f}  deg")
+            print("-" * 46)
+            print(f"  THD of I_L2         : {THD_percent:>10.4f}  %")
+            print("=" * 46)
 
-        # ── Plot ──────────────────────────────────────────────────────────────────
-        fig, axes = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
+        # ── Plot ──────────────────────────────────────────────────
+        if plot:
+            fig, axes = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
+            axes[0].plot(t_w, Ig_ref_w, label='Ig_ref', linewidth=1.5)
+            axes[0].plot(t_w, I_L2_w, label='I_L2', linewidth=1.0, linestyle='--')
+            axes[0].set_ylabel("Current [A]")
+            axes[0].legend()
+            axes[0].set_title("Waveform comparison")
 
-        axes[0].plot(t_w, Ig_ref_w, label='Ig_ref', linewidth=1.5)
-        axes[0].plot(t_w, I_L2_w, label='I_L2', linewidth=1.0, linestyle='--')
-        axes[0].set_ylabel("Current [A]")
-        axes[0].legend()
-        axes[0].set_title("Waveform comparison")
+            axes[1].plot(t_w, error, color='red', linewidth=1.0,
+                         label='Error (I_L2 − Ig_ref)')
+            axes[1].axhline(0, color='k', linewidth=0.5)
+            axes[1].set_ylabel("Error [A]")
+            axes[1].set_xlabel("Time [s]")
+            axes[1].legend()
+            axes[1].set_title(
+                f"Tracking error  |  NRMSE = {NRMSE:.3f}%  |  THD = {THD_percent:.3f}%")
 
-        axes[1].plot(t_w, error, color='red', linewidth=1.0, label='Error (I_L2 − Ig_ref)')
-        axes[1].axhline(0, color='k', linewidth=0.5)
-        axes[1].set_ylabel("Error [A]")
-        axes[1].set_xlabel("Time [s]")
-        axes[1].legend()
-        axes[1].set_title(f"Tracking error  |  NRMSE = {NRMSE:.3f}%  |  THD = {THD:.3f}%")
+            plt.xlim(t_w[0], t_w[-1])
+            plt.tight_layout()
+            plt.savefig(save_path)
+            plt.close()
 
-        plt.xlim(t_w[0], t_w[-1])
-        plt.tight_layout()
-        plt.savefig(save_path)
-        plt.close()
+        return THD_percent
 
     @staticmethod
     def compute_I_C_RMS_per_harmonic_for_capacitor(I_C, f, fsw, resolution_per_cycle, Profile_size):
@@ -1090,6 +1003,12 @@ class Calculation_functions_class:
 
         f_i = harmonic_orders * f  # Absolute frequency of each harmonic [Hz]
 
+        # ----------------------------------------#
+        # Rs temperature correction
+        # ----------------------------------------#
+        # Datasheet page 18: Rs_85 = 1.25 * Rs_20
+        # Linear interpolation between 20°C and 85°C
+
         # Dielectric losses at each harmonic: PD(fi) = I(fi)^2 * tan_delta_0 / (2*pi*fi*C)
         P_D = I_C_RMS_harmonics ** 2 * tan_delta_0 / (2 * np.pi * f_i * C)
 
@@ -1126,14 +1045,14 @@ class Calculation_functions_class:
         return T_C
 
     @staticmethod
-    def Capacitor_voltage_RMS(V_C, resolution_per_cycle, f):
+    def Singal_RMS(Signal, resolution_per_cycle, f):
         """
         Compute the RMS voltage across the LCL filter capacitor for each second of the mission profile.
 
         Parameters
         ----------
-        V_C : ndarray, shape (Profile_size * samples_per_second,)
-            Instantaneous capacitor voltage waveform over the full mission profile [V].
+        Signal : ndarray, shape (Profile_size * samples_per_second,)
+            Instantaneous signal waveform over the full mission profile.
         resolution_per_cycle : int
             Number of simulation samples per fundamental AC cycle [-].
         f : float
@@ -1141,7 +1060,7 @@ class Calculation_functions_class:
 
         Returns
         -------
-        V_C_RMS : ndarray, shape (Profile_size,)
+        Signal_RMS : ndarray, shape (Profile_size,)
             RMS voltage across the capacitor for each mission-profile second [V].
 
         """
@@ -1149,21 +1068,34 @@ class Calculation_functions_class:
         samples_per_second = resolution_per_cycle * f  # Number of simulation samples in one second
         samples_per_second = int(samples_per_second)
 
-        Profile_size = len(V_C) // samples_per_second  # Recover the number of mission-profile seconds
+        Profile_size = len(Signal) // samples_per_second  # Recover the number of mission-profile seconds
 
-        V_C_reshaped = V_C.reshape(Profile_size,
-                                   samples_per_second)  # Reshape into (Profile_size, samples_per_second) so each row = one second of data
+        Signal_reshaped = Signal.reshape(Profile_size,
+                                         samples_per_second)  # Reshape into (Profile_size, samples_per_second) so each row = one second of data
 
-        V_C_RMS = np.sqrt(
-            np.mean(V_C_reshaped ** 2, axis=1))  # Compute RMS over each row (each mission-profile second) [V]
+        Signal_RMS = np.sqrt(
+            np.mean(Signal_reshaped ** 2, axis=1))  # Compute RMS over each row (each mission-profile second)
 
-        return V_C_RMS
+        return Signal_RMS
 
     @staticmethod
-    def validate_capacitor_operating_limits(T_C, V_C_RMS, V_C, T_C_Rated, V_C_RMS_Rated, V_C_Peak_Rated):
+    def validate_capacitor_operating_limits(T_C, V_C_RMS, V_C, T_C_Rated, V_C_RMS_Rated, V_C_Peak_Rated, V_RMS_overvoltage_factor=1.0, V_peak_overvoltage_factor=1.0):
         """
         Validate that the LCL filter capacitor operates within its rated limits at all times.
 
+        Temperature is a hard limit — it cannot be extended under any circumstances.
+        Voltage limits can be extended using overvoltage factors, which multiply the
+        rated voltage to allow operation above the nominal rating when justified
+        (e.g. short-duration transients, accepted derating trade-off).
+
+        Physical basis for voltage overvoltage factors
+        -----------------------------------------------
+        TDK B3236X datasheet page 14 defines:
+            - Max recurrent peak voltage û: permissible for max 1% of the period
+            - Non-recurrent surge voltage Vs: allowed for limited occurrences
+        This means the capacitor CAN tolerate voltages above V_RMS_Rated and
+        V_Peak_Rated under controlled conditions. The overvoltage factors encode
+        this allowance explicitly so it is visible and auditable in the simulation.
 
         Parameters
         ----------
@@ -1173,12 +1105,28 @@ class Calculation_functions_class:
             RMS voltage across the capacitor for each mission-profile second [V].
         V_C : ndarray, shape (Profile_size * samples_per_second,)
             Instantaneous capacitor voltage over the full mission profile [V].
-        T_C_Rated : float, optional
-            Maximum allowable capacitor hotspot temperature [K]. Default: 273 + 85 = 358 K.
-        V_C_RMS_Rated : float, optional
-            Maximum allowable RMS voltage across the capacitor [V]. Default: 530 V.
-        V_C_Peak_Rated : float, optional
-            Maximum allowable instantaneous peak voltage across the capacitor [V]. Default: 750 V.
+        T_C_Rated : float
+            Maximum allowable capacitor hotspot temperature [K].
+            Hard limit — cannot be extended by any factor.
+            Source: TDK B3236X datasheet page 3, T_hs = 85°C.
+        V_C_RMS_Rated : float
+            Nominal rated RMS voltage of the capacitor [V].
+            Source: TDK B3236X datasheet page 10.
+        V_C_Peak_Rated : float
+            Nominal rated peak voltage of the capacitor [V].
+            Source: TDK B3236X datasheet page 10.
+        V_RMS_overvoltage_factor : float, optional
+            Multiplicative factor applied to V_C_RMS_Rated to define the
+            actual RMS voltage limit used in the check [−].
+            Default = 1.0 (no extension beyond rated value).
+            Example: 1.1 means 10% overvoltage above rated RMS is accepted.
+            Effective limit = V_C_RMS_Rated * V_RMS_overvoltage_factor.
+        V_peak_overvoltage_factor : float, optional
+            Multiplicative factor applied to V_C_Peak_Rated to define the
+            actual peak voltage limit used in the check [−].
+            Default = 1.0 (no extension beyond rated value).
+            Example: 1.1 means 10% overvoltage above rated peak is accepted.
+            Effective limit = V_C_Peak_Rated * V_peak_overvoltage_factor.
 
         Returns
         -------
@@ -1188,57 +1136,70 @@ class Calculation_functions_class:
         Raises
         ------
         ValueError
-            If any of the three operating limits are exceeded, with a detailed message
-            identifying the violated condition, the worst-case value, and the mission-profile
-            second or sample index where the violation occurs.
+            If any operating limit is exceeded, with a detailed message identifying
+            the violated condition, the effective limit used, the worst-case value,
+            and the mission-profile second or sample index where the violation occurs.
         """
+
+        # ----------------------------------------#
+        # Compute effective voltage limits
+        # ----------------------------------------#
+
+        V_C_RMS_limit = V_C_RMS_Rated * V_RMS_overvoltage_factor  # [V] effective RMS limit
+        V_C_Peak_limit = V_C_Peak_Rated * V_peak_overvoltage_factor  # [V] effective peak limit
 
         errors = []
 
         # ----------------------------------------#
         # Check 1: Hotspot temperature limit
+        # HARD LIMIT — no factor applied
         # ----------------------------------------#
 
         if np.any(T_C > T_C_Rated):
-            violated_seconds = np.where(T_C > T_C_Rated)[0] + 1  # 1-indexed mission-profile seconds for readability
+            violated_seconds = np.where(T_C > T_C_Rated)[0] + 1
             worst_index = np.argmax(T_C)
             worst_value = T_C[worst_index]
             errors.append(
                 f"\nCondition 1 FAILED: Capacitor hotspot temperature exceeds rated limit.\n"
-                f"  Limit              : {T_C_Rated} K ({T_C_Rated - 273:.0f} °C)\n"
-                f"  Worst value        : {worst_value:.2f} K ({worst_value - 273:.2f} °C) "
+                f"  Hard limit (cannot be extended) : {T_C_Rated} K ({T_C_Rated - 273:.0f} °C)\n"
+                f"  Worst value                     : {worst_value:.2f} K ({worst_value - 273:.2f} °C) "
                 f"at mission-profile second {worst_index + 1}\n"
-                f"  Exceeded at second : {violated_seconds.tolist()}\n")
+                f"  Exceeded at seconds             : {violated_seconds.tolist()}\n")
 
         # ----------------------------------------#
         # Check 2: RMS voltage limit
+        # SOFT LIMIT — extended by V_RMS_overvoltage_factor
         # ----------------------------------------#
 
-        if np.any(V_C_RMS > V_C_RMS_Rated):
-            violated_seconds = np.where(V_C_RMS > V_C_RMS_Rated)[
-                                   0] + 1  # 1-indexed mission-profile seconds for readability
+        if np.any(V_C_RMS > V_C_RMS_limit):
+            violated_seconds = np.where(V_C_RMS > V_C_RMS_limit)[0] + 1
             worst_index = np.argmax(V_C_RMS)
             worst_value = V_C_RMS[worst_index]
             errors.append(
-                f"\nCondition 2 FAILED: Capacitor RMS voltage exceeds rated limit.\n"
-                f"  Limit              : {V_C_RMS_Rated} V\n"
-                f"  Worst value        : {worst_value:.2f} V "
+                f"\nCondition 2 FAILED: Capacitor RMS voltage exceeds effective limit.\n"
+                f"  Rated limit                     : {V_C_RMS_Rated} V\n"
+                f"  Overvoltage factor applied      : {V_RMS_overvoltage_factor}\n"
+                f"  Effective limit                 : {V_C_RMS_limit:.2f} V\n"
+                f"  Worst value                     : {worst_value:.2f} V "
                 f"at mission-profile second {worst_index + 1}\n"
-                f"  Exceeded at second : {violated_seconds.tolist()}\n")
+                f"  Exceeded at seconds             : {violated_seconds.tolist()}\n")
 
         # ----------------------------------------#
         # Check 3: Instantaneous peak voltage limit
+        # SOFT LIMIT — extended by V_peak_overvoltage_factor
         # ----------------------------------------#
 
-        if np.any(np.abs(V_C) > V_C_Peak_Rated):
-            violated_samples = np.where(np.abs(V_C) > V_C_Peak_Rated)[0]  # Sample indices where the limit is exceeded
+        if np.any(np.abs(V_C) > V_C_Peak_limit):
+            violated_samples = np.where(np.abs(V_C) > V_C_Peak_limit)[0]
             worst_index = np.argmax(np.abs(V_C))
             worst_value = V_C[worst_index]
             errors.append(
-                f"\nCondition 3 FAILED: Capacitor instantaneous voltage exceeds rated peak limit.\n"
-                f"  Limit              : ±{V_C_Peak_Rated} V\n"
-                f"  Worst value        : {worst_value:.2f} V at sample index {worst_index}\n"
-                f"  Number of violated samples : {len(violated_samples)}\n")
+                f"\nCondition 3 FAILED: Capacitor instantaneous voltage exceeds effective peak limit.\n"
+                f"  Rated limit                     : ±{V_C_Peak_Rated} V\n"
+                f"  Overvoltage factor applied      : {V_peak_overvoltage_factor}\n"
+                f"  Effective limit                 : ±{V_C_Peak_limit:.2f} V\n"
+                f"  Worst value                     : {worst_value:.2f} V at sample index {worst_index}\n"
+                f"  Number of violated samples      : {len(violated_samples)}\n")
 
         # ----------------------------------------#
         # Raise all errors together if any occurred
@@ -1249,11 +1210,10 @@ class Calculation_functions_class:
                 "\n" + "=" * 60 +
                 "\nCAPACITOR OPERATING LIMIT VIOLATION DETECTED" +
                 "\n" + "=" * 60 +
-                "".join(errors) +
-                "\n" + "=" * 60)
+                "".join(errors))
 
     @staticmethod
-    def Capacitor_lifetime(T_C, V_C_RMS, V_C_RMS_Rated, lifetime_curves):
+    def Capacitor_lifetime_graphical(T_C, V_C_RMS, V_C_RMS_Rated, lifetime_curves):
         """
         Parameters
         ----------
@@ -1327,149 +1287,8 @@ class Calculation_functions_class:
 
         return L
 
-########################################################################################################################
-# If you have time in the end make the PMW better which is basically production of Vs from Vs_ref
-########################################################################################################################
-
     @staticmethod
-    def Sinusoidal_Pulse_Width_Modulation_One_Phase(P_RMS, t, Vo, Vs_ref, Tsw):
-
-        """
-        Generate single-phase sinusoidal PWM (SPWM) voltage waveform.
-
-        Parameters
-        ----------
-        P_RMS : array
-        RMS Active Power [s]
-        t : array
-        Time vector [s]
-        Vo : array
-        PWM pulse amplitude [V]
-        Tsw : float
-        Switching period [s]
-        Vs_ref : array
-        Reference voltage for inverter PMW output[V]
-
-        Returns
-        -------
-        V_s : array
-        PWM output voltage waveform [V]
-        """
-
-        t_profile = np.arange(len(P_RMS))
-        Vo_t = np.interp(t, t_profile, Vo)
-        m_ref = Vs_ref / Vo_t
-
-        def v_carrier(t, Tsw):
-            tau = (t % Tsw) / Tsw
-            return 4.0 * np.abs(tau - 0.5) - 1.0
-
-        carrier = v_carrier(t, Tsw)
-
-        Vs = np.where(m_ref >= carrier, Vo_t, -Vo_t)
-
-        return Vs
-
-    @staticmethod
-    def Sinusoidal_Pulse_Width_Modulation_One_Phase_updated(P_RMS, t, Vo, Vs_ref, Tsw, f):
-
-        """
-        Generate the effective phase-A voltage of a three-phase SPWM inverter.
-
-        This function internally creates three 120-degree shifted PWM pole voltages,
-        removes the common-mode voltage, and returns the phase-A voltage seen by
-        the LCL filter.
-
-        Parameters
-        ----------
-        P_RMS : array
-            RMS active power profile. Used to define the mission-profile time axis
-            for interpolating Vo.
-
-        t : array
-            Time vector [s].
-
-        Vo : array
-            PWM pole-voltage amplitude profile [V], usually Vdc/2.
-
-        Tsw : float
-            Switching period [s].
-
-        Vs_ref : array
-            Phase-A reference voltage for inverter PWM output [V].
-
-        f : float
-            Fundamental frequency [Hz].
-
-        Returns
-        -------
-        V_s : array
-            Effective phase-A inverter voltage waveform after common-mode removal [V].
-        """
-
-        from scipy.signal import hilbert
-
-        t = np.asarray(t)
-        Vs_ref = np.asarray(Vs_ref)
-
-        if len(t) != len(Vs_ref):
-            raise ValueError("t and Vs_ref must have the same length.")
-
-        t_profile = np.arange(len(P_RMS))
-        Vo_t = np.interp(t, t_profile, Vo)
-
-        if np.any(Vo_t <= 0):
-            raise ValueError("All interpolated Vo values must be positive.")
-
-        # ----------------------------------------#
-        # Problem 1 fix: proper 120° phase shifts
-        # using Hilbert transform so m_b, m_c carry
-        # the same harmonic content as m_a
-        # ----------------------------------------#
-        analytic_signal = hilbert(Vs_ref)
-        Vs_ref_b = np.real(analytic_signal * np.exp(-1j * 2 * np.pi / 3))
-        Vs_ref_c = np.real(analytic_signal * np.exp(+1j * 2 * np.pi / 3))
-
-        m_a = Vs_ref / Vo_t
-        m_b = Vs_ref_b / Vo_t
-        m_c = Vs_ref_c / Vo_t
-
-        # ----------------------------------------#
-        # Problem 2 fix: min-max zero-sequence
-        # injection (SVM equivalent)
-        # ----------------------------------------#
-        m_stack = np.vstack([m_a, m_b, m_c])
-        v_zs = -0.5 * (np.max(m_stack, axis=0) + np.min(m_stack, axis=0))
-
-        m_a = m_a + v_zs
-        m_b = m_b + v_zs
-        m_c = m_c + v_zs
-
-        if np.any(np.abs(m_a) > 1):
-            raise ValueError("Phase-A modulation reference exceeds [-1, 1] after injection.")
-
-        # ----------------------------------------#
-        # Carrier and switching
-        # ----------------------------------------#
-        def v_carrier(t, Tsw):
-            tau = (t % Tsw) / Tsw
-            return 4.0 * np.abs(tau - 0.5) - 1.0
-
-        carrier = v_carrier(t, Tsw)
-
-        Vao = np.where(m_a >= carrier, Vo_t, -Vo_t)
-        Vbo = np.where(m_b >= carrier, Vo_t, -Vo_t)
-        Vco = np.where(m_c >= carrier, Vo_t, -Vo_t)
-
-        V_common = (Vao + Vbo + Vco) / 3.0
-        V_s = Vao - V_common
-
-        return V_s
-
-    @staticmethod
-    def plot_LCL_signals(t, V_L1, I_L1, V_C, I_C, V_L2, I_L2,
-                         resolution_per_cycle,
-                         save_path):
+    def plot_LCL_signals(t, V_L1, I_L1, V_C, I_C, V_L2, I_L2, resolution_per_cycle, save_path):
         """
         Plot all LCL filter voltages and currents for the last fundamental cycle.
 
@@ -1524,3 +1343,1682 @@ class Calculation_functions_class:
         plt.tight_layout()
         plt.savefig(save_path, bbox_inches='tight')
         plt.close()
+
+    @staticmethod
+    def calculate_core_surface_area(A_core, B_core, D_core, F_core, G_core):
+        """
+        Calculate the total exposed surface area of a rectangular tape-wound core.
+
+        The core geometry is a rectangular frame (picture-frame cross-section)
+        with depth D. Three surface groups contribute:
+
+            Outer perimeter surfaces : 2(A + B) × D
+            Inner window surfaces    : 2(F + G) × D
+            Two end faces            : 2(A×B - F×G)
+
+        Parameters
+        ----------
+        A_core : float  Overall width          [m]  outer horizontal dimension
+        B_core : float  Overall height         [m]  outer vertical dimension
+        D_core : float  Depth (cast width)     [m]  dimension into the page
+        F_core : float  Window width           [m]  inner horizontal opening
+        G_core : float  Window height          [m]  inner vertical opening
+
+        Returns
+        -------
+        A_surface : float  Total exposed surface area [m²]
+        """
+
+        outer_perimeter = 2 * (A_core + B_core) * D_core  # [m²] four outer side faces
+        inner_perimeter = 2 * (F_core + G_core) * D_core  # [m²] four inner window faces
+        end_faces = 2 * (A_core * B_core - F_core * G_core)  # [m²] front and back faces
+
+        A_surface = outer_perimeter + inner_perimeter + end_faces
+
+        return A_surface
+
+    @staticmethod
+    def calculate_Ae(method, Ae_user=None, kf=None, D_core=None, E_core=None):
+
+        """
+        Calculate or supply the effective cross-sectional area of the inductor core.
+
+        Two methods are supported:
+
+        Method 1 — "user":
+            User provides Ae directly from the datasheet Table 2.
+            Use this when the manufacturer has already accounted for the stacking
+            factor and published the effective area directly.
+
+        Method 2 — "geometry":
+            Ae is computed from core geometry and stacking factor:
+                Ae = kf * D * E
+            where D is the core depth, E is the build (thickness), and kf is the
+            stacking factor accounting for gaps between lamination layers.
+            Use this when scaling an existing core or estimating a custom core size.
+            Reference: Kazimierczuk, M.K., "High-Frequency Magnetic Components",
+                       2nd Ed., Wiley-IEEE Press, 2014, Chapter 1.
+
+        Parameters
+        ----------
+        method : str
+            Calculation method. One of: "user", "geometry".
+
+        Ae_user : float, optional
+            User-supplied effective cross-sectional area [m²].
+            Required when method = "user".
+
+        kf : float, optional
+            Core stacking factor [-]; ratio of magnetic material to total cross-section.
+            Accounts for gaps between lamination layers.
+            For Metglas 2605SA1: kf = 0.82 from [A] Table 2.
+            Required when method = "geometry".
+
+        D_core : float, optional
+            Depth of the core (cast width) [m]; one side of the cross-section.
+            From datasheet Table 1.
+            Required when method = "geometry".
+
+        E_core : float, optional
+            Build (thickness) of the core [m]; other side of the cross-section.
+            From datasheet Table 1.
+            Required when method = "geometry".
+
+        Returns
+        -------
+        Ae : float
+            Effective cross-sectional area of the core [m²].
+        """
+
+        if method == "user":
+            if Ae_user is None:
+                raise ValueError("method='user' requires Ae_user to be provided.")
+            Ae = Ae_user
+
+        elif method == "geometry":
+            if kf is None or D_core is None or E_core is None:
+                raise ValueError("method='geometry' requires kf, D_core, and E_core.")
+            Ae = kf * D_core * E_core  # [m²]  Ae = kf × D × E
+
+        else:
+            raise ValueError(f"Unknown method '{method}'. Choose from: 'user', 'geometry'.")
+
+        return Ae
+
+    @staticmethod
+    def calculate_le(method, le_user=None, A_core=None, B_core=None, F_core=None, G_core=None):
+        """
+        Calculate or supply the effective magnetic path length of the inductor core.
+
+        Two methods are supported:
+
+        Method 1 — "user":
+            User provides le directly from the datasheet Table 2.
+            Use this when the manufacturer has published the effective magnetic
+            path length directly. Preferred when available — more accurate than
+            the geometry estimate because it accounts for corner rounding.
+
+        Method 2 — "geometry":
+            le is estimated from the core outer and window dimensions as the
+            perimeter of the centreline rectangle through the core material:
+
+                leg_w = (A - F) / 2          horizontal leg half-width
+                leg_h = (B - G) / 2          vertical leg half-height
+                le    = (A + F) + (B + G)    centreline perimeter
+
+            Physical origin: flux travels through the midpoint of each leg,
+            not along the outer or inner edge. The centreline lies halfway
+            between the outer dimension and the window dimension on each side.
+            This formula gives a close approximation; the small residual error
+            (~10%) relative to the datasheet value comes from corner rounding
+            of the wound core, which shortens the actual path slightly.
+
+            Reference: Kazimierczuk, M.K., "High-Frequency Magnetic Components",
+                       2nd Ed., Wiley-IEEE Press, 2014, Chapter 1.
+
+        Parameters
+        ----------
+        method : str
+            Calculation method. One of: "user", "geometry".
+
+        le_user : float, optional
+            User-supplied effective magnetic path length [m].
+            Required when method = "user".
+
+        A_core : float, optional
+            Overall width of the core [m]; outer horizontal dimension.
+            From datasheet Table 1. Required when method = "geometry".
+
+        B_core : float, optional
+            Overall height of the core [m]; outer vertical dimension.
+            From datasheet Table 1. Required when method = "geometry".
+
+        F_core : float, optional
+            Width of the core window [m]; inner horizontal opening.
+            From datasheet Table 1. Required when method = "geometry".
+
+        G_core : float, optional
+            Height of the core window [m]; inner vertical opening.
+            From datasheet Table 1. Required when method = "geometry".
+
+        Returns
+        -------
+        le : float
+            Effective magnetic path length [m].
+        """
+
+        if method == "user":
+            if le_user is None:
+                raise ValueError("method='user' requires le_user to be provided.")
+            le = le_user
+
+        elif method == "geometry":
+            if any(v is None for v in [A_core, B_core, F_core, G_core]):
+                raise ValueError("method='geometry' requires A_core, B_core, F_core, and G_core.")
+
+            leg_w = (A_core - F_core) / 2  # [m]  horizontal leg half-width
+            leg_h = (B_core - G_core) / 2  # [m]  vertical leg half-height
+            le = 2 * (F_core + leg_w) + 2 * (G_core + leg_h)  # [m]  centreline perimeter
+            # Simplified: le = (A_core + F_core) + (B_core + G_core)
+
+        else:
+            raise ValueError(f"Unknown method '{method}'. Choose from: 'user', 'geometry'.")
+
+        return le
+
+    @staticmethod
+    def calculate_core_volume(Ae, le):
+        """
+        Calculate the effective core volume.
+
+        Ve = Ae × le
+
+        Parameters
+        ----------
+        Ae : float  Effective cross-sectional area [m²]
+        le : float  Effective magnetic path length [m]
+
+        Returns
+        -------
+        Ve : float  Effective core volume [m³]
+        """
+
+        Ve = Ae * le
+
+        return Ve
+
+    @staticmethod
+    def calculate_turns(L, I_peak, B_max, Ae):
+        """
+        Calculate the minimum number of turns required for an inductor.
+
+        Physical origin
+        ---------------
+        Start from the definition of inductance:
+            L = N * Phi / I = N * B * Ae / I
+
+        Rearranging for B:
+            B = L * I / (N * Ae)
+
+        At peak current I = I_peak, we want B to stay below B_max:
+            B_peak = L * I_peak / (N * Ae) <= B_max
+
+        Solving for the minimum N:
+            N >= L * I_peak / (B_max * Ae)
+
+        We round UP to the nearest integer because:
+            - N must be a whole number of turns
+            - Rounding down would give B_peak > B_max (saturation risk)
+            - Rounding up keeps B_peak safely below B_max
+
+        Reference
+        ---------
+        Kazimierczuk, M.K., "High-Frequency Magnetic Components",
+        2nd Ed., Wiley-IEEE Press, 2014, Chapter 2.
+
+        Parameters
+        ----------
+        L      : float  target inductance            [H]
+        I_peak : float  peak current                 [A]
+        B_max  : float  maximum allowed flux density [T]
+        Ae     : float  effective cross section area [m²]
+
+        Returns
+        -------
+        N : int
+            Minimum number of turns required.
+            Unit: [-]
+        """
+        N = int(np.ceil((L * I_peak) / (B_max * Ae)))
+        return N
+
+    @staticmethod
+    def calculate_air_gap(mu_0, N, Ae, L, le, mu_r):
+        """
+        Calculate the required air gap length for a gapped inductor core.
+
+        Physical origin
+        ---------------
+        From Ampere's law around the magnetic circuit:
+            N * I = H_core * le  +  H_gap * lg
+        Where:
+            H_core = B / (mu_0 * mu_r)
+            H_gap  = B / mu_0
+        Using B = L * I / (N * Ae) and solving for lg:
+            lg = (mu_0 * N² * Ae / L) - (le / mu_r)
+
+        Reference
+        ---------
+        Kazimierczuk, M.K., "High-Frequency Magnetic Components",
+        2nd Ed., Wiley-IEEE Press, 2014, Chapter 2.
+
+        Parameters
+        ----------
+        mu_0 : float  permeability of free space  [H/m]
+        N    : int    number of turns             [-]
+        Ae   : float  effective cross section     [m²]
+        L    : float  target inductance           [H]
+        le   : float  magnetic path length        [m]
+        mu_r : float  relative permeability       [-]
+
+        Returns
+        -------
+        lg : float
+            Required air gap length.
+            Unit: [m]
+        """
+        lg = (mu_0 * N ** 2 * Ae / L) - (le / mu_r)
+        return lg
+
+    @staticmethod
+    def calculate_B_peak(mu_0, N, I_peak, lg, le, mu_r):
+        """
+        Calculate the peak flux density in the inductor core.
+
+        Physical origin
+        ---------------
+        From Ampere's law:
+
+            N * I = B * le / (mu_0 * mu_r)  +  B * lg / mu_0
+            N * I = B * (le/mu_r + lg) / mu_0
+
+        Solving for B at I = I_peak:
+
+            B_peak = mu_0 * N * I_peak / (lg + le/mu_r)
+
+        Reference
+        ---------
+        Kazimierczuk, M.K., "High-Frequency Magnetic Components",
+        2nd Ed., Wiley-IEEE Press, 2014, Chapter 2.
+
+        Parameters
+        ----------
+        mu_0   : float  permeability of free space  [H/m]
+        N      : int    number of turns             [-]
+        I_peak : float  peak current                [A]
+        lg     : float  air gap length              [m]
+        le     : float  magnetic path length        [m]
+        mu_r   : float  relative permeability       [-]
+
+        Returns
+        -------
+        B_peak : float
+            Peak flux density in the core.
+            Unit: [T]
+        """
+        B_peak = (mu_0 * N * I_peak) / (lg + le / mu_r)
+        return B_peak
+
+    @staticmethod
+    def safety_checks(B_peak, B_max, Bsat, lg, le):
+        # ── Check 1: B_peak must be below B_max ──────────────────────────────────────
+        if B_peak >= B_max:
+            raise ValueError(
+                f"\nSAFETY CHECK FAILED: Flux density exceeds maximum operating limit.\n"
+                f"B_peak = {B_peak:.4f} T\n"
+                f"B_max  = {B_max:.4f} T\n"
+                f"\nRecommendation:\n"
+                f"  Increase N by 1 and recalculate lg, or\n"
+                f"  Increase Ae to reduce required N, or\n"
+                f"  Reduce I_peak by using more parallel inductor units.")
+
+        # ── Check 2: B_peak must be below Bsat ───────────────────────────────────────
+        if B_peak >= Bsat:
+            raise ValueError(
+                f"\nSAFETY CHECK FAILED: Flux density exceeds saturation limit.\n"
+                f"B_peak = {B_peak:.4f} T\n"
+                f"Bsat   = {Bsat:.4f} T\n"
+                f"\nRecommendation:\n"
+                f"  Core will saturate and inductance will collapse.\n"
+                f"  Increase N or increase Ae immediately.")
+
+        # ── Check 3: lg must be positive ─────────────────────────────────────────────
+        if lg <= 0:
+            raise ValueError(
+                f"\nSAFETY CHECK FAILED: Air gap is zero or negative.\n"
+                f"lg = {lg * 1000:.2f} mm\n"
+                f"\nRecommendation:\n"
+                f"  Core is too large for the required inductance.\n"
+                f"  Reduce Ae or reduce N.")
+
+        # ── Check 4: lg must be less than le ─────────────────────────────────────────
+        if lg >= le:
+            raise ValueError(
+                f"\nSAFETY CHECK FAILED: Air gap is larger than magnetic path length.\n"
+                f"lg = {lg * 1000:.2f} mm\n"
+                f"le = {le * 1000:.2f} mm\n"
+                f"\nRecommendation:\n"
+                f"  This core is far too small for this current level.\n"
+                f"  Increase Ae significantly, or\n"
+                f"  Use multiple cores in parallel, or\n"
+                f"  Use a custom larger core.")
+
+        # ── Check 5: lg/le ratio warning ─────────────────────────────────────────────
+        lg_le_ratio = lg / le
+        if lg_le_ratio > 0.10:
+            raise ValueError(
+                f"\nWARNING CHECK 5: Air gap ratio lg/le = {lg_le_ratio * 100:.1f}%\n"
+                f"  Recommended maximum is 10%.\n"
+                f"  Large air gap causes fringing flux which increases losses.\n"
+                f"  Recommendation: Increase Ae to reduce required air gap.")
+
+    @staticmethod
+    def calculate_minimum_required_wire_area(I_RMS_rated, J_max):
+        """
+        Calculate the minimum copper cross-section required to carry the rated
+        current within the maximum allowed current density.
+
+        A_wire = I_RMS / J_max
+        d_wire = sqrt(4 × A_wire / π)
+
+        Parameters
+        ----------
+        I_RMS_rated : float  Rated RMS current          [A]
+        J_max       : float  Maximum current density    [A/m²]
+
+        Returns
+        -------
+        A_wire_minimum : float  Minimum copper cross-section  [m²]
+        d_wire_minimum : float  Equivalent minimum wire diameter [m]
+        """
+
+        A_wire_minimum = I_RMS_rated / J_max
+        d_wire_minimum = np.sqrt((4 * A_wire_minimum) / np.pi)
+
+        return A_wire_minimum, d_wire_minimum
+
+    @staticmethod
+    def calculate_parallel_strands(A_wire_minimum, A_strand):
+        """
+        Calculate the number of parallel strands required to achieve the
+        minimum copper cross-section from individual strand area.
+
+        N_parallel = ceil(A_wire_minimum / A_strand)
+
+        Ceiling is used because rounding down would give insufficient
+        copper area, potentially exceeding the current density limit.
+
+        Parameters
+        ----------
+        A_wire_minimum : float  Minimum required copper cross-section  [m²]
+        A_strand       : float  Bare copper area of one strand         [m²]
+
+        Returns
+        -------
+        N_parallel : int  Number of parallel strands required  [-]
+        """
+
+        N_parallel = int(np.ceil(A_wire_minimum / A_strand))
+
+        return N_parallel
+
+    @staticmethod
+    def calculate_actual_wire_area(N_parallel, A_strand):
+        """
+        Calculate the actual total copper cross-section after rounding up
+        the number of parallel strands.
+
+        A_wire_actual = N_parallel × A_strand
+
+        Parameters
+        ----------
+        N_parallel : int    Number of parallel strands  [-]
+        A_strand   : float  Bare copper area per strand [m²]
+
+        Returns
+        -------
+        A_wire_actual : float  Actual total copper cross-section [m²]
+        """
+
+        A_wire_actual = N_parallel * A_strand
+
+        return A_wire_actual
+
+    @staticmethod
+    def check_window_fill(N_turns, N_parallel, A_wire_bare, F_core, G_core, kf_window_max):
+        """
+        Check whether the winding physically fits inside the core window
+        using the standard window utilization factor ku defined in Kazimierczuk.
+
+        Definition (Kazimierczuk, Chapter 10):
+            ku = (N_turns * N_parallel * A_bare) / A_window
+
+        The limits below use bare copper area — insulation, air gaps, and
+        imperfect packing are already absorbed into the empirical limit values:
+            ku ≤ 0.3  — hand-wound toroid, random lay
+            ku ≤ 0.4  — machine-wound, random lay
+            ku ≤ 0.6  — organised / orthocyclic winding
+
+        Reference: Kazimierczuk, M.K., "High-Frequency Magnetic Components", 2nd Ed., Wiley-IEEE Press, 2014, Chapter 10.
+
+        Parameters
+        ----------
+        N_turns      : int    number of winding turns              [-]
+        N_parallel   : int    number of parallel strands per turn  [-]
+        A_wire_bare  : float  bare copper area of one strand       [m²]
+                              Use A_strand_wire_L1 (not outer area)
+        F_core       : float  core window width  (inner)           [m]
+        G_core       : float  core window height (inner)           [m]
+        kf_window_max: float  maximum allowed ku                   [-]
+
+        Returns
+        -------
+        ku : float  actual window utilization factor [-]
+        """
+
+        A_window = F_core * G_core  # [m²] window area
+        A_copper_total = N_turns * N_parallel * A_wire_bare  # [m²] total bare copper area
+
+        ku = A_copper_total / A_window  # [-]  utilization factor
+
+        if ku > kf_window_max:
+            raise ValueError(
+                f"\nSAFETY CHECK FAILED: Winding does not fit inside core window.\n"
+                f"\n  Core window area        : {A_window * 1e6:.1f} mm²"
+                f"  (F={F_core * 1e3:.1f} mm × G={G_core * 1e3:.1f} mm)\n"
+                f"  Total bare copper area  : {A_copper_total * 1e6:.1f} mm²"
+                f"  ({N_turns} turns × {N_parallel} strands"
+                f" × {A_wire_bare * 1e6:.4f} mm² per strand)\n"
+                f"  Actual ku               : {ku:.3f}\n"
+                f"  Maximum allowed ku      : {kf_window_max:.3f}\n"
+                f"\nRecommendations:\n"
+                f"  (1) Increase core window: scale F_core and G_core up, or\n"
+                f"  (2) Reduce N_turns: increase Ae to allow fewer turns, or\n"
+                f"  (3) Switch to copper foil or busbar winding\n"
+                f"      (standard practice at MW current levels), or\n"
+                f"  (4) Use organised winding and set kf_window_max=0.6.")
+
+    @staticmethod
+    def calculate_l_turn(D_core, E_core):
+        """
+        Estimate mean length of one turn for a rectangular toroidal core.
+
+        The copper winding wraps around one leg of the core.
+        The mean turn path goes around the perimeter of the core cross-section,
+        which is D (depth) × E (build/thickness).
+
+        Physical origin:
+            The winding sits at the midpoint of the core leg cross-section.
+            Mean turn = perimeter of the D × E rectangle.
+
+        Parameters
+        ----------
+        D_core : float  core depth (cast width)     [m]   from datasheet Table 1
+        E_core : float  core build (thickness)       [m]   from datasheet Table 1
+
+        Returns
+        -------
+        l_turn : float  mean length of one turn      [m]
+        """
+        l_turn = 2 * (D_core + E_core)  # [m]  perimeter of D × E rectangle
+        return l_turn
+
+    @staticmethod
+    def calculate_Rdc(rho, N, l_turn, A_wire):
+
+        """
+        Calculate DC winding resistance.
+        Assumed  no Skin or Proximity Effect
+
+        Reference
+        ---------
+        Kazimierczuk, M.K., "High-Frequency Magnetic Components",
+        2nd Ed., Wiley-IEEE Press, 2014, Chapter 3, Eq. (3.1).
+
+        Parameters
+        ----------
+        rho : float  copper resistivity  [ohm·m]
+        N          : int    number of turns     [-]
+        l_turn     : float  mean turn length    [m]
+        A_wire     : float  wire cross section  [m²]
+
+        Returns
+        -------
+        Rdc : float  DC winding resistance  [ohm]
+        """
+
+        Rdc = (rho * N * l_turn) / A_wire
+        return Rdc
+
+    @staticmethod
+    def compute_I_L_peak_per_harmonic_for_inductor(I_L, f, resolution_per_cycle, Profile_size):
+        """
+        Decompose the inductor current I_L into peak amplitudes at each harmonic of the fundamental frequency, for each
+         second of the mission profile.
+
+        Unlike the capacitor function which targets specific harmonics, this function includes ALL harmonics from order 1
+        up to the Nyquist limit. This is required for inductor core loss calculation via Steinmetz's equation (Eq. 8),
+        where the f^alpha term amplifies contributions from higher harmonics, making cherry-picking insufficient. The paper
+        (Martin-Arroyo et al., ICREPQ 2022) showed that using only 511 harmonics gives 73.6% error, while 5000 harmonics
+        gives 0.6% error.
+
+        Note: Returns PEAK amplitudes (not RMS) because the Steinmetz equation requires peak flux density:
+         B_j = (mu_0 * N * I_j_peak) / (lg + le/mu_r).
+
+        FFT bin spacing
+        ---------------
+        The signal is 1 second long with N = resolution_per_cycle * f samples.
+        The FFT frequency resolution is therefore:
+            df = sampling_rate / N = N / N = 1 Hz per bin
+        So FFT bin k corresponds to exactly k Hz.
+        Harmonic order j of the fundamental (f Hz) sits at frequency j*f Hz, which is FFT bin j*f. Only these bins carry
+        real signal energy. All other bins between harmonics contain only numerical noise and must be discarded — including
+        them would corrupt the Steinmetz sum.
+
+        Parameters
+        ----------
+        I_L : np.ndarray
+            Time-domain inductor current signal [A].
+            Length = Profile_size * resolution_per_cycle * f
+        f : float
+            Fundamental frequency [Hz]
+        resolution_per_cycle : int
+            Number of discrete simulation samples per fundamental cycle. Controls the Nyquist limit: higher values resolve more harmonics.
+        Profile_size : int
+            Number of seconds in the mission profile.
+
+        Returns
+        -------
+        I_L1_peak_harmonics : np.ndarray, shape (Profile_size, max_harmonic_order)
+            Peak current amplitude [A] at each harmonic of f, for each mission-profile second.
+            I_L1_peak_harmonics[i, j] = peak amplitude at harmonic order (j+1) during second i.
+        harmonic_orders : np.ndarray, shape (max_harmonic_order,)
+            Harmonic order indices [1, 2, 3, ..., max_harmonic_order]. Multiply by f to get frequency in Hz.
+        harmonic_freqs : np.ndarray, shape (max_harmonic_order,)
+            Physical frequency [Hz] of each harmonic order.
+            harmonic_freqs[j] = (j+1) * f
+            Spans from f to f_Nyquist = sampling_rate / 2.
+        """
+
+        samples_per_second = int(
+            resolution_per_cycle * f)  # [samples/s] total samples in one second; also the FFT length N
+        N = samples_per_second
+
+        # ----------------------------------------#
+        # Harmonic orders and frequencies
+        # ----------------------------------------#
+        # FFT bin spacing = sampling_rate / N = N / N = 1 Hz per bin
+        # → FFT bin k = k Hz exactly
+        # → Harmonic order j of fundamental f sits at bin j*f
+        #
+        # Maximum resolvable frequency = Nyquist = N / 2 Hz
+        # Maximum resolvable harmonic order = Nyquist / f = (N/2) / f
+        #
+        # Example: resolution_per_cycle=3000, f=50
+        #   N               = 150,000 samples/s
+        #   Nyquist         = 75,000 Hz
+        #   max_harmonic    = 75,000 / 50 = 1,500
+        #   harmonic_freqs  = [50, 100, 150, ..., 75,000] Hz
+
+        max_harmonic_order = int((N // 2) // f)  # highest harmonic order resolvable within Nyquist limit
+
+        harmonic_orders = np.arange(1, max_harmonic_order + 1)  # [1, 2, 3, ..., max_harmonic_order]
+        harmonic_freqs = harmonic_orders * f  # [f, 2f, 3f, ..., max_harmonic_order * f] [Hz]
+
+        # ----------------------------------------#
+        # Reshape into (Profile_size, N) matrix
+        # ----------------------------------------#
+        # Each row = one second of time-domain data
+        I_matrix = I_L.reshape(Profile_size, N)  # Shape: (Profile_size, N)
+
+        # ----------------------------------------#
+        # FFT for all seconds simultaneously
+        # ----------------------------------------#
+        # rfft returns N//2 + 1 complex bins for a real input of length N
+        # Bin k corresponds to frequency k * (sampling_rate / N) = k * 1 Hz = k Hz
+        fft_vals = np.fft.rfft(I_matrix, axis=1)  # Shape: (Profile_size, N//2 + 1)
+
+        # ----------------------------------------#
+        # Extract bins at harmonic frequencies only
+        # ----------------------------------------#
+        # Harmonic order j sits at frequency j*f Hz = FFT bin j*f
+        # We must extract ONLY these bins and discard all others.
+        # Extracting all bins would include inter-harmonic noise bins,
+        # which have no physical meaning but would inflate the Steinmetz sum.
+        #
+        # bin_indices[j] = harmonic_orders[j] * f = the FFT bin number for harmonic j
+        # Example: harmonic 1 → bin 50 (50 Hz), harmonic 200 → bin 10000 (10 kHz)
+
+        bin_indices = (harmonic_orders * int(f)).astype(int)  # FFT bin index for each harmonic order
+        fft_harmonic_vals = fft_vals[:, bin_indices]  # Shape: (Profile_size, max_harmonic_order)
+
+        # ----------------------------------------#
+        # Convert FFT output to peak amplitudes
+        # ----------------------------------------#
+        # Factor of 2: rfft only returns positive-frequency bins; the negative-
+        #   frequency mirror carries equal energy, so multiply by 2 to recover
+        #   the full single-sided peak amplitude.
+        # Divide by N: numpy's rfft is unnormalised (sum of inputs, not average),
+        #   so dividing by N converts raw FFT magnitude to physical amplitude [A].
+        # DC bin (bin 0) is excluded — it has no factor-of-2 correction and
+        #   carries no harmonic information relevant to core losses.
+
+        I_L_peak_harmonics = (2 * np.abs(
+            fft_harmonic_vals)) / N  # Shape: (Profile_size, max_harmonic_order); Peak amplitude [A]
+
+        return I_L_peak_harmonics, harmonic_orders, harmonic_freqs
+
+    @staticmethod
+    def calculate_inductor_core_losses(I_peak_harmonics, harmonic_freqs, mu_0, N, lg, le, mu_r, k, a, b, Ve):
+        """
+        Compute the total core loss in the inductor L1 for each second of the mission profile using Steinmetz's equation
+         applied to all harmonics of the inductor current (Eq. 8, Martin-Arroyo et al., ICREPQ 2022).
+
+        Parameters
+        ----------
+        I_peak_harmonics : np.ndarray, shape (Profile_size, N//2)
+            Peak current amplitude [A] at each harmonic order for each second
+            of the mission profile. Row i = second i, column j = harmonic j+1.
+        harmonic_freqs : np.ndarray, shape (N//2,)
+            Frequency [Hz] of each harmonic order.
+        mu_0 : float
+            Permeability of free space [H/m]. Physical constant = 4π × 10⁻⁷.
+        N : int
+            Number of turns in the winding [-].
+        lg : float
+            Air gap length [m].
+        le : float
+            Effective magnetic path length of the core [m].
+        mu_r : float
+            Relative permeability of the core material [-].
+        k : float
+            Steinmetz loss coefficient [W/m³].
+        a : float
+            Steinmetz frequency exponent alpha [-].
+        b : float
+            Steinmetz flux density exponent beta [-].
+        Ve : float
+            Effective core volume [m³].
+
+        Returns
+        -------
+        P_c : np.ndarray, shape (Profile_size,)
+            Total core loss [W] for each second of the mission profile.
+        P_c_matrix : np.ndarray, shape (Profile_size, N//2)
+            Core loss contribution [W] per second per harmonic.
+        """
+
+        # ----------------------------------------#
+        # Step 1 — Peak flux density per harmonic
+        # ----------------------------------------#
+        # Ampere's law for a gapped core:
+        #   B_j = (mu_0 * N * I_j_peak) / (lg + le/mu_r)
+        # Shape: (Profile_size, N//2)
+        B_j = (mu_0 * N * I_peak_harmonics) / (lg + le / mu_r)
+
+        # ----------------------------------------#
+        # Step 2 — Core loss per harmonic
+        # ----------------------------------------#
+        # Steinmetz equation per harmonic:
+        #   P_c_j = k * f_j^alpha * B_j^beta * Ve
+        # harmonic_freqs shape (N//2,) broadcasts across (Profile_size, N//2)
+        # Shape: (Profile_size, N//2)
+        P_c_matrix = k * (harmonic_freqs ** a) * (B_j ** b) * Ve
+
+        # ----------------------------------------#
+        # Step 3 — Sum over all harmonics
+        # ----------------------------------------#
+        # Shape: (Profile_size,)
+        P_c = np.sum(P_c_matrix, axis=1)
+
+        return P_c, P_c_matrix
+
+    @staticmethod
+    def calculate_winding_losses(I_L, Rdc, resolution_per_cycle, f, Profile_size):
+        """
+        Calculate DC copper winding losses for each second of the mission profile.
+
+        P_w = Rdc × I_RMS²
+
+        Parameters
+        ----------
+        I_L                 : np.ndarray  instantaneous inductor current [A]
+        Rdc                  : float       DC winding resistance          [Ω]
+        resolution_per_cycle : int         samples per fundamental cycle  [-]
+        f                    : float       fundamental frequency          [Hz]
+        Profile_size         : int         mission profile length         [s]
+
+        Returns
+        -------
+        P_w    : np.ndarray, shape (Profile_size,)  copper losses per second  [W]
+        I_RMS  : np.ndarray, shape (Profile_size,)  RMS current per second    [A]
+        """
+
+        samples_per_second = int(resolution_per_cycle * f)
+        I_matrix = I_L.reshape(Profile_size, samples_per_second)
+        I_RMS = np.sqrt(np.mean(I_matrix ** 2, axis=1))
+        P_w = Rdc * I_RMS ** 2
+
+        return P_w, I_RMS
+
+    @staticmethod
+    def calculate_inductor_thermal_resistance(method, R_th_user=None, A_surface=None, heat_transfer_coefficient=None, Ve_m3=None):
+
+        """
+        Calculate or supply the thermal resistance of the inductor core to ambient.
+
+        Three methods are supported:
+
+        Method 1 — "user":
+            User provides R_th directly from a datasheet or measurement.
+
+        Method 2 — "surface_area":
+            R_th is computed from the core surface area and convective heat
+            transfer coefficient:
+                R_th = 1 / (h * A_surface)
+            Reference: Incropera, F.P., DeWitt, D.P., Bergman, T.L., Lavine, A.S.,
+                       "Fundamentals of Heat and Mass Transfer",
+                       7th Ed., Wiley, 2011, Table 1.1
+
+        Method 3 — "empirical":
+            R_th is estimated from core volume using the Kazimierczuk empirical
+            formula for naturally cooled magnetic cores:
+                R_th = 14.5 / Ve^0.37   [K/W], Ve in cm³
+            Reference: Kazimierczuk, M.K., "High-Frequency Magnetic Components",
+                       2nd Ed., Wiley-IEEE Press, 2014, Chapter 1, Eq. (1.186)
+
+        Parameters
+        ----------
+        method : str
+            Calculation method. One of: "user", "surface_area", "empirical".
+
+        R_th_user : float, optional
+            User-supplied thermal resistance [K/W].
+            Required when method = "user".
+
+        A_surface : float, optional
+            Total exposed surface area of the core [m²].
+            Required when method = "surface_area".
+
+        heat_transfer_coefficient : float, optional
+            Convective heat transfer coefficient [W/(m²·K)].
+            Required when method = "surface_area".
+            Typical values:
+                10  W/(m²·K) — natural convection, still air
+                50  W/(m²·K) — moderate forced air cooling
+                250 W/(m²·K) — high-velocity forced air
+                500 W/(m²·K) — Liquid Cooling
+            Source: Incropera et al., Table 1.1
+
+        Ve_m3  : float, optional
+            Effective core volume [m³].
+            Required when method = "empirical".
+
+        Returns
+        -------
+        R_th : float
+            Thermal resistance from core to ambient [K/W].
+        """
+
+        if method == "user":
+            if R_th_user is None:
+                raise ValueError("method='user' requires R_th_user to be provided.")
+            R_th = R_th_user
+
+        elif method == "surface_area":
+            if A_surface is None or heat_transfer_coefficient is None:
+                raise ValueError("method='surface_area' requires A_surface and heat_transfer_coefficient.")
+            # Single-node lumped thermal model: R_th computed from core surface area only.
+            # Core and winding are assumed to be at the same temperature. where a single Rth represents the combined thermal
+            # path of the entire inductor assembly to ambient, noting that Rth includes the thermal resistance between the
+            # core and ambient, the thermal resistance between the conductor and ambient, and the conduction and radiation
+            # thermal resistances between the conductor surface and the core.
+            # [1] S. Martín-Arroyo et al., "Core losses analysis of the LCL filter inductor for SiC-based inverter",
+            # Renewable Energy and Power Quality Journal (RE&PQJ), Vol. 20, September
+            R_th = 1 / (heat_transfer_coefficient * A_surface)
+
+        elif method == "empirical":
+            if Ve_m3 is None:
+                raise ValueError("method='empirical' requires Ve_cm3 to be provided.")
+            Ve_cm3 = Ve_m3 * 1e6  # [cm³]
+            R_th = 14.5 / (Ve_cm3 ** 0.37)
+        else:
+            raise ValueError(f"Unknown method '{method}'. Choose from: 'user', 'surface_area', 'empirical'.")
+
+        return R_th
+
+    @staticmethod
+    def calculate_inductor_temperature(T_amb, R_th, P_total):
+        """
+        Calculate inductor temperature for each second of the mission profile.
+
+        Single-node lumped thermal model:
+            T = T_amb + R_th × P_total
+
+        Consistent with Martín-Arroyo et al., ICREPQ 2022, Eq. (1):
+            ΔT = (Pw + Pc) · Rth
+
+        Parameters
+        ----------
+        T_amb   : np.ndarray  ambient temperature          [K]
+        R_th    : float       thermal resistance           [K/W]
+        P_total : np.ndarray  total losses per second      [W]
+
+        Returns
+        -------
+        T_inductor : np.ndarray  inductor temperature per second [K]
+        """
+
+        T_inductor = T_amb + R_th * P_total
+
+        return T_inductor
+
+    @staticmethod
+    def check_insulation_voltage_stress(V_L, N_turns, V_bd, resolution_per_cycle, f, Profile_size):
+        """
+        Compute peak turn-to-turn voltage and verify it does not exceed
+        the insulation breakdown voltage.
+
+        The enamel insulation between two adjacent turns sees approximately
+        one turn's worth of the total inductor voltage:
+            V_turn = V_L / N_turns
+
+        A well-designed inductor should have V_turn << V_bd.
+
+        Parameters
+        ----------
+        V_L                  : np.ndarray  instantaneous inductor voltage  [V]
+        N_turns              : int         number of winding turns         [-]
+        V_bd                 : float       insulation breakdown voltage    [V]
+                                           Source: Elektrisola datasheet page 4
+                                           Grade 1 = 2400 V, Grade 2 = 4600 V
+        resolution_per_cycle : int         samples per fundamental cycle   [-]
+        f                    : float       fundamental frequency           [Hz]
+        Profile_size         : int         mission profile length          [s]
+
+        Returns
+        -------
+        V_turn_peak    : np.ndarray, shape (Profile_size,)
+                         Peak turn-to-turn voltage per profile second [V]
+        V_stress_ratio : np.ndarray, shape (Profile_size,)
+                         V_turn_peak / V_bd per profile second        [-]
+
+        Raises
+        ------
+        ValueError
+            If any V_stress_ratio >= 1.0 — insulation will fail immediately.
+        """
+
+        # ── Turn-to-turn voltage ──────────────────────────────────────────────
+        samples_per_second = int(resolution_per_cycle * f)
+        V_matrix = V_L.reshape(Profile_size, samples_per_second)
+        V_turn_peak = np.max(np.abs(V_matrix), axis=1) / N_turns
+
+        # ── Stress ratio ──────────────────────────────────────────────────────
+        V_stress_ratio = V_turn_peak / V_bd
+
+        # ── Hard failure check ────────────────────────────────────────────────
+        if np.any(V_stress_ratio >= 1.0):
+            raise ValueError(
+                f"\nSAFETY CHECK FAILED: Turn-to-turn voltage exceeds breakdown voltage.\n"
+                f"  Peak V_turn  = {np.max(V_turn_peak):.2f} V\n"
+                f"  V_bd         = {V_bd:.2f} V\n"
+                f"  Stress ratio = {np.max(V_stress_ratio):.4f}\n"
+                f"\nRecommendations:\n"
+                f"  (1) Increase N to reduce voltage per turn, or\n")
+
+    @staticmethod
+    def calculate_inductor_lifetime(T_operating, T_rated, L_rated, Ea, kb):
+
+        """
+        Calculate winding insulation lifetime using the Arrhenius thermal aging model.
+
+        Parameters
+        ----------
+        T_operating : np.ndarray or float
+            Operating temperature of the inductor [K].
+            Use T_inductor_L1 from the thermal model.
+        T_rated : float
+            Rated temperature index of the insulation [K].
+            Source: Elektrisola datasheet page 3 — 210°C = 483 K for Amidester 200.
+        L_rated : float
+            Reference lifetime at T_rated [h].
+            Source: IEC 60172 — 20,000 h reference point.
+        Ea : float
+            Activation energy of insulation degradation [J].
+        kb : float
+            Boltzmann constant [J/K]
+
+        Returns
+        -------
+        L : np.ndarray or float
+            Predicted insulation lifetime [Years] at each operating temperature.
+        """
+
+        L = L_rated * np.exp((Ea / kb) * (1 / T_operating - 1 / T_rated))
+        L = L / (365 * 24)
+        return L
+
+    @staticmethod
+    def miners_rule(L_per_second):
+        """
+        Apply Miner's cumulative damage rule to compute expected total lifetime
+        and the fraction of life consumed by one mission profile cycle.
+
+        Miner's rule states that failure occurs when cumulative damage D = 1:
+            D = sum( dt_i / L_i )
+        where dt_i is the time spent at condition i and L_i is the lifetime
+        at that condition. The expected total lifetime is then:
+            L_total = Profile_duration / D_cycle
+
+        Reference
+        ---------
+        Miner, M.A., "Cumulative damage in fatigue",
+        Journal of Applied Mechanics, 1945.
+        IEC 60216-1: Electrical insulating materials — Thermal endurance properties.
+
+        Parameters
+        ----------
+        L_per_second : np.ndarray, shape (Profile_size,)
+            Predicted insulation lifetime [years] at each second of the mission
+            profile, computed from the Arrhenius thermal aging model.
+            L_per_second[i] = lifetime [years] if the inductor operated forever
+            at the temperature of second i.
+
+        Returns
+        -------
+        L_total : float
+            Total predicted insulation lifetime [years].
+            Defined as the time until cumulative damage D reaches 1.0.
+            Computed by repeating the mission profile until failure:
+                L_total = Profile_duration / D_cycle
+
+        life_consumed_percent : float
+            Fraction of total insulation life consumed by ONE complete run
+            of the mission profile [%].
+            Range: 0% to 100%. Failure occurs when cumulative total reaches 100%.
+            life_consumed_percent = (Profile_duration / L_total) * 100
+        """
+
+        dt_profile_years = 1 / (365 * 24 * 3600)  # [years] duration of one second
+        d_i = dt_profile_years / L_per_second  # [-]     fractional damage per second
+        D_cycle = np.sum(d_i)  # [-]     total fractional damage per profile cycle
+        Profile_duration = len(L_per_second) * dt_profile_years  # [years] total duration of mission profile
+        L_total = Profile_duration / D_cycle  # [years] total predicted lifetime
+
+        life_consumed_percent = D_cycle * 100  # [%]     life consumed by one profile cycle
+
+        #print(f"Total predicted lifetime : {L_total:.4f} years")
+        #print(f"Life consumed so far     : {life_consumed_percent:.6e} % out of 100%")
+
+        return L_total, life_consumed_percent
+
+
+    @staticmethod
+    def miners_rule_modified(L_per_second, seconds_per_sample=1.0):
+        """
+        Apply Miner's cumulative damage rule to compute expected total lifetime
+        and the fraction of life consumed by one mission profile cycle.
+
+        Miner's rule states that failure occurs when cumulative damage D = 1:
+            D = sum( dt_i / L_i )
+        where dt_i is the time spent at condition i and L_i is the lifetime
+        at that condition. The expected total lifetime is then:
+            L_total = Profile_duration / D_cycle
+
+        Reference
+        ---------
+        Miner, M.A., "Cumulative damage in fatigue",
+        Journal of Applied Mechanics, 1945.
+        IEC 60216-1: Electrical insulating materials — Thermal endurance properties.
+
+        Parameters
+        ----------
+        L_per_second : np.ndarray, shape (Profile_size,)
+            Predicted insulation lifetime [years] at each second of the mission
+            profile, computed from the Arrhenius thermal aging model.
+            L_per_second[i] = lifetime [years] if the inductor operated forever
+            at the temperature of second i.
+
+        seconds_per_sample : float or np.ndarray, optional
+            Duration [s] that each entry of L_per_second represents.
+            Default 1.0 (one entry = one second, original behaviour).
+            Pass a scalar (e.g. 86400 for daily points) or an array of
+            per-sample durations for an irregular profile.
+
+        Returns
+        -------
+        L_total : float
+            Total predicted insulation lifetime [years].
+            Defined as the time until cumulative damage D reaches 1.0.
+            Computed by repeating the mission profile until failure:
+                L_total = Profile_duration / D_cycle
+
+        life_consumed_percent : float
+            Fraction of total insulation life consumed by ONE complete run
+            of the mission profile [%].
+            Range: 0% to 100%. Failure occurs when cumulative total reaches 100%.
+            life_consumed_percent = (Profile_duration / L_total) * 100
+
+
+        """
+        sec_per_year = 365 * 24 * 3600
+        dt_years = seconds_per_sample / sec_per_year  # scalar or array, [years] per sample
+        d_i = dt_years / L_per_second  # fractional damage per sample
+        D_cycle = np.sum(d_i)
+        Profile_duration = np.sum(np.broadcast_to(dt_years, np.shape(L_per_second)))
+        L_total = Profile_duration / D_cycle
+        life_consumed_percent = D_cycle * 100
+        if life_consumed_percent > 100:
+            life_consumed_percent = 100.0
+        return L_total, life_consumed_percent
+
+    @staticmethod
+    def calculate_capacitor_thermal_resistance(method, D_case=None, H_case=None, heat_transfer_coefficient=None, R_th_user=None):
+        """
+        Calculate thermal resistance of the capacitor to ambient.
+
+        Two methods are supported:
+
+        Method 1 — "user":
+            User provides R_th directly from datasheet or measurement.
+
+        Method 2 — "surface_area":
+            R_th computed from cylindrical capacitor can geometry and
+            convective heat transfer coefficient:
+                A_surface = pi*D*H + pi*D²/2   [m²]  (cylinder lateral + two end caps)
+                R_th      = 1 / (h * A_surface) [K/W]
+            Reference: Incropera et al., "Fundamentals of Heat and Mass Transfer",
+                       7th Ed., Wiley, 2011, Table 1.1
+
+        Parameters
+        ----------
+        method : str
+            Calculation method. One of: "user", "surface_area".
+        D_case : float, optional
+            Outer diameter of capacitor can [m].
+            Required when method = "surface_area".
+            Source: TDK B3236X datasheet page 10, column D.
+        H_case : float, optional
+            Height of capacitor can [m].
+            Required when method = "surface_area".
+            Source: TDK B3236X datasheet page 10, column H.
+        heat_transfer_coefficient : float, optional
+            Convective heat transfer coefficient [W/(m²·K)].
+            Required when method = "surface_area".
+            Typical values:
+                10  W/(m²·K) — natural convection, still air
+                50  W/(m²·K) — moderate forced air cooling
+                250 W/(m²·K) — high-velocity forced air
+            Source: Incropera et al., Table 1.1
+        R_th_user : float, optional
+            User-supplied thermal resistance [K/W].
+            Required when method = "user".
+
+        Returns
+        -------
+        R_th : float
+            Thermal resistance from capacitor hotspot to ambient [K/W].
+        """
+
+        if method == "user":
+            if R_th_user is None:
+                raise ValueError("method='user' requires R_th_user.")
+            R_th = R_th_user
+
+        elif method == "surface_area":
+            if D_case is None or H_case is None or heat_transfer_coefficient is None:
+                raise ValueError("method='surface_area' requires D_case, H_case, "
+                                 "and heat_transfer_coefficient.")
+            A_lateral = np.pi * D_case * H_case  # [m²] cylindrical side
+            A_end_caps = 2 * np.pi * (D_case / 2) ** 2  # [m²] two circular ends
+            A_surface = A_lateral + A_end_caps  # [m²] total surface area
+            R_th = 1 / (heat_transfer_coefficient * A_surface)  # [K/W]
+
+        else:
+            raise ValueError(f"Unknown method '{method}'. Choose from: 'user', 'surface_area'.")
+
+        return R_th
+
+    @staticmethod
+    def calculate_tan_delta_0(tan_delta_measured, Rs, C, f_measured):
+
+        """
+        Calculate the dielectric loss tangent tan_delta_0 of a polypropylene
+        film capacitor from the measured total dissipation factor.
+
+        Physical origin
+        ---------------
+        The total dissipation factor of a capacitor has two contributions (TDK B3236X datasheet, page 16):
+            tan_delta(f) = tan_delta_0 + Rs * omega * C
+        Where:
+            tan_delta_0   = dielectric loss tangent (frequency-independent material property)
+            Rs * omega * C = resistive loss contribution (frequency-dependent)
+        Rearranging for tan_delta_0:
+            tan_delta_0 = tan_delta(f) - Rs * omega * C
+        Reference
+        ---------
+        TDK Electronics, "FilterCap MKP AC — Single phase, B3236X Series",
+        Datasheet version 08, 2022-05-03:
+            - Equation: page 16
+            - tan_delta measured value: page 3, row "Dissipation factor tan δ at 100 Hz"
+            - Rs value: page 10, product table, column Rs
+
+        Parameters
+        ----------
+        tan_delta_measured : float
+            Total measured dissipation factor [-] at frequency f_measured.
+            Source: TDK B3236X datasheet page 3 — tan δ ≤ 1.0×10⁻³ at 100 Hz.
+            Use the maximum specified value (1.0e-3) as a conservative estimate.
+
+        Rs : float
+            Series resistance of the capacitor [Ohm].
+            Source: TDK B3236X datasheet page 10, product table, column Rs.
+            For B32362A4157J080: Rs = 1.9e-3 Ohm.
+
+        C : float
+            Capacitance [F].
+            Source: TDK B3236X datasheet page 10, product table, column C_R.
+            For B32362A4157J080: C = 150e-6 F.
+
+        f_measured : float, optional
+            Frequency at which tan_delta_measured was specified [Hz].
+            Default = 100 Hz.
+            Source: TDK B3236X datasheet page 3 — measurement frequency is 100 Hz.
+
+        Returns
+        -------
+        tan_delta_0 : float
+            Dielectric loss tangent of the polypropylene film [-].
+            Frequency-independent material property of the dielectric.
+            Used in capacitor power loss calculations:
+                P_D = V_peak² * pi * f * C * tan_delta_0
+        """
+
+        omega = 2 * np.pi * f_measured  # [rad/s] angular frequency
+        resistive_term = Rs * omega * C  # [-]     resistive contribution
+        tan_delta_0 = tan_delta_measured - resistive_term  # [-]     dielectric contribution
+
+        if tan_delta_0 <= 0:
+            raise ValueError(
+                f"\ntan_delta_0 came out negative or zero: {tan_delta_0:.4e}\n"
+                f"This means the resistive term Rs*omega*C = {resistive_term:.4e}\n"
+                f"exceeds the measured tan_delta = {tan_delta_measured:.4e}.\n"
+                f"Check that Rs, C, and f_measured are consistent with "
+                f"the measurement conditions.")
+
+        return tan_delta_0
+
+    @staticmethod
+    def calculate_capacitor_lifetime_analytical(T_operating, V_C_RMS, V_C_RMS_Rated, t1, T1, A, n):
+        """
+        Estimate capacitor lifetime using the TDK analytical lifetime formula.
+
+        Formula (TDK B3236X datasheet, page 19):
+            t2 = t1 * exp((T1 - T2) / A) * (V1 / V2)^n
+
+        This formula models two independent degradation mechanisms:
+            1. Thermal aging    → exponential term exp((T1-T2)/A)
+            2. Voltage stress   → power law term (V1/V2)^n
+
+        Parameters
+        ----------
+        T_operating : np.ndarray, shape (Profile_size,)
+            Capacitor hotspot temperature at each second of mission profile [K].
+            Converted internally to °C for the formula.
+
+        V_C_RMS : np.ndarray, shape (Profile_size,)
+            RMS capacitor voltage at each second of mission profile [V].
+
+        V_C_RMS_Rated : float
+            Rated RMS voltage of the capacitor [V].
+            V1 in the formula.
+            Source: TDK B3236X datasheet page 10 — 480 V for B32362A4157J080.
+
+        t1 : float, optional
+            Reference lifetime at T1 and V1 [hours].
+            Default = 100,000 hours.
+            Source: TDK B3236X datasheet page 3 — life expectancy at V_RMS, |ΔC/C| ≤ 3%.
+
+        T1 : float, optional
+            Reference temperature [K].
+            Source: TDK B3236X datasheet page 19 — example reference temperature.
+
+        A : float, optional
+            Thermal acceleration factor [°C].
+            Default = 8.5°C.
+            Source: Standard value for metallized polypropylene film capacitors.
+                    Not specified in TDK B3236X datasheet — literature value.
+                    Reference: Kemet, "Film Capacitor Lifetime Estimation", 2018.
+
+        n : float, optional
+            Voltage acceleration factor [-].
+            Default = 9.4.
+            Source: Standard value for metallized polypropylene (MKP) film capacitors.
+                    Not specified in TDK B3236X datasheet — literature value.
+                    Reference: IEC 61071, MKP industry standard.
+
+        Returns
+        -------
+        t2_years : np.ndarray, shape (Profile_size,)
+            Estimated capacitor lifetime [years] at each second of the mission
+            profile, given the operating temperature and voltage at that second.
+        """
+
+        # Convert operating temperature from Kelvin to Celsius
+        T2 = T_operating - 273.15  # [°C]
+        T1 = T1 - 273.15  # [°C]
+
+        # Voltage stress ratio V1/V2
+        # V1 = V_C_RMS_Rated (reference rated voltage)
+        # V2 = V_C_RMS       (actual operating voltage)
+        # If V2 > V1 → ratio < 1 → lifetime decreases
+        # If V2 < V1 → ratio > 1 → lifetime increases
+        voltage_ratio = V_C_RMS_Rated / V_C_RMS  # [-]  V1/V2
+
+        # Thermal acceleration term
+        thermal_term = np.exp((T1 - T2) / A)  # [-]
+
+        # Voltage acceleration term
+        voltage_term = voltage_ratio ** n  # [-]
+
+        # Estimated lifetime in hours
+        t2_hours = t1 * thermal_term * voltage_term  # [hours]
+
+        # Convert to years
+        t2_years = t2_hours / (365 * 24)  # [years]
+
+        return t2_years
+
+    @staticmethod
+    def check_within_tolerance(values, tol=0.10):
+        """
+        Verify each user-chosen component value is within `tol` (fractional) of the
+        design-function optimum.
+
+        Parameters
+        ----------
+        values : dict   name -> (actual, optimum)
+        tol    : float  allowed fractional deviation (0.10 = 10%)
+
+        Raises
+        ------
+        ValueError if any |actual - optimum| / |optimum| > tol.
+        """
+        offending = []
+        for name, (actual, optimum) in values.items():
+            actual, optimum = float(actual), float(optimum)
+            dev = abs(actual - optimum) / abs(optimum) if optimum != 0 else float('inf')
+            if dev > tol:
+                offending.append((name, actual, optimum, dev))
+
+        if offending:
+            lines = [f"\nComponent value(s) outside ±{tol * 100:.0f}% of the design optimum:\n"]
+            lines.append(f"  {'Component':<16}{'Actual':>16}{'Optimum':>16}{'Deviation':>12}")
+            lines.append("  " + "-" * 60)
+            for name, actual, optimum, dev in offending:
+                lines.append(f"  {name:<16}{actual:>16.6e}{optimum:>16.6e}{dev * 100:>11.2f}%")
+            lines.append(
+                "\nEither bring the chosen values closer to the optimum, "
+                "or relax `tol` if the deviation is intentional."
+            )
+            raise ValueError("\n".join(lines))
+
+    @staticmethod
+    def Three_phase_switching_output(t, Vs_ref, Vo, Tsw, f, Profile_size, sample="center"):
+        """
+        Produce the switched phase-A inverter voltage Vs from its reference Vs_ref,
+        for a three-phase, three-wire inverter, using exact switching instants rendered
+        onto the existing (coarse) time grid by volt-second-preserving averaging.
+
+        Method
+        ------
+        1. Build three modulating references at 0, -120, +120 deg from Vs_ref
+           (analytic time-shift, not Hilbert).
+        2. Add min-max zero-sequence injection (SVPWM).
+        3. For each of the three legs, use SYMMETRIC REGULAR SAMPLING: sample the
+           modulating signal once per carrier period (at the carrier centre), and
+           compute the two switching instants analytically from the carrier geometry.
+           This places every edge exactly, with no dependence on grid resolution.
+        4. Render each leg onto the coarse grid by assigning every sample the
+           *time-average* of the pole voltage over its dt window (volt-second exact,
+           anti-aliased -- not point-sampled, so no jitter).
+        5. Remove common mode: Vs = Vao - (Vao + Vbo + Vco)/3  (the phase voltage a
+           3-wire load actually sees).
+
+        The carrier is the same "V"-shaped triangle used previously:
+            c(tau) = 4*|tau - 0.5| - 1,   tau = (t mod Tsw)/Tsw
+        A leg is ON (+Vo) when its modulating signal m >= c, which occurs on the
+        interval [tau1, tau2] with
+            tau1 = (1 - m)/4,  tau2 = (m + 3)/4,  duty = tau2 - tau1 = (m + 1)/2.
+
+        Parameters
+        ----------
+        t : np.ndarray
+            Uniform time grid [s], length Profile_size * samples_per_second.
+        Vs_ref : np.ndarray
+            Phase-A reference voltage [V], same length as t.
+        Vo : float or np.ndarray
+            Pole-voltage amplitude (Vdc/2) [V]. Scalar, or per-second profile of
+            length Profile_size.
+        Tsw : float
+            Switching period [s].
+        f : float
+            Fundamental frequency [Hz].
+        Profile_size : int
+            Number of 1-second mission-profile points.
+        sample : {"center", "natural"}
+            "center"  -> symmetric regular sampling (one m per carrier period, taken at the period centre). Recommended: exact, jitter-free.
+            "natural" -> natural sampling (m taken at the analytic crossing). Almost identical here because f << fsw.
+
+        Returns
+        -------
+        Vs : np.ndarray
+            Switched phase-A voltage [V] on the grid t (volt-second averaged).
+        """
+
+        t = np.asarray(t, dtype=float)
+        Vs_ref = np.asarray(Vs_ref, dtype=float)
+        if t.shape != Vs_ref.shape:
+            raise ValueError("t and Vs_ref must have the same shape.")
+
+        n = t.size
+        dt = float(t[1] - t[0])
+        samples_per_second = n // int(Profile_size)
+        if samples_per_second * int(Profile_size) != n:
+            raise ValueError("len(t) must be Profile_size * samples_per_second.")
+
+        # Per-sample pole amplitude Vo(t)
+        Vo_arr = np.atleast_1d(np.asarray(Vo, dtype=float))
+        if Vo_arr.size == 1:
+            Vo_t = np.full(n, Vo_arr[0])
+        elif Vo_arr.size == int(Profile_size):
+            Vo_t = np.repeat(Vo_arr, samples_per_second)
+        else:
+            raise ValueError("Vo must be scalar or length Profile_size.")
+        if np.any(Vo_t <= 0):
+            raise ValueError("Vo must be positive everywhere.")
+
+        # ------------------------------------------------------------------ #
+        # 1) Three references at 0, -120, +120 deg via per-second time shift
+        # ------------------------------------------------------------------ #
+        period_samples = int(round((1.0 / f) / dt))  # samples in one fundamental cycle
+        if period_samples % 3 != 0:
+            # not fatal, but the 120 deg shift is only exact if divisible by 3
+            pass
+        shift = period_samples // 3
+
+        block = Vs_ref.reshape(int(Profile_size), samples_per_second)
+        ref_a = Vs_ref
+        ref_b = np.roll(block, +shift, axis=1).reshape(n)  # lags a by 120 deg
+        ref_c = np.roll(block, +2 * shift, axis=1).reshape(n)  # leads a by 120 deg
+
+        m_a = ref_a / Vo_t
+        m_b = ref_b / Vo_t
+        m_c = ref_c / Vo_t
+
+        # ------------------------------------------------------------------ #
+        # 2) Min-max zero-sequence injection (SVPWM)
+        # ------------------------------------------------------------------ #
+        m_stack = np.vstack([m_a, m_b, m_c])
+        v_zs = -0.5 * (m_stack.max(axis=0) + m_stack.min(axis=0))
+        m_a = np.clip(m_a + v_zs, -1.0, 1.0)
+        m_b = np.clip(m_b + v_zs, -1.0, 1.0)
+        m_c = np.clip(m_c + v_zs, -1.0, 1.0)
+
+        # ------------------------------------------------------------------ #
+        # 3+4) Exact edges + volt-second rendering, per leg
+        # ------------------------------------------------------------------ #
+        t_end = t[-1] + dt
+        n_periods = int(np.ceil(t_end / Tsw))
+        k = np.arange(n_periods)
+        t_k0 = k * Tsw  # start time of each carrier period
+        t_kc = (k + 0.5) * Tsw  # centre time of each carrier period
+
+        # cell boundaries: A(t) evaluated here, differenced to get per-cell on-time
+        bounds = np.empty(n + 1)
+        bounds[:n] = t
+        bounds[n] = t_end
+
+        def render_leg(m_leg):
+            # Sample the modulating signal once per carrier period
+            if sample == "center":
+                m_k = np.interp(t_kc, t, m_leg)
+            elif sample == "natural":
+                # natural sampling differs only at second order when f << fsw;
+                # use the centre sample as the crossing estimate
+                m_k = np.interp(t_kc, t, m_leg)
+            else:
+                raise ValueError("sample must be 'center' or 'natural'.")
+            m_k = np.clip(m_k, -1.0, 1.0)
+
+            # Exact switching instants within each period
+            tau1 = (1.0 - m_k) / 4.0
+            tau2 = (m_k + 3.0) / 4.0
+            R = t_k0 + tau1 * Tsw  # rising edge (leg turns ON)
+            F = t_k0 + tau2 * Tsw  # falling edge (leg turns OFF)
+            dur = F - R  # ON duration this period
+
+            # Cumulative ON-time function A(t), piecewise linear through knots.
+            cum_before = np.concatenate(([0.0], np.cumsum(dur)[:-1]))
+            knot_t = np.empty(2 * n_periods)
+            knot_A = np.empty(2 * n_periods)
+            knot_t[0::2] = R
+            knot_t[1::2] = F
+            knot_A[0::2] = cum_before
+            knot_A[1::2] = cum_before + dur
+
+            # A at cell boundaries -> on-time per cell -> fraction on
+            A_bounds = np.interp(bounds, knot_t, knot_A, left=knot_A[0], right=knot_A[-1])
+            on_time = np.diff(A_bounds)
+            frac_on = on_time / dt
+
+            # Pole voltage averaged over each cell: +Vo when on, -Vo when off
+            return Vo_t * (2.0 * frac_on - 1.0)
+
+        Vao = render_leg(m_a)
+        Vbo = render_leg(m_b)
+        Vco = render_leg(m_c)
+
+        # ------------------------------------------------------------------ #
+        # 5) Common-mode removal -> phase-A voltage seen by the LCL
+        # ------------------------------------------------------------------ #
+        V_cm = (Vao + Vbo + Vco) / 3.0
+        Vs = Vao - V_cm
+        return Vs
+
+    @staticmethod
+    def check_Vs_quality(t, Vs, Vs_ref, f, fsw, Profile_size, amp_tol=0.03, phase_tol_deg=1.0, avg_rms_tol=0.02, baseband_tol=0.01, carrier_guard=20, raise_on_fail=True):
+
+        """
+        Validate that a switched inverter voltage Vs faithfully represents its reference Vs_ref, via three checks. Analysis
+        is done per mission-profile second (1 s blocks -> 1 Hz FFT bins -> harmonic order j sits at bin j*f), and the WORST
+         second is used for the pass/fail decision.
+
+        Check 1 - Fundamental match
+            FFT both signals, compare the f-Hz component.
+            Pass if  |amp_err| <= amp_tol  AND  |phase_err| <= phase_tol_deg.
+
+        Check 2 - Volt-second tracking
+            Moving-average Vs over one switching period Tsw and compare to Vs_ref.
+            Pass if  RMS(avg - ref) / fundamental_peak <= avg_rms_tol.
+
+        Check 3 - Baseband cleanliness
+            Inspect harmonics from order 2 up to just below the carrier (fsw/f).
+            In ideal linear-region PWM these are ~0 (energy lives in carrier groups);
+            anything large here is numerical error.
+            Pass if  largest single baseband harmonic / fundamental <= baseband_tol.
+
+        Parameters
+        ----------
+        t, Vs, Vs_ref : np.ndarray   time grid and the two voltages [V]
+        f, fsw        : float        fundamental and switching frequency [Hz]
+        Profile_size  : int          number of 1-second blocks
+        amp_tol       : float        fundamental amplitude tolerance (0.03 = 3%)
+        phase_tol_deg : float        fundamental phase tolerance [deg]
+        avg_rms_tol   : float        volt-second RMS tolerance, fraction of peak
+        baseband_tol  : float        max single baseband harmonic, fraction of fund
+        carrier_guard : float The safety margin (in harmonic orders)
+        raise_on_fail : bool         raise ValueError if any check fails
+
+        Returns
+        -------
+        result : dict   {'passed': bool, 'check1', 'check2', 'check3', per-second arrays}
+        """
+
+        t = np.asarray(t, float);
+        Vs = np.asarray(Vs, float);
+        Vs_ref = np.asarray(Vs_ref, float)
+        n = t.size
+        dt = float(t[1] - t[0])
+        P = int(Profile_size)
+        N = n // P
+        if N * P != n:
+            raise ValueError("len(t) must be Profile_size * samples_per_second.")
+
+        f_bin = int(round(f))
+        mf = fsw / f
+        base_top = max(3, int(np.floor(mf)) - int(carrier_guard))
+        base_orders = np.arange(2, base_top)
+        base_bins = (base_orders * f_bin).astype(int)
+        w = max(int(round((1.0 / fsw) / dt)), 1)
+
+        Vs_b = Vs.reshape(P, N)
+        ref_b = Vs_ref.reshape(P, N)
+
+        X = np.fft.rfft(Vs_b, axis=1)
+        Xr = np.fft.rfft(ref_b, axis=1)
+
+        # Check 1 - fundamental
+        a_vs = 2 * np.abs(X[:, f_bin]) / N
+        a_rf = 2 * np.abs(Xr[:, f_bin]) / N
+        amp_err = np.where(a_rf != 0, (a_vs - a_rf) / a_rf, np.inf)
+        d = np.angle(X[:, f_bin]) - np.angle(Xr[:, f_bin])
+        ph_err = np.degrees((d + np.pi) % (2 * np.pi) - np.pi)
+
+        # Check 3 - baseband
+        base_amp = 2 * np.abs(X[:, base_bins]) / N
+        base_peak = base_amp.max(axis=1) / a_rf
+        base_thd = np.sqrt((base_amp ** 2).sum(axis=1)) / a_rf
+
+        # Check 2 - volt-second tracking (centred Tsw moving average vs ref)
+        cs = np.concatenate([np.zeros((P, 1)), np.cumsum(Vs_b, axis=1)], axis=1)
+        ma = (cs[:, w:] - cs[:, :-w]) / w  # window [i, i+w), shape (P, N-w+1)
+        off = w // 2
+        ref_aligned = ref_b[:, off:off + ma.shape[1]]
+        avg_rms = np.sqrt(np.mean((ma - ref_aligned) ** 2, axis=1)) / a_rf
+
+        # worst-second summary
+        c1_amp = np.abs(amp_err).max();
+        c1_ph = np.abs(ph_err).max()
+        c2 = avg_rms.max();
+        c3_peak = base_peak.max();
+        c3_thd = base_thd.max()
+
+        amp_ok = c1_amp <= amp_tol
+        phase_ok = c1_ph <= phase_tol_deg
+        p1 = amp_ok and phase_ok
+        p2 = c2 <= avg_rms_tol
+        p3 = c3_peak <= baseband_tol
+        passed = p1 and p2 and p3
+
+        # specific failure reasons
+        reasons = []
+        if not amp_ok:
+            reasons.append(f"Check 1 (fundamental amplitude): {c1_amp * 100:.3f}% > tol {amp_tol * 100:.1f}%")
+        if not phase_ok:
+            reasons.append(f"Check 1 (fundamental phase): {c1_ph:.3f} deg > tol {phase_tol_deg:.1f} deg")
+        if not p2:
+            reasons.append(f"Check 2 (volt-second tracking): {c2 * 100:.3f}% > tol {avg_rms_tol * 100:.1f}%")
+        if not p3:
+            reasons.append(f"Check 3 (baseband cleanliness): {c3_peak * 100:.3f}% "
+                           f"(orders 2..{base_orders[-1]}) > tol {baseband_tol * 100:.1f}%")
+
+        result = {
+            'passed': passed,
+            'reasons': reasons,
+            'check1': {'amp_err': c1_amp, 'phase_err_deg': c1_ph, 'pass': p1},
+            'check2': {'avg_rms_rel': c2, 'pass': p2},
+            'check3': {'baseband_peak': c3_peak, 'baseband_thd': c3_thd, 'pass': p3},
+            'per_second': {'amp_err': amp_err, 'phase_err_deg': ph_err,
+                           'avg_rms_rel': avg_rms, 'baseband_peak': base_peak},
+        }
+
+        # Print + raise ONLY on failure; silent on success.
+        if not passed:
+            def tag(ok):
+                return "PASS" if ok else "FAIL"
+
+            print("=" * 60)
+            print("Vs QUALITY CHECK   (worst of {} second(s))".format(P))
+            print("=" * 60)
+            print(f"[{tag(p1)}] 1. Fundamental match")
+            print(f"        amplitude error : {c1_amp * 100:6.3f} %   (tol {amp_tol * 100:.1f} %)")
+            print(f"        phase error     : {c1_ph:6.3f} deg (tol {phase_tol_deg:.1f} deg)")
+            print(f"[{tag(p2)}] 2. Volt-second tracking (Tsw moving avg)")
+            print(f"        RMS error / peak: {c2 * 100:6.3f} %   (tol {avg_rms_tol * 100:.1f} %)")
+            print(f"[{tag(p3)}] 3. Baseband cleanliness (orders 2..{base_orders[-1]})")
+            print(f"        largest harmonic: {c3_peak * 100:6.3f} %   (tol {baseband_tol * 100:.1f} %)")
+            print(f"        baseband THD    : {c3_thd * 100:6.3f} %   (info only)")
+            print("-" * 60)
+            print("OVERALL: FAIL")
+            print("=" * 60)
+            if raise_on_fail:
+                raise ValueError("Vs quality check FAILED - simulation stopped. Reason(s):\n"
+                                 + "\n".join("  - " + r for r in reasons))
+
+        return result
+
+    @staticmethod
+    def last_of_column(val, Profile_size):
+        col = np.full(Profile_size, np.nan)
+        col[-1] = val
+        return col
+
+    @staticmethod
+    def create_simulation_folders(base="Results"):
+        """
+        Creates:
+            Results/
+                Simulation_N/        <- auto-incremented
+                    Dataframes/
+                    Figures/
+
+        Returns:
+            sim_dir, dataframes_dir, figures_dir
+        """
+
+        base_dir = Path(base)
+        base_dir.mkdir(exist_ok=True)
+
+        # --- detect existing Simulation_N folders ---
+        existing = []
+        for p in base_dir.iterdir():
+            if p.is_dir() and p.name.startswith("Simulation_"):
+                try:
+                    existing.append(int(p.name.split("_")[1]))
+                except (IndexError, ValueError):
+                    pass
+
+        next_n = max(existing) + 1 if existing else 1
+
+        # --- create Simulation_N and its two subfolders ---
+        sim_dir = base_dir / f"Simulation_{next_n}"
+        sim_dir.mkdir(exist_ok=True)
+
+        dataframes_dir = sim_dir / "Dataframes"
+        figures_dir = sim_dir / "Figures"
+        dataframes_dir.mkdir(exist_ok=True)
+        figures_dir.mkdir(exist_ok=True)
+
+        return sim_dir, dataframes_dir, figures_dir

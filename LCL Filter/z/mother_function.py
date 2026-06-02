@@ -4,7 +4,6 @@ from Calculation_functions import Calculation_functions_class
 from LCL_filter_design import LCL_filter_design_function
 from Plotting_function import Plotting_functions_class
 import pandas as pd
-from functools import lru_cache
 
 params = Input_parameters_class()
 Calculation_functions = Calculation_functions_class()
@@ -13,7 +12,7 @@ Plotting_function = Plotting_functions_class()
 Vdc_rated = params.Vdc_rated; Vo_rated = params.Vo_rated; inverter_phases = params.inverter_phases; M_rated = params.M_rated; single_phase_inverter_topology = params.single_phase_inverter_topology; waveform_voltage_definition = params.waveform_voltage_definition; modulation_scheme = params.modulation_scheme; f = params.f; fsw = params.fsw; T = params.T; Tsw = params.Tsw; omega = params.omega
 Profile_size = params.Profile_size; Vdc_RMS = params.Vdc_RMS; M = params.M; Vo = params.Vo; Vg_RMS = params.Vg_RMS; S_RMS = params.S_RMS; pf = params.pf; P_RMS = params.P_RMS; Q_RMS = params.Q_RMS; Ig_RMS = params.Ig_RMS
 T_amb = params.T_amb
-resolution_per_cycle = params.resolution_per_cycle; dt = params.dt; samples_per_switching_period = params.samples_per_switching_period; Minimum_required_samples_per_switching_period = params.Minimum_required_samples_per_switching_period; seconds_per_sample = params.seconds_per_sample
+resolution_per_cycle = params.resolution_per_cycle; dt = params.dt; samples_per_switching_period = params.samples_per_switching_period; Minimum_required_samples_per_switching_period = params.Minimum_required_samples_per_switching_period
 L1_specs = params.L1_specs
 C_specs = params.C_specs
 L2_specs = params.L2_specs
@@ -24,6 +23,7 @@ Vg_ll_RMS = params.Vg_ll_RMS; S_rated = params.S_rated; I_rated_RMS = params.I_r
 sim_dir = "Results/Simulation_1"
 dataframes_dir = "Results/Simulation_1/Dataframes"
 figures_dir = "Results/Simulation_1/Figures"
+
 
 # ----------------------------------------#
 # Input validation and safety checks
@@ -46,6 +46,41 @@ Calculation_functions.validate_pwm_pulse_amplitude_profile(Vdc_RMS=Vdc_RMS, inve
 L1_optimum, L2_optimum, C_optimum, R3_optimum = LCL_filter_design_function(Vg_ll_RMS=Vg_ll_RMS, S_rated=S_rated, I_rated=I_rated_RMS, fsw=fsw, omega_sw=omega_sw, fo=f, Udc_rated=Vdc_rated, M_rated=M_rated, inverter_phases=inverter_phases, modulation_scheme=modulation_scheme, print_values = False, current_ripple_limit=0.30, delta=0.19, num_C_values=10)
 Calculation_functions.check_within_tolerance({"L1": (L1_specs["L1"], L1_optimum), "L2": (L2_specs["L2"], L2_optimum), "C":  (C_specs["C"],   C_optimum), "R3": (C_specs["R3"],  R3_optimum), }, tol=0.125)
 
+
+
+# ----------------------------------------#
+# Time profile
+# ----------------------------------------#
+
+t = np.arange(0, Profile_size, dt)                                                                                      # Create the simulation time vector from 0 to Profile_size seconds using the fixed time step dt
+samples_per_second = resolution_per_cycle * f                                                                           # Number of simulation samples in one second, used to expand 1-second mission-profile values into time-domain waveforms
+
+########################################################################################################################
+# Electrical model
+########################################################################################################################
+
+
+Vg = np.sqrt(2) * np.repeat(Vg_RMS, samples_per_second) * np.sin(omega * t)                                             # Generate the instantaneous grid voltage waveform from the RMS grid-voltage profile
+
+pf_inst = np.repeat(pf, samples_per_second)                                                                             # Expand the 1-second power-factor profile so it has the same length as the time vector
+phi = np.arccos(np.abs(pf_inst))                                                                                        # Compute the power-factor phase angle from the magnitude of the power factor
+phase_shift = np.sign(pf_inst) * phi                                                                                    # Apply the sign of the power factor to determine whether the current leads or lags the voltage
+Ig_ref = np.sqrt(2) * np.repeat(Ig_RMS, samples_per_second) * np.sin(omega * t + phase_shift)                           # Generate the instantaneous current reference that the inverter should inject into the grid
+
+Vs_ref = Calculation_functions.compute_Vs_ref_phasor(t=t, f=f, Ig_RMS=Ig_RMS, Vg_RMS=Vg_RMS, phase_shift=phase_shift, L1=L1_specs["L1"], L2=L2_specs["L2"], C=C_specs["C"], R1=L1_specs["R1"], R2=L2_specs["R2"], R3=C_specs["R3"], Profile_size=Profile_size, samples_per_second=samples_per_second)
+
+Calculation_functions.validate_required_inverter_voltage(Vs_ref=Vs_ref, Vo_available=Vo_rated)         # Update validate_required_inverter_voltage
+
+Vs = Calculation_functions.Three_phase_switching_output(t=t, Vs_ref=Vs_ref, Vo=Vo, Tsw=Tsw, f=f, Profile_size=Profile_size)         # Producing the switching Vs from semiconductors#
+_ = Calculation_functions.check_Vs_quality( t=t, Vs=Vs, Vs_ref=Vs_ref, f=f, fsw=fsw, Profile_size=Profile_size, raise_on_fail=True) # Checking the quality of Vs produced
+
+V_L1, I_L1, V_C, I_C, V_L2, I_L2 = Calculation_functions.LCL_Filter_Grid_Connected(t=t, Vs=Vs, Vg=Vg, L1=L1_specs["L1"], L2=L2_specs["L2"], C=C_specs["C"], R1=L1_specs["R1"], R2=L2_specs["R2"], R3=C_specs["R3"]) # Simulate the LCL filter response and obtain voltages and currents of L1, C, and L2
+
+THD_percent = Calculation_functions.compute_THD_I_L2(t=t, I_L2=I_L2, Ig_ref=Ig_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
+
+
+########################################################################################################################
+
 # ----------------------------------------#
 # LCL filter middle branch [C]
 # ----------------------------------------#
@@ -55,9 +90,40 @@ if C_specs["Thermal_resistance_C"] == None:
 if C_specs["tan_delta_0"] == None:
     C_specs["tan_delta_0"] = Calculation_functions.calculate_tan_delta_0(tan_delta_measured = C_specs["tan_delta_measured"],  Rs = C_specs["Rs"],C = C_specs["C"], f_measured = C_specs["f_measured_for_tan_delta"])
 
+I_C_RMS_harmonics = Calculation_functions.compute_I_C_RMS_per_harmonic_for_capacitor(I_C=I_C, f=f, fsw=fsw, resolution_per_cycle=resolution_per_cycle, Profile_size=Profile_size)
+I_C_RMS = Calculation_functions.Singal_RMS(Signal=I_C, resolution_per_cycle=resolution_per_cycle, f=f)
+
+# Power Losses
+
+P_total_C = Calculation_functions.Capacitor_total_power_losses(fsw=fsw,f=f, I_C_RMS_harmonics=I_C_RMS_harmonics,tan_delta_0=C_specs["tan_delta_0"],C=C_specs["C"],Rs=C_specs["Rs"])
+
+# Temperature Calculations
+
+T_C = Calculation_functions.Capacitor_hotspot_temperature(T_amb=T_amb, P_total_C=P_total_C, Thermal_resistance_C=C_specs["Thermal_resistance_C"])
+V_C_RMS = Calculation_functions.Singal_RMS(Signal=V_C, resolution_per_cycle=resolution_per_cycle, f=f)
+Calculation_functions.validate_capacitor_operating_limits(T_C=T_C, V_C_RMS=V_C_RMS, V_C=V_C, T_C_Rated=C_specs["T_C_Rated"], V_C_RMS_Rated=C_specs["V_C_RMS_Rated"], V_C_Peak_Rated=C_specs["V_C_Peak_Rated"],V_RMS_overvoltage_factor=1.5, V_peak_overvoltage_factor=1.5)
+
+
+
+# Lifetime Calculations
+
+if C_specs["Lifetime_calculations"] == "Graphical":
+    Lifetime_C_series = Calculation_functions.Capacitor_lifetime_graphical(T_C= T_C, V_C_RMS=V_C_RMS, V_C_RMS_Rated=C_specs["V_C_RMS_Rated"], lifetime_curves=C_specs["lifetime_curves"])
+elif C_specs["Lifetime_calculations"] == "Analytical":
+    Lifetime_C_series = Calculation_functions.calculate_capacitor_lifetime_analytical(T_operating = T_C, V_C_RMS = V_C_RMS, V_C_RMS_Rated = C_specs["V_C_RMS_Rated"], t1 = C_specs["Lifetime_Rated"], T1 = C_specs["Temperature_Rated"], A = C_specs["A"], n = C_specs["n"])
+
+Lifetime_C, Lifetime_consumed_C = Calculation_functions.miners_rule(L_per_second =Lifetime_C_series)
+
+#########################################################################################################################
+
 # ----------------------------------------#
 # LCL filter inverter side [L1]
 # ----------------------------------------#
+
+# RMS
+
+V_L1_RMS = Calculation_functions.Singal_RMS(Signal=V_L1, resolution_per_cycle=resolution_per_cycle, f=f)
+I_L1_RMS = Calculation_functions.Singal_RMS(Signal=I_L1, resolution_per_cycle=resolution_per_cycle, f=f)
 
 # Core Geometry
 
@@ -78,11 +144,37 @@ A_wire_actual_L1 = Calculation_functions.calculate_actual_wire_area(N_parallel =
 Calculation_functions.check_window_fill(N_turns = N_L1, N_parallel = N_parallel_wire_L1, A_wire_bare = L1_specs["A_strand"], F_core = L1_specs["F_core"], G_core = L1_specs["G_core"], kf_window_max= 0.4) # Check whether the winding physically fits inside the core window.
 l_turn_L1 = Calculation_functions.calculate_l_turn(D_core=L1_specs["D_core"], E_core=L1_specs["E_core"])                                               # [m] Estimate mean length of one turn for a rectangular toroidal core.
 Rdc_L1 = Calculation_functions.calculate_Rdc(rho=L1_specs["rho"], N=N_L1, l_turn=l_turn_L1, A_wire=A_wire_actual_L1)                                                         # [ohm] float  DC winding resistance # Assumed  no Skin or Proximity Effect
-R_th_L1 = Calculation_functions.calculate_inductor_thermal_resistance(method="surface_area", A_surface=A_surface_L1,heat_transfer_coefficient=10)  # [K/W] Thermal resistance from  to ambient .
+
+# Power Losses
+
+I_L1_peak_harmonics, harmonic_orders_L1, harmonic_freqs_L1  = Calculation_functions.compute_I_L_peak_per_harmonic_for_inductor(I_L=I_L1, f=f, resolution_per_cycle=resolution_per_cycle, Profile_size=Profile_size) # [A] Peak amplitudes at each harmonic of the fundamental frequency
+P_c_L1, _ = Calculation_functions.calculate_inductor_core_losses(I_peak_harmonics=I_L1_peak_harmonics, harmonic_freqs=harmonic_freqs_L1, mu_0=L1_specs["mu_0"], N=N_L1, lg=lg_L1, le=le_L1, mu_r=L1_specs["mu_r"], k=L1_specs["k"], a=L1_specs["a"], b=L1_specs["b"], Ve=Ve_L1) # [W] Total core loss in the inductor L1
+P_w_L1, _ = Calculation_functions.calculate_winding_losses(I_L = I_L1, Rdc = Rdc_L1, resolution_per_cycle = resolution_per_cycle, f = f, Profile_size = Profile_size) # [W] Total winding  loss in the inductor L1
+P_total_L1 = P_c_L1 + P_w_L1   # [W] Total inductor losses
+
+# Temperature Calculations
+
+R_th_L1 = Calculation_functions.calculate_inductor_thermal_resistance(method = "surface_area", A_surface = A_surface_L1 , heat_transfer_coefficient = 10)   # [K/W] Thermal resistance from  to ambient .
+T_inductor_L1 = Calculation_functions.calculate_inductor_temperature(T_amb = T_amb, R_th = R_th_L1, P_total = P_total_L1)                     # [K] Inductor temperature
+
+# Lifetime Calculations
+
+Calculation_functions.check_insulation_voltage_stress(V_L = V_L1, N_turns = N_L1, V_bd = L1_specs['V_bd'], resolution_per_cycle = resolution_per_cycle, f = f, Profile_size = Profile_size)
+Lifetime_L1_series = Calculation_functions.calculate_inductor_lifetime(T_operating = T_inductor_L1, T_rated = L1_specs["T_insulation_rated"], L_rated = L1_specs["L_insulation_rated"], Ea = L1_specs["Ea_insulation"], kb = L1_specs["kb"] )   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
+Lifetime_L1, Lifetime_consumed_L1 = Calculation_functions.miners_rule(L_per_second = Lifetime_L1_series)
+
+
+
+#########################################################################################################################
 
 # ----------------------------------------#
 # LCL filter grid side [L2]
 # ----------------------------------------#
+
+# RMS
+
+V_L2_RMS = Calculation_functions.Singal_RMS(Signal=V_L2, resolution_per_cycle=resolution_per_cycle, f=f)
+I_L2_RMS = Calculation_functions.Singal_RMS(Signal=I_L2, resolution_per_cycle=resolution_per_cycle, f=f)
 
 # Core Geometry
 
@@ -103,291 +195,25 @@ A_wire_actual_L2 = Calculation_functions.calculate_actual_wire_area(N_parallel =
 Calculation_functions.check_window_fill(N_turns = N_L2, N_parallel = N_parallel_wire_L2, A_wire_bare = L2_specs["A_strand"], F_core = L2_specs["F_core"], G_core = L2_specs["G_core"], kf_window_max= 0.45) # Check whether the winding physically fits inside the core window.
 l_turn_L2 = Calculation_functions.calculate_l_turn(D_core=L2_specs["D_core"], E_core=L2_specs["E_core"])                                               # [m] Estimate mean length of one turn for a rectangular toroidal core.
 Rdc_L2 = Calculation_functions.calculate_Rdc(rho=L2_specs["rho"], N=N_L2, l_turn=l_turn_L2, A_wire=A_wire_actual_L2)                                                         # [ohm] float  DC winding resistance # Assumed  no Skin or Proximity Effect
+
+# Power Losses
+
+I_L2_peak_harmonics, harmonic_orders_L2, harmonic_freqs_L2  = Calculation_functions.compute_I_L_peak_per_harmonic_for_inductor(I_L=I_L2, f=f, resolution_per_cycle=resolution_per_cycle, Profile_size=Profile_size) # [A] Peak amplitudes at each harmonic of the fundamental frequency
+P_c_L2, _ = Calculation_functions.calculate_inductor_core_losses(I_peak_harmonics=I_L2_peak_harmonics, harmonic_freqs=harmonic_freqs_L2, mu_0=L2_specs["mu_0"], N=N_L2, lg=lg_L2, le=le_L2, mu_r=L2_specs["mu_r"], k=L2_specs["k"], a=L2_specs["a"], b=L2_specs["b"], Ve=Ve_L2) # [W] Total core loss in the inductor L1
+P_w_L2, _ = Calculation_functions.calculate_winding_losses(I_L = I_L2, Rdc = Rdc_L2, resolution_per_cycle = resolution_per_cycle, f = f, Profile_size = Profile_size) # [W] Total winding  loss in the inductor L1
+P_total_L2 = P_c_L2 + P_w_L2   # [W] Total inductor losses
+
+# Temperature Calculations
+
 R_th_L2 = Calculation_functions.calculate_inductor_thermal_resistance(method = "surface_area", A_surface = A_surface_L2 , heat_transfer_coefficient = 10)   # [K/W] Thermal resistance from  to ambient .
-
-# ----------------------------------------#
-# Start of lru_cache
-# ----------------------------------------#
-
-# samples for ONE second (one fundamental-profile second)
-samples_per_second = resolution_per_cycle * f
-t_one = np.arange(0, 1, dt)          # time vector for a single second
-
-@lru_cache(maxsize=1500)
-def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i,P_RMS_i, Q_RMS_i, Ig_RMS_i, T_amb_i):
-
-    # ----------------------------------------#
-    # Electrical model
-    # ----------------------------------------#
-
-    # grid voltage waveform (one second)
-    Vg = np.sqrt(2) * Vg_RMS_i * np.sin(omega * t_one)
-
-    # power-factor -> phase shift (constant over the second)
-    pf_inst = np.full(samples_per_second, pf_i)
-    phi = np.arccos(np.abs(pf_inst))
-    phase_shift = np.sign(pf_inst) * phi
-
-    # current reference waveform
-    Ig_ref = np.sqrt(2) * Ig_RMS_i * np.sin(omega * t_one + phase_shift)
-
-    # required inverter voltage (pass single-element arrays, Profile_size=1)
-    Vs_ref = Calculation_functions.compute_Vs_ref_phasor(t=t_one, f=f,Ig_RMS=np.array([Ig_RMS_i]), Vg_RMS=np.array([Vg_RMS_i]), phase_shift=phase_shift, L1=L1_specs["L1"], L2=L2_specs["L2"], C=C_specs["C"],R1=L1_specs["R1"], R2=L2_specs["R2"], R3=C_specs["R3"],Profile_size=1, samples_per_second=samples_per_second)
-
-    Calculation_functions.validate_required_inverter_voltage(Vs_ref=Vs_ref, Vo_available=Vo_rated)
-
-    # switching output (Vo passed as single-element array, Profile_size=1)
-    Vs = Calculation_functions.Three_phase_switching_output(t=t_one, Vs_ref=Vs_ref, Vo=np.array([Vo_i]), Tsw=Tsw, f=f, Profile_size=1)
-
-    _ = Calculation_functions.check_Vs_quality(t=t_one, Vs=Vs, Vs_ref=Vs_ref, f=f, fsw=fsw, Profile_size=1, raise_on_fail=True)
-
-    # LCL filter response
-    V_L1, I_L1, V_C, I_C, V_L2, I_L2 = Calculation_functions.LCL_Filter_Grid_Connected(t=t_one, Vs=Vs, Vg=Vg, L1=L1_specs["L1"], L2=L2_specs["L2"], C=C_specs["C"],R1=L1_specs["R1"], R2=L2_specs["R2"], R3=C_specs["R3"])
-
-    # ----------------------------------------#
-    # LCL filter middle branch [C]
-    # ----------------------------------------#
-
-    # ----- Capacitor branch [C] -----
-    I_C_RMS_harmonics = Calculation_functions.compute_I_C_RMS_per_harmonic_for_capacitor(I_C=I_C, f=f, fsw=fsw,resolution_per_cycle=resolution_per_cycle, Profile_size=1)
-
-    I_C_RMS = Calculation_functions.Singal_RMS(Signal=I_C, resolution_per_cycle=resolution_per_cycle, f=f)
-
-    # Power losses
-    P_total_C = Calculation_functions.Capacitor_total_power_losses(fsw=fsw, f=f, I_C_RMS_harmonics=I_C_RMS_harmonics,tan_delta_0=C_specs["tan_delta_0"], C=C_specs["C"], Rs=C_specs["Rs"])
-
-    # Temperature  (T_amb is THIS operating point's ambient)
-    T_C = Calculation_functions.Capacitor_hotspot_temperature(T_amb=T_amb_i, P_total_C=P_total_C,Thermal_resistance_C=C_specs["Thermal_resistance_C"])
-
-    V_C_RMS = Calculation_functions.Singal_RMS(Signal=V_C, resolution_per_cycle=resolution_per_cycle, f=f)
-
-    Calculation_functions.validate_capacitor_operating_limits(T_C=T_C, V_C_RMS=V_C_RMS, V_C=V_C,T_C_Rated=C_specs["T_C_Rated"],
-                                                              V_C_RMS_Rated=C_specs["V_C_RMS_Rated"],V_C_Peak_Rated=C_specs["V_C_Peak_Rated"],
-                                                              V_RMS_overvoltage_factor=1.5, V_peak_overvoltage_factor=1.5)
-
-    # ----------------------------------------#
-    # LCL filter inverter side [L1]
-    # ----------------------------------------#
-
-    # ----- Inverter-side inductor [L1] (operating-point dependent) -----
-    V_L1_RMS = Calculation_functions.Singal_RMS(Signal=V_L1, resolution_per_cycle=resolution_per_cycle, f=f)
-    I_L1_RMS = Calculation_functions.Singal_RMS(Signal=I_L1, resolution_per_cycle=resolution_per_cycle, f=f)
-
-    I_L1_peak_harmonics, harmonic_orders_L1, harmonic_freqs_L1 = Calculation_functions.compute_I_L_peak_per_harmonic_for_inductor(I_L=I_L1, f=f, resolution_per_cycle=resolution_per_cycle, Profile_size=1)
-
-    P_c_L1, _ = Calculation_functions.calculate_inductor_core_losses(I_peak_harmonics=I_L1_peak_harmonics, harmonic_freqs=harmonic_freqs_L1,
-                                                                     mu_0=L1_specs["mu_0"], N=N_L1, lg=lg_L1, le=le_L1, mu_r=L1_specs["mu_r"],
-                                                                     k=L1_specs["k"], a=L1_specs["a"], b=L1_specs["b"], Ve=Ve_L1)
-
-    P_w_L1, _ = Calculation_functions.calculate_winding_losses(I_L=I_L1, Rdc=Rdc_L1, resolution_per_cycle=resolution_per_cycle, f=f, Profile_size=1)
-
-    P_total_L1 = P_c_L1 + P_w_L1
-
-    T_inductor_L1 = Calculation_functions.calculate_inductor_temperature(T_amb=T_amb_i, R_th=R_th_L1, P_total=P_total_L1)
-
-    Calculation_functions.check_insulation_voltage_stress(V_L=V_L1, N_turns=N_L1, V_bd=L1_specs['V_bd'],resolution_per_cycle=resolution_per_cycle, f=f, Profile_size=1)
-
-    # ----------------------------------------#
-    # LCL filter grid side [L2]
-    # ----------------------------------------#
-
-    # ----- Grid-side inductor [L2] (operating-point dependent) -----
-    V_L2_RMS = Calculation_functions.Singal_RMS(Signal=V_L2, resolution_per_cycle=resolution_per_cycle, f=f)
-    I_L2_RMS = Calculation_functions.Singal_RMS(Signal=I_L2, resolution_per_cycle=resolution_per_cycle, f=f)
-
-    I_L2_peak_harmonics, harmonic_orders_L2, harmonic_freqs_L2 = Calculation_functions.compute_I_L_peak_per_harmonic_for_inductor(I_L=I_L2, f=f, resolution_per_cycle=resolution_per_cycle, Profile_size=1)
-
-    P_c_L2, _ = Calculation_functions.calculate_inductor_core_losses(I_peak_harmonics=I_L2_peak_harmonics, harmonic_freqs=harmonic_freqs_L2,mu_0=L2_specs["mu_0"], N=N_L2, lg=lg_L2, le=le_L2, mu_r=L2_specs["mu_r"],k=L2_specs["k"], a=L2_specs["a"], b=L2_specs["b"], Ve=Ve_L2)
-
-    P_w_L2, _ = Calculation_functions.calculate_winding_losses(I_L=I_L2, Rdc=Rdc_L2, resolution_per_cycle=resolution_per_cycle, f=f, Profile_size=1)
-
-    P_total_L2 = P_c_L2 + P_w_L2
-
-    T_inductor_L2 = Calculation_functions.calculate_inductor_temperature(T_amb=T_amb_i, R_th=R_th_L2, P_total=P_total_L2)
-
-    Calculation_functions.check_insulation_voltage_stress(V_L=V_L2, N_turns=N_L2, V_bd=L2_specs['V_bd'],resolution_per_cycle=resolution_per_cycle, f=f, Profile_size=1)
-
-    return (Vg, pf_inst, phi, phase_shift, Ig_ref, Vs_ref, Vs,
-            V_L1, I_L1, V_C, I_C, V_L2, I_L2,
-            I_C_RMS_harmonics, I_C_RMS, P_total_C, T_C, V_C_RMS,
-            V_L1_RMS, I_L1_RMS, P_c_L1, P_w_L1, P_total_L1, T_inductor_L1,
-            V_L2_RMS, I_L2_RMS, P_c_L2, P_w_L2, P_total_L2, T_inductor_L2)
-
-# collect one tuple per second
-results = [solve_setpoint(round(float(Vdc_RMS[i]), 3), round(float(M[i]), 4), round(float(Vo[i]), 3),
-                          round(float(Vg_RMS[i]), 3), round(float(S_RMS[i]), 1), round(float(pf[i]), 4),
-                          round(float(P_RMS[i]), 1), round(float(Q_RMS[i]), 1), round(float(Ig_RMS[i]), 3),
-                          round(float(T_amb[i]), 2),)
-    for i in range(Profile_size)]
-
-
-# transpose: turn a list-of-tuples into a tuple-of-lists, then concatenate each
-(Vg, pf_inst, phi, phase_shift, Ig_ref, Vs_ref, Vs,
-V_L1, I_L1, V_C, I_C, V_L2, I_L2,
-I_C_RMS_harmonics, I_C_RMS, P_total_C, T_C, V_C_RMS,
-V_L1_RMS, I_L1_RMS, P_c_L1, P_w_L1, P_total_L1, T_inductor_L1,
-V_L2_RMS, I_L2_RMS, P_c_L2, P_w_L2, P_total_L2, T_inductor_L2) = (np.concatenate(col) for col in zip(*results))
-
-THD_percent = Calculation_functions.compute_THD_I_L2(t=t_one, I_L2=I_L2, Ig_ref=Ig_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
-
-# ----------------------------------------#
-# LCL filter middle branch [C]
-# ----------------------------------------#
+T_inductor_L2 = Calculation_functions.calculate_inductor_temperature(T_amb = T_amb, R_th = R_th_L2, P_total = P_total_L2)                     # [K] Inductor temperature
 
 # Lifetime Calculations
-if C_specs["Lifetime_calculations"] == "Graphical":
-    Lifetime_C_series = Calculation_functions.Capacitor_lifetime_graphical(T_C= T_C, V_C_RMS=V_C_RMS, V_C_RMS_Rated=C_specs["V_C_RMS_Rated"], lifetime_curves=C_specs["lifetime_curves"])
-elif C_specs["Lifetime_calculations"] == "Analytical":
-    Lifetime_C_series = Calculation_functions.calculate_capacitor_lifetime_analytical(T_operating = T_C, V_C_RMS = V_C_RMS, V_C_RMS_Rated = C_specs["V_C_RMS_Rated"], t1 = C_specs["Lifetime_Rated"], T1 = C_specs["Temperature_Rated"], A = C_specs["A"], n = C_specs["n"])
-Lifetime_C,  Lifetime_consumed_C  = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_C_series,  seconds_per_sample=seconds_per_sample)
 
-# ----------------------------------------#
-# LCL filter inverter side [L1]
-# ----------------------------------------#
-
-# Lifetime Calculations
-Lifetime_L1_series = Calculation_functions.calculate_inductor_lifetime(T_operating = T_inductor_L1, T_rated = L1_specs["T_insulation_rated"], L_rated = L1_specs["L_insulation_rated"], Ea = L1_specs["Ea_insulation"], kb = L1_specs["kb"] )   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
-Lifetime_L1, Lifetime_consumed_L1 = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_L1_series, seconds_per_sample=seconds_per_sample)
-
-# ----------------------------------------#
-# LCL filter grid side [L2]
-# ----------------------------------------#
-
+Calculation_functions.check_insulation_voltage_stress(V_L = V_L2, N_turns = N_L2, V_bd = L2_specs['V_bd'], resolution_per_cycle = resolution_per_cycle, f = f, Profile_size = Profile_size)
 Lifetime_L2_series = Calculation_functions.calculate_inductor_lifetime(T_operating = T_inductor_L2, T_rated = L2_specs["T_insulation_rated"], L_rated = L2_specs["L_insulation_rated"], Ea = L2_specs["Ea_insulation"], kb = L2_specs["kb"] )   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
-Lifetime_L2, Lifetime_consumed_L2 = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_L2_series, seconds_per_sample=seconds_per_sample)
+Lifetime_L2, Lifetime_consumed_L2 = Calculation_functions.miners_rule(L_per_second = Lifetime_L2_series)
 
-'''
-def compare_components(C, L1, L2, profile_index=-1, K_to_C=273.15):
-    """
-    Print a side-by-side comparison of the capacitor (C) and the two inductors (L1, L2).
-
-    Each argument is a dict of already-computed results. Values may be scalars or
-    per-second arrays; arrays are reduced to the second given by `profile_index`
-    (default -1 = last second of the mission profile).
-
-    Expected keys
-    -------------
-    C  : C, R_th, V_RMS, V_RMS_rated, I_RMS, P_total, T, T_rated, Lifetime
-    L1 / L2 : L, N, lg, B_peak, B_max, Bsat, Ae, le, Ve, A_surface,
-              I_RMS, V_RMS, Rdc, N_parallel, A_wire, l_turn,
-              P_core, P_winding, P_total, R_th, T, T_rated,
-              Lifetime, Lifetime_consumed
-
-    Missing keys print as a dash, so the function still works on partially-filled dicts.
-    """
-
-    LBL, UNT, COL, RAT = 24, 8, 15, 10
-    line = "-" * (LBL + UNT + 2 * COL + RAT)
-
-    def _val(x, profile_index=-1):
-        if x is None:
-            return None
-        arr = np.atleast_1d(x)
-        if arr.size == 1:
-            return float(arr[0])
-        return float(arr[profile_index])
-
-    def v(d, key):
-        return _val(d.get(key), profile_index)
-
-    def row(label, unit, a, b, scale=1.0, offset=0.0, nfmt="{:.4f}", ratio=False):
-        s1 = nfmt.format(a * scale + offset) if a is not None else "-"
-        s2 = nfmt.format(b * scale + offset) if b is not None else "-"
-        if ratio and a not in (None, 0) and b not in (None, 0):
-            rr = "{:.2f}".format(a / b)
-        else:
-            rr = ""
-        print(f"{label:<{LBL}}{unit:<{UNT}}{s1:>{COL}}{s2:>{COL}}{rr:>{RAT}}")
-
-    # ------------------------------------------------------------------ #
-    # Header
-    # ------------------------------------------------------------------ #
-    print("=" * len(line))
-    print(f"COMPONENT COMPARISON   (mission-profile second index = {profile_index})")
-    print("=" * len(line))
-
-    # ------------------------------------------------------------------ #
-    # Capacitor (standalone block)
-    # ------------------------------------------------------------------ #
-    print("\nCAPACITOR")
-    print(line)
-    C_C = v(C, "C")
-    vrms, vrated = v(C, "V_RMS"), v(C, "V_RMS_rated")
-    tc, trated = v(C, "T"), v(C, "T_rated")
-    print(f"  Capacitance        : {C_C * 1e6:.4f} µF" if C_C is not None else "  Capacitance        : -")
-    if v(C, "R_th") is not None:
-        print(f"  Thermal resistance : {v(C, 'R_th'):.4f} K/W")
-    if vrms is not None:
-        ratio_txt = f"   (rated {vrated:.0f} V, ratio {vrms / vrated:.2f})" if vrated else ""
-        print(f"  V_RMS              : {vrms:.2f} V{ratio_txt}")
-    if v(C, "I_RMS") is not None:
-        print(f"  I_RMS              : {v(C, 'I_RMS'):.2f} A")
-    if v(C, "P_total") is not None:
-        print(f"  P_total            : {v(C, 'P_total'):.4f} W")
-    if tc is not None:
-        margin = f"   (rated {trated - K_to_C:.0f} °C)" if trated else ""
-        print(f"  T_hotspot          : {tc - K_to_C:.2f} °C{margin}")
-    if v(C, "Lifetime") is not None:
-        print(f"  Lifetime           : {v(C, 'Lifetime'):.2f} years")
-    if v(C, "Lifetime_consumed_C") is not None:
-        print(f"  Lifetime consumed  : {v(C, 'Lifetime_consumed_C'):.2f} %")
-
-    # ------------------------------------------------------------------ #
-    # Inductors L1 vs L2 (aligned columns)
-    # ------------------------------------------------------------------ #
-    print("\nINDUCTORS  —  L1 (inverter side)  vs  L2 (grid side)")
-    print(line)
-    print(f"{'Quantity':<{LBL}}{'Unit':<{UNT}}{'L1':>{COL}}{'L2':>{COL}}{'L1/L2':>{RAT}}")
-    print(line)
-
-    print("[ Core geometry ]")
-    row("Inductance",     "[µH]",  v(L1, "L"),  v(L2, "L"),  scale=1e6, nfmt="{:.3f}", ratio=True)
-    row("Turns N",        "[-]",   v(L1, "N"),  v(L2, "N"),  nfmt="{:.0f}", ratio=True)
-    row("Air gap",        "[mm]",  v(L1, "lg"), v(L2, "lg"), scale=1e3, nfmt="{:.3f}", ratio=True)
-    row("B_peak",         "[T]",   v(L1, "B_peak"), v(L2, "B_peak"), nfmt="{:.4f}", ratio=True)
-    # B_peak / Bsat as a percentage
-    bp1 = v(L1, "B_peak"); bs1 = v(L1, "Bsat")
-    bp2 = v(L2, "B_peak"); bs2 = v(L2, "Bsat")
-    pct1 = (bp1 / bs1) if (bp1 is not None and bs1) else None
-    pct2 = (bp2 / bs2) if (bp2 is not None and bs2) else None
-    row("B_peak / Bsat",  "[%]",   pct1, pct2, scale=100.0, nfmt="{:.2f}")
-    row("Ae (eff. area)", "[mm²]", v(L1, "Ae"), v(L2, "Ae"), scale=1e6, nfmt="{:.2f}", ratio=True)
-    row("le (path len)",  "[mm]",  v(L1, "le"), v(L2, "le"), scale=1e3, nfmt="{:.2f}", ratio=True)
-    row("Ve (volume)",    "[cm³]", v(L1, "Ve"), v(L2, "Ve"), scale=1e6, nfmt="{:.2f}", ratio=True)
-    row("A_surface",      "[cm²]", v(L1, "A_surface"), v(L2, "A_surface"), scale=1e4, nfmt="{:.2f}", ratio=True)
-
-    print("[ Winding ]")
-    row("I_RMS",          "[A]",   v(L1, "I_RMS"), v(L2, "I_RMS"), nfmt="{:.2f}", ratio=True)
-    row("V_RMS",          "[V]",   v(L1, "V_RMS"), v(L2, "V_RMS"), nfmt="{:.4f}", ratio=True)
-    row("Rdc",            "[mΩ]",  v(L1, "Rdc"), v(L2, "Rdc"), scale=1e3, nfmt="{:.4f}", ratio=True)
-    row("Parallel strands", "[-]", v(L1, "N_parallel"), v(L2, "N_parallel"), nfmt="{:.0f}", ratio=True)
-    row("A_wire actual",  "[mm²]", v(L1, "A_wire"), v(L2, "A_wire"), scale=1e6, nfmt="{:.2f}", ratio=True)
-    row("Mean turn len",  "[mm]",  v(L1, "l_turn"), v(L2, "l_turn"), scale=1e3, nfmt="{:.2f}", ratio=True)
-
-    print("[ Power losses ]")
-    row("Core loss  P_c",    "[W]", v(L1, "P_core"),    v(L2, "P_core"),    nfmt="{:.4f}", ratio=True)
-    row("Winding loss P_w",  "[W]", v(L1, "P_winding"), v(L2, "P_winding"), nfmt="{:.4f}", ratio=True)
-    row("Total loss P_tot",  "[W]", v(L1, "P_total"),   v(L2, "P_total"),   nfmt="{:.4f}", ratio=True)
-
-    print("[ Thermal ]")
-    row("Thermal R_th",   "[K/W]", v(L1, "R_th"), v(L2, "R_th"), nfmt="{:.4f}", ratio=True)
-    row("Temperature",    "[°C]",  v(L1, "T"), v(L2, "T"), offset=-K_to_C, nfmt="{:.2f}")
-    row("Rated temp",     "[°C]",  v(L1, "T_rated"), v(L2, "T_rated"), offset=-K_to_C, nfmt="{:.2f}")
-    # Margin = T_rated - T_operating
-    m1 = (v(L1, "T_rated") - v(L1, "T")) if (v(L1, "T_rated") is not None and v(L1, "T") is not None) else None
-    m2 = (v(L2, "T_rated") - v(L2, "T")) if (v(L2, "T_rated") is not None and v(L2, "T") is not None) else None
-    row("Margin below rated", "[K]", m1, m2, nfmt="{:.2f}")
-
-    print("[ Lifetime ]")
-    row("Lifetime",          "[yr]", v(L1, "Lifetime"), v(L2, "Lifetime"), nfmt="{:.4f}", ratio=True)
-    row("Lifetime consumed", "[%]",  v(L1, "Lifetime_consumed"), v(L2, "Lifetime_consumed"))
-
-    print("=" * len(line))
-C_report = dict(C=C_specs["C"], R_th=C_specs["Thermal_resistance_C"], V_RMS=V_C_RMS, V_RMS_rated=C_specs["V_C_RMS_Rated"], I_RMS=I_C_RMS, P_total=P_total_C, T=T_C, T_rated=C_specs["T_C_Rated"], Lifetime=Lifetime_C,Lifetime_consumed_C=Lifetime_consumed_C)
-L1_report = dict(L=L1_specs["L1"], N=N_L1, lg=lg_L1, B_peak=B_peak_L1, B_max=L1_specs["B_max"], Bsat=L1_specs["Bsat"], Ae=Ae_L1, le=le_L1, Ve=Ve_L1, A_surface=A_surface_L1, I_RMS=I_L1_RMS, V_RMS=V_L1_RMS, Rdc=Rdc_L1, N_parallel=N_parallel_wire_L1, A_wire=A_wire_actual_L1, l_turn=l_turn_L1, P_core=P_c_L1, P_winding=P_w_L1, P_total=P_total_L1, R_th=R_th_L1, T=T_inductor_L1, T_rated=L1_specs["T_insulation_rated"], Lifetime=Lifetime_L1, Lifetime_consumed=Lifetime_consumed_L1,)
-L2_report = dict(L=L2_specs["L2"], N=N_L2, lg=lg_L2, B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], Ae=Ae_L2, le=le_L2, Ve=Ve_L2, A_surface=A_surface_L2, I_RMS=I_L2_RMS, V_RMS=V_L2_RMS, Rdc=Rdc_L2, N_parallel=N_parallel_wire_L2, A_wire=A_wire_actual_L2, l_turn=l_turn_L2, P_core=P_c_L2, P_winding=P_w_L2, P_total=P_total_L2, R_th=R_th_L2, T=T_inductor_L2, T_rated=L2_specs["T_insulation_rated"], Lifetime=Lifetime_L2, Lifetime_consumed=Lifetime_consumed_L2, )
-compare_components(C_report, L1_report, L2_report)
-'''
 
 df_1_power_flow_RMS = pd.DataFrame(
     {
@@ -400,8 +226,8 @@ df_1_power_flow_RMS = pd.DataFrame(
         "Ig_RMS": Ig_RMS,
     })
 #df_1_power_flow_RMS.to_parquet(f"{dataframes_dir}/df_1_power_flow_RMS.parquet")
-Plotting_function.plot_df_1_power_flow_RMS(df_1_power_flow_RMS=df_1_power_flow_RMS, figures_dir=figures_dir,xlabel = "Time [day]")
-del df_1_power_flow_RMS
+#Plotting_function.plot_df_1_power_flow_RMS(df_1_power_flow_RMS=df_1_power_flow_RMS, figures_dir=figures_dir)
+
 
 df_2_power_flow_inst = pd.DataFrame(
     {
@@ -416,11 +242,11 @@ df_2_power_flow_inst = pd.DataFrame(
         "I_C": I_C,
         "V_L2": V_L2,
         "I_L2": I_L2,
-        "THD_percent": np.where(Profile_size - 1, THD_percent, np.nan),
+        "THD_percent": np.where(np.arange(len(t)) == len(t) - 1, THD_percent, np.nan),
     })
 #df_2_power_flow_inst.to_parquet(f"{dataframes_dir}/df_2_power_flow_inst.parquet")
 Plotting_function.plot_df_2_power_flow_inst(df_2_power_flow_inst=df_2_power_flow_inst, figures_dir=figures_dir, resolution_per_cycle=resolution_per_cycle)
-del df_2_power_flow_inst
+
 
 df_3_C = pd.DataFrame(
     {
@@ -487,8 +313,7 @@ df_5_L2 = pd.DataFrame(
     })
 #df_5_L2.to_parquet(f"{dataframes_dir}/df_5_L2.parquet")
 
-Plotting_function.plot_df_components(df_3_C=df_3_C, df_4_L1=df_4_L1, df_5_L2=df_5_L2, figures_dir=figures_dir,xlabel = "Time [day]")
-del df_3_C, df_4_L1, df_5_L2
+Plotting_function.plot_df_components(df_3_C, df_4_L1, df_5_L2, figures_dir)
 
 
 
@@ -499,4 +324,143 @@ del df_3_C, df_4_L1, df_5_L2
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################################################################################################################
+
+
+'''
+def compare_components(C, L1, L2, profile_index=-1, K_to_C=273.15):
+    """
+    Print a side-by-side comparison of the capacitor (C) and the two inductors (L1, L2).
+
+    Each argument is a dict of already-computed results. Values may be scalars or
+    per-second arrays; arrays are reduced to the second given by `profile_index`
+    (default -1 = last second of the mission profile).
+
+    Expected keys
+    -------------
+    C  : C, R_th, V_RMS, V_RMS_rated, I_RMS, P_total, T, T_rated, Lifetime
+    L1 / L2 : L, N, lg, B_peak, B_max, Bsat, Ae, le, Ve, A_surface,
+              I_RMS, V_RMS, Rdc, N_parallel, A_wire, l_turn,
+              P_core, P_winding, P_total, R_th, T, T_rated,
+              Lifetime, Lifetime_consumed
+
+    Missing keys print as a dash, so the function still works on partially-filled dicts.
+    """
+
+    LBL, UNT, COL, RAT = 24, 8, 15, 10
+    line = "-" * (LBL + UNT + 2 * COL + RAT)
+
+    def v(d, key):
+        return _val(d.get(key), profile_index)
+
+    def row(label, unit, a, b, scale=1.0, offset=0.0, nfmt="{:.4f}", ratio=False):
+        s1 = nfmt.format(a * scale + offset) if a is not None else "-"
+        s2 = nfmt.format(b * scale + offset) if b is not None else "-"
+        if ratio and a not in (None, 0) and b not in (None, 0):
+            rr = "{:.2f}".format(a / b)
+        else:
+            rr = ""
+        print(f"{label:<{LBL}}{unit:<{UNT}}{s1:>{COL}}{s2:>{COL}}{rr:>{RAT}}")
+
+    # ------------------------------------------------------------------ #
+    # Header
+    # ------------------------------------------------------------------ #
+    print("=" * len(line))
+    print(f"COMPONENT COMPARISON   (mission-profile second index = {profile_index})")
+    print("=" * len(line))
+
+    # ------------------------------------------------------------------ #
+    # Capacitor (standalone block)
+    # ------------------------------------------------------------------ #
+    print("\nCAPACITOR")
+    print(line)
+    C_C = v(C, "C")
+    vrms, vrated = v(C, "V_RMS"), v(C, "V_RMS_rated")
+    tc, trated = v(C, "T"), v(C, "T_rated")
+    print(f"  Capacitance        : {C_C * 1e6:.4f} µF" if C_C is not None else "  Capacitance        : -")
+    if v(C, "R_th") is not None:
+        print(f"  Thermal resistance : {v(C, 'R_th'):.4f} K/W")
+    if vrms is not None:
+        ratio_txt = f"   (rated {vrated:.0f} V, ratio {vrms / vrated:.2f})" if vrated else ""
+        print(f"  V_RMS              : {vrms:.2f} V{ratio_txt}")
+    if v(C, "I_RMS") is not None:
+        print(f"  I_RMS              : {v(C, 'I_RMS'):.2f} A")
+    if v(C, "P_total") is not None:
+        print(f"  P_total            : {v(C, 'P_total'):.4f} W")
+    if tc is not None:
+        margin = f"   (rated {trated - K_to_C:.0f} °C)" if trated else ""
+        print(f"  T_hotspot          : {tc - K_to_C:.2f} °C{margin}")
+    if v(C, "Lifetime") is not None:
+        print(f"  Lifetime           : {v(C, 'Lifetime'):.2f} years")
+
+    # ------------------------------------------------------------------ #
+    # Inductors L1 vs L2 (aligned columns)
+    # ------------------------------------------------------------------ #
+    print("\nINDUCTORS  —  L1 (inverter side)  vs  L2 (grid side)")
+    print(line)
+    print(f"{'Quantity':<{LBL}}{'Unit':<{UNT}}{'L1':>{COL}}{'L2':>{COL}}{'L1/L2':>{RAT}}")
+    print(line)
+
+    print("[ Core geometry ]")
+    row("Inductance",     "[µH]",  v(L1, "L"),  v(L2, "L"),  scale=1e6, nfmt="{:.3f}", ratio=True)
+    row("Turns N",        "[-]",   v(L1, "N"),  v(L2, "N"),  nfmt="{:.0f}", ratio=True)
+    row("Air gap",        "[mm]",  v(L1, "lg"), v(L2, "lg"), scale=1e3, nfmt="{:.3f}", ratio=True)
+    row("B_peak",         "[T]",   v(L1, "B_peak"), v(L2, "B_peak"), nfmt="{:.4f}", ratio=True)
+    # B_peak / Bsat as a percentage
+    bp1 = v(L1, "B_peak"); bs1 = v(L1, "Bsat")
+    bp2 = v(L2, "B_peak"); bs2 = v(L2, "Bsat")
+    pct1 = (bp1 / bs1) if (bp1 is not None and bs1) else None
+    pct2 = (bp2 / bs2) if (bp2 is not None and bs2) else None
+    row("B_peak / Bsat",  "[%]",   pct1, pct2, scale=100.0, nfmt="{:.2f}")
+    row("Ae (eff. area)", "[mm²]", v(L1, "Ae"), v(L2, "Ae"), scale=1e6, nfmt="{:.2f}", ratio=True)
+    row("le (path len)",  "[mm]",  v(L1, "le"), v(L2, "le"), scale=1e3, nfmt="{:.2f}", ratio=True)
+    row("Ve (volume)",    "[cm³]", v(L1, "Ve"), v(L2, "Ve"), scale=1e6, nfmt="{:.2f}", ratio=True)
+    row("A_surface",      "[cm²]", v(L1, "A_surface"), v(L2, "A_surface"), scale=1e4, nfmt="{:.2f}", ratio=True)
+
+    print("[ Winding ]")
+    row("I_RMS",          "[A]",   v(L1, "I_RMS"), v(L2, "I_RMS"), nfmt="{:.2f}", ratio=True)
+    row("V_RMS",          "[V]",   v(L1, "V_RMS"), v(L2, "V_RMS"), nfmt="{:.4f}", ratio=True)
+    row("Rdc",            "[mΩ]",  v(L1, "Rdc"), v(L2, "Rdc"), scale=1e3, nfmt="{:.4f}", ratio=True)
+    row("Parallel strands", "[-]", v(L1, "N_parallel"), v(L2, "N_parallel"), nfmt="{:.0f}", ratio=True)
+    row("A_wire actual",  "[mm²]", v(L1, "A_wire"), v(L2, "A_wire"), scale=1e6, nfmt="{:.2f}", ratio=True)
+    row("Mean turn len",  "[mm]",  v(L1, "l_turn"), v(L2, "l_turn"), scale=1e3, nfmt="{:.2f}", ratio=True)
+
+    print("[ Power losses ]")
+    row("Core loss  P_c",    "[W]", v(L1, "P_core"),    v(L2, "P_core"),    nfmt="{:.4f}", ratio=True)
+    row("Winding loss P_w",  "[W]", v(L1, "P_winding"), v(L2, "P_winding"), nfmt="{:.4f}", ratio=True)
+    row("Total loss P_tot",  "[W]", v(L1, "P_total"),   v(L2, "P_total"),   nfmt="{:.4f}", ratio=True)
+
+    print("[ Thermal ]")
+    row("Thermal R_th",   "[K/W]", v(L1, "R_th"), v(L2, "R_th"), nfmt="{:.4f}", ratio=True)
+    row("Temperature",    "[°C]",  v(L1, "T"), v(L2, "T"), offset=-K_to_C, nfmt="{:.2f}")
+    row("Rated temp",     "[°C]",  v(L1, "T_rated"), v(L2, "T_rated"), offset=-K_to_C, nfmt="{:.2f}")
+    # Margin = T_rated - T_operating
+    m1 = (v(L1, "T_rated") - v(L1, "T")) if (v(L1, "T_rated") is not None and v(L1, "T") is not None) else None
+    m2 = (v(L2, "T_rated") - v(L2, "T")) if (v(L2, "T_rated") is not None and v(L2, "T") is not None) else None
+    row("Margin below rated", "[K]", m1, m2, nfmt="{:.2f}")
+
+    print("[ Lifetime ]")
+    row("Lifetime",          "[yr]", v(L1, "Lifetime"), v(L2, "Lifetime"), nfmt="{:.4f}", ratio=True)
+    row("Lifetime consumed", "[%]",  v(L1, "Lifetime_consumed"), v(L2, "Lifetime_consumed"), nfmt="{:.3e}")
+
+    print("=" * len(line))
+C_report = dict(C=C_specs["C"], R_th=C_specs["Thermal_resistance_C"], V_RMS=V_C_RMS, V_RMS_rated=C_specs["V_C_RMS_Rated"], I_RMS=I_C_RMS, P_total=P_total_C, T=T_C, T_rated=C_specs["T_C_Rated"], Lifetime=Lifetime_C,)
+L1_report = dict(L=L1_specs["L1"], N=N_L1, lg=lg_L1, B_peak=B_peak_L1, B_max=L1_specs["B_max"], Bsat=L1_specs["Bsat"], Ae=Ae_L1, le=le_L1, Ve=Ve_L1, A_surface=A_surface_L1, I_RMS=I_L1_RMS, V_RMS=V_L1_RMS, Rdc=Rdc_L1, N_parallel=N_parallel_wire_L1, A_wire=A_wire_actual_L1, l_turn=l_turn_L1, P_core=P_c_L1, P_winding=P_w_L1, P_total=P_total_L1, R_th=R_th_L1, T=T_inductor_L1, T_rated=L1_specs["T_insulation_rated"], Lifetime=Lifetime_L1, Lifetime_consumed=Lifetime_consumed_L1,)
+L2_report = dict(L=L2_specs["L2"], N=N_L2, lg=lg_L2, B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], Ae=Ae_L2, le=le_L2, Ve=Ve_L2, A_surface=A_surface_L2, I_RMS=I_L2_RMS, V_RMS=V_L2_RMS, Rdc=Rdc_L2, N_parallel=N_parallel_wire_L2, A_wire=A_wire_actual_L2, l_turn=l_turn_L2, P_core=P_c_L2, P_winding=P_w_L2, P_total=P_total_L2, R_th=R_th_L2, T=T_inductor_L2, T_rated=L2_specs["T_insulation_rated"], Lifetime=Lifetime_L2, Lifetime_consumed=Lifetime_consumed_L2, )
+compare_components(C_report, L1_report, L2_report)
+'''
 

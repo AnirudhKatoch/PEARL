@@ -39,6 +39,7 @@ Bsat_L1      = 1.56                 # [T]     from [B] page 1 electromagnetic ta
 B_max_L1     = 0.7 * Bsat_L1        # [T]     70% safety margin
 mu_r_L1      = 3000                 # [-]     from [A] Fig 12a at 10kHz # Assumed constant for simplicity
 
+
 #------------------------------------------------------------------------------#
 # Core Geometry Parameters
 #------------------------------------------------------------------------------#
@@ -53,8 +54,7 @@ G_core_L1 = 140e-3 * 1.55 # [m]  Height of the core window; the inner vertical o
 
 # Surface area of rectangular toroidal core
 A_surface_L1 = ((2 * (A_core_L1 + B_core_L1)  ) * D_core_L1 + (2 * (F_core_L1 + G_core_L1) ) * D_core_L1 + 2 * (A_core_L1*B_core_L1 - F_core_L1*G_core_L1   )) # [m²]  Two end faces (front and back); total exposed core surface area available for convective cooling
-
-# Calculate Ae_L1 and le_L1 with geometry value and not directly
+    # Calculate Ae_L1 and le_L1 with geometry value and not directly
 # Make a function to either input Ae_L1 and le_L1 ypurself or calculate it through the gemorety
 
 mu_0    = 4 * np.pi * 1e-7  # [H/m]  Permeability of free space (physical constant)
@@ -126,6 +126,7 @@ def calculate_Ae(method, Ae_user=None, kf=None, D_core=None, E_core=None):
 
     return Ae
 Ae_L1 = calculate_Ae(method = "geometry", kf=kf_L1, D_core=D_core_L1, E_core=E_core_L1) # Effective cross-sectional area of the core [m²].
+
 
 def calculate_le(method, le_user=None, A_core=None, B_core=None, F_core=None, G_core=None):
     """
@@ -399,6 +400,7 @@ safety_checks(B_peak=B_peak_L1, B_max=B_max_L1, Bsat=Bsat_L1, lg=lg_L1, le=le_L1
 rho                = 1.709e-8        # [Ω·m]   Copper resistivity at 20°C
 alpha_cu           = 0.00393         # [1/°C]  Temperature coefficient of resistivity for copper
 J_max              = 4e6             # [A/m²]  Maximum allowed current density = 4 A/mm²
+
 A_wire_L1_minimum  = I_RMS_rated_L1 / J_max   # [m²]  Minimum total copper cross-section required
 d_wire_L1_minimum  = np.sqrt((4 * A_wire_L1_minimum) / np.pi)  # [m]  Equivalent minimum round wire diameter
 
@@ -445,8 +447,6 @@ def check_window_fill(N_turns, N_parallel, A_wire_bare, F_core, G_core, kf_windo
     A_copper_total = N_turns * N_parallel * A_wire_bare        # [m²] total bare copper area
 
     ku = A_copper_total / A_window                             # [-]  utilization factor
-
-    print(f"Window utilization factor ku = {ku:.3f}  (limit = {kf_window_max})")
 
     if ku > kf_window_max:
         raise ValueError(
@@ -793,29 +793,109 @@ def calculate_inductor_thermal_resistance(method, R_th_user=None, A_surface=None
 
     return R_th
 R_th_L1 = calculate_inductor_thermal_resistance(method="surface_area", A_surface=A_surface_L1, heat_transfer_coefficient=10) # Thermal resistance from core to ambient [K/W].
-T_inductor_L1   = T_amb + R_th_L1* P_total_L1
+T_inductor_L1   = T_amb + R_th_L1 * P_total_L1
 
 #------------------------------------------------------------------------------#
 # Lifetime Calculations
 #------------------------------------------------------------------------------#
+
+# Temperature
 
 # Wire: Elektrisola Amidester 200 (A200), Theic-modified Polyesterimide
 # Source: Elektrisola Enamelled Copper Wire — Manufacturing Programme and
 #         Technical Data, Page 3, product table, thermal values row
 #         https://www.mintex.si/wp-content/uploads/2018/06/CuL-englisch.pdf
 
-T_insulation_rated = 273 + 210             # [K]  Temperature index of Amidester 200 insulation.
-                                           #  Definition: the continuous operating temperature at which the insulation reaches its reference lifetime of 20,000 hours.
-                                           #  Value 210°C taken directly from Elektrisola datasheet page 3, thermal values table, column "Amidester 200", row
+T_insulation_rated = 273 + 210         # [K]  Temperature index of Amidester 200 insulation.
+                                       #  Definition: the continuous operating temperature at which the insulation reaches its reference lifetime of 20,000 hours.
+                                       #  Value 210°C taken directly from Elektrisola datasheet page 3, thermal values table, column "Amidester 200", row
+L_insulation_rated = 20000             # [h] Reference lifetime at T_insulation_rated.
+Ea_insulation      = 1.1 * 1.602e-19   # [J] Activation energy of the thermal degradation reaction in the polyesterimide insulation.
+                                       #  Source: Emery, F.T., "Arrhenius model for insulation aging", IEEE Electrical Insulation
+                                       #  Magazine, widely adopted for Class 200 polyesterimide systems.
+kb_insulation      = 1.381e-23         # [J/K] Boltzmann constant — physical constant relating thermal energy to temperature.
 
-L_insulation_rated = 20000                 # [h] Reference lifetime at T_insulation_rated.
+# Voltage
 
-Ea_insulation      = 1.1 * 1.602e-19       # [J] Activation energy of the thermal degradation reaction in the polyesterimide insulation.
-                                           #  Source: Emery, F.T., "Arrhenius model for insulation aging", IEEE Electrical Insulation
-                                           #  Magazine, widely adopted for Class 200 polyesterimide systems.
+# Voltage endurance coefficient for polyesterimide insulation
+# Source: Montanari, G.C., "Aging and lifetime of electrical insulation: challenges and perspectives", IEEE Electrical Insulation Magazine, Vol. 9, No. 5, 1993.
+# Simoni, L., "General equation of the decline in the electric strength for combined thermal-electrical stresses", IEEE Trans. on Electrical Insulation, Vol. EI-19, No. 1, 1984.
 
-kb_insulation      = 1.381e-23           # [J/K] Boltzmann constant — physical constant relating thermal energy to temperature.
+# Typical range for Class 200 polyesterimide: n = 9 to 12 Conservative value n = 9 used here.
+n_endurance = 9                  # [-] voltage endurance coefficient
 
+# Insulation breakdown voltage from Elektrisola datasheet page 4 Wire: 0.500mm, Grade 1, cylinder test, minimum value
+# Source: Elektrisola datasheet page 4, "Minimum breakdown voltage" column
+V_bd_insulation = 2400           # [V] minimum breakdown voltage
+
+def compute_V_turn_peak(V_L1, N_turns, resolution_per_cycle, f, Profile_size):
+
+    """
+    Compute the peak turn-to-turn voltage for each second of the mission profile.
+
+    The voltage across one turn is approximately:
+        V_turn = V_L1 / N_turns
+
+    The insulation between two adjacent turns sees this voltage.
+    Peak value is used for the electrical stress assessment.
+
+    Parameters
+    ----------
+    V_L1                 : np.ndarray  instantaneous inductor voltage [V]
+    N_turns              : int         number of winding turns        [-]
+    resolution_per_cycle : int     samples per fundamental cycle  [-]
+    f                    : float       fundamental frequency          [Hz]
+    Profile_size         : int         mission profile length         [s]
+
+    Returns
+    -------
+    V_turn_peak : np.ndarray, shape (Profile_size,)
+        Peak turn-to-turn voltage for each profile second [V].
+    """
+
+    samples_per_second = int(resolution_per_cycle * f)
+    V_matrix    = V_L1.reshape(Profile_size, samples_per_second)  # (Profile_size, N)
+    V_turn_peak = np.max(np.abs(V_matrix), axis=1) / N_turns      # [V] peak per second
+    return V_turn_peak
+V_turn_peak_L1 = compute_V_turn_peak(V_L1 = V_L1, N_turns = N_L1, resolution_per_cycle = resolution_per_cycle, f = f, Profile_size = Profile_size)
+
+def check_voltage_stress(V_turn_peak, V_bd):
+
+    """
+    Check that the peak turn-to-turn voltage does not approach the insulation breakdown voltage.
+
+    Two thresholds are applied:
+        V_turn / V_bd >= 1.0  → hard failure  (insulation will fail immediately)
+
+    Parameters
+    ----------
+    V_turn_peak : np.ndarray  peak turn-to-turn voltage per second  [V]
+    V_bd        : float       insulation breakdown voltage          [V]
+
+    Returns
+    -------
+    V_stress_ratio : np.ndarray  V_turn_peak / V_bd per second [-]
+
+    Raises
+    ------
+    ValueError
+        If any V_stress_ratio >= 1.0
+    """
+
+    V_stress_ratio = V_turn_peak / V_bd
+
+    if np.any(V_stress_ratio >= 1.0):
+        raise ValueError(
+            f"\nSAFETY CHECK FAILED: Turn-to-turn voltage exceeds breakdown voltage.\n"
+            f"  Peak V_turn  = {np.max(V_turn_peak):.2f} V\n"
+            f"  V_bd         = {V_bd:.2f} V\n"
+            f"  Stress ratio = {np.max(V_stress_ratio):.4f}\n"
+            f"\nRecommendations:\n"
+            f"  (1) Increase N to reduce voltage per turn, or\n"
+            f"  (2) Use Grade 2 wire (V_bd = 4600 V) or Grade 3 (V_bd = 7000 V).")
+
+    return V_stress_ratio
+V_stress_ratio_L1 = check_voltage_stress(V_turn_peak = V_turn_peak_L1, V_bd = V_bd_insulation)
 
 # Arrhenius lifetime formula
 # Standard: IEC 60216 — "Electrical insulating materials — Thermal endurance properties" — defines the application of the Arrhenius model to predict insulation lifetime from temperature.
@@ -853,3 +933,32 @@ def calculate_inductor_lifetime(T_operating, T_rated, L_rated, Ea, kb):
     return L
 L_inductor_L1 = calculate_inductor_lifetime(T_operating = T_inductor_L1, T_rated = T_insulation_rated, L_rated = L_insulation_rated, Ea = Ea_insulation, kb = kb_insulation )   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
 
+def apply_miners_rule(L_per_second):
+
+    """
+
+    Apply Miner's cumulative damage rule to compute expected total lifetime.
+
+    D_cycle  = sum( dt / L_i )          — damage per mission-profile cycle
+    L_total  = Profile_duration / D     — expected lifetime [years]
+
+    Reference: Miner, M.A., Journal of Applied Mechanics, 1945. IEC 60216-1.
+
+    Parameters
+    ----------
+    L_per_second : np.ndarray  lifetime at each profile second [years]
+
+    Returns
+    -------
+    L_total : float  expected total lifetime [years]
+
+    """
+
+    dt_profile_years = 1 / (365 * 24 * 3600)
+    d_i              = dt_profile_years / L_per_second        # [-] damage per step
+    D_cycle          = np.sum(d_i)                            # [-] total damage per cycle
+    Profile_duration = len(L_per_second) * dt_profile_years   # [years]
+    L_total          = Profile_duration / D_cycle             # [years]
+
+    return L_total
+L_total_L1 = apply_miners_rule(L_per_second = L_inductor_L1)

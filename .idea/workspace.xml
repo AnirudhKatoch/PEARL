@@ -5,9 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest">
+      <change afterPath="$PROJECT_DIR$/LCL Filter/Plotting_function.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/mother_function_trial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Inductor_Inputs.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Inductor_L1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/~$te for inductor lifetime.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Figures/-0.1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Figures/0.1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Figures/1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Figures/Current_comparing_-0.1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Figures/Current_comparing_0.1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Figures/Current_comparing_1.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Figures/Current_comparing_1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Figures/I_L2_Harmonics.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Inductor_L1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/mother_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/mother_function.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/trial.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/trial.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -57,6 +68,7 @@
     "Python.Electrical_model.executor": "Run",
     "Python.Inductor_Inputs.executor": "Run",
     "Python.Inductor_L1.executor": "Run",
+    "Python.Inductor_L2.executor": "Run",
     "Python.Input_parameters.executor": "Run",
     "Python.Inverter_calculations.executor": "Run",
     "Python.Inverter_model.executor": "Run",
@@ -77,6 +89,7 @@
     "Python.main.executor": "Run",
     "Python.main_temp.executor": "Run",
     "Python.mother_function.executor": "Run",
+    "Python.mother_function_trial.executor": "Run",
     "Python.runner.executor": "Run",
     "Python.runner_0.1.executor": "Run",
     "Python.runner_0.executor": "Run",
