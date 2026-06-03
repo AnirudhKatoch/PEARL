@@ -12,7 +12,7 @@ Plotting_function = Plotting_functions_class()
 
 Vdc_rated = params.Vdc_rated; Vo_rated = params.Vo_rated; inverter_phases = params.inverter_phases; M_rated = params.M_rated; single_phase_inverter_topology = params.single_phase_inverter_topology; waveform_voltage_definition = params.waveform_voltage_definition; modulation_scheme = params.modulation_scheme; f = params.f; fsw = params.fsw; T = params.T; Tsw = params.Tsw; omega = params.omega
 Profile_size = params.Profile_size; Vdc_RMS = params.Vdc_RMS; M = params.M; Vo = params.Vo; Vg_RMS = params.Vg_RMS; S_RMS = params.S_RMS; pf = params.pf; P_RMS = params.P_RMS; Q_RMS = params.Q_RMS; Ig_RMS = params.Ig_RMS
-T_amb = params.T_amb
+T_amb = params.T_amb; heat_transfer_coefficient = params.heat_transfer_coefficient
 resolution_per_cycle = params.resolution_per_cycle; dt = params.dt; samples_per_switching_period = params.samples_per_switching_period; Minimum_required_samples_per_switching_period = params.Minimum_required_samples_per_switching_period; seconds_per_sample = params.seconds_per_sample
 L1_specs = params.L1_specs
 C_specs = params.C_specs
@@ -51,7 +51,7 @@ Calculation_functions.check_within_tolerance({"L1": (L1_specs["L1"], L1_optimum)
 # ----------------------------------------#
 
 if C_specs["Thermal_resistance_C"] == None:
-    C_specs["Thermal_resistance_C"] = Calculation_functions.calculate_capacitor_thermal_resistance(method="surface_area", D_case=C_specs["D_case"], H_case=C_specs["H_case"], heat_transfer_coefficient=10)  # [W/m²K] natural convection
+    C_specs["Thermal_resistance_C"] = Calculation_functions.calculate_capacitor_thermal_resistance(method="surface_area", D_case=C_specs["D_case"], H_case=C_specs["H_case"], heat_transfer_coefficient=heat_transfer_coefficient)  # [W/m²K] natural convection
 if C_specs["tan_delta_0"] == None:
     C_specs["tan_delta_0"] = Calculation_functions.calculate_tan_delta_0(tan_delta_measured = C_specs["tan_delta_measured"],  Rs = C_specs["Rs"],C = C_specs["C"], f_measured = C_specs["f_measured_for_tan_delta"])
 
@@ -77,8 +77,8 @@ N_parallel_wire_L1 = Calculation_functions.calculate_parallel_strands(A_wire_min
 A_wire_actual_L1 = Calculation_functions.calculate_actual_wire_area(N_parallel = N_parallel_wire_L1, A_strand = L1_specs["A_strand"])                  # [m²] Actual total copper cross-section after rounding up
 Calculation_functions.check_window_fill(N_turns = N_L1, N_parallel = N_parallel_wire_L1, A_wire_bare = L1_specs["A_strand"], F_core = L1_specs["F_core"], G_core = L1_specs["G_core"], kf_window_max= 0.4) # Check whether the winding physically fits inside the core window.
 l_turn_L1 = Calculation_functions.calculate_l_turn(D_core=L1_specs["D_core"], E_core=L1_specs["E_core"])                                               # [m] Estimate mean length of one turn for a rectangular toroidal core.
-Rdc_L1 = Calculation_functions.calculate_Rdc(rho=L1_specs["rho"], N=N_L1, l_turn=l_turn_L1, A_wire=A_wire_actual_L1)                                                         # [ohm] float  DC winding resistance # Assumed  no Skin or Proximity Effect
-R_th_L1 = Calculation_functions.calculate_inductor_thermal_resistance(method="surface_area", A_surface=A_surface_L1,heat_transfer_coefficient=10)  # [K/W] Thermal resistance from  to ambient .
+Rdc_L1 = Calculation_functions.calculate_Rdc(rho=L1_specs["rho"], N=N_L1, l_turn=l_turn_L1, A_wire=A_wire_actual_L1)                                   # [ohm] float  DC winding resistance # Assumed  no Skin or Proximity Effect
+R_th_L1 = Calculation_functions.calculate_inductor_thermal_resistance(method="surface_area", A_surface=A_surface_L1,heat_transfer_coefficient=heat_transfer_coefficient)      # [K/W] Thermal resistance from  to ambient.
 
 # ----------------------------------------#
 # LCL filter grid side [L2]
@@ -103,18 +103,16 @@ A_wire_actual_L2 = Calculation_functions.calculate_actual_wire_area(N_parallel =
 Calculation_functions.check_window_fill(N_turns = N_L2, N_parallel = N_parallel_wire_L2, A_wire_bare = L2_specs["A_strand"], F_core = L2_specs["F_core"], G_core = L2_specs["G_core"], kf_window_max= 0.45) # Check whether the winding physically fits inside the core window.
 l_turn_L2 = Calculation_functions.calculate_l_turn(D_core=L2_specs["D_core"], E_core=L2_specs["E_core"])                                               # [m] Estimate mean length of one turn for a rectangular toroidal core.
 Rdc_L2 = Calculation_functions.calculate_Rdc(rho=L2_specs["rho"], N=N_L2, l_turn=l_turn_L2, A_wire=A_wire_actual_L2)                                                         # [ohm] float  DC winding resistance # Assumed  no Skin or Proximity Effect
-R_th_L2 = Calculation_functions.calculate_inductor_thermal_resistance(method = "surface_area", A_surface = A_surface_L2 , heat_transfer_coefficient = 10)   # [K/W] Thermal resistance from  to ambient .
+R_th_L2 = Calculation_functions.calculate_inductor_thermal_resistance(method = "surface_area", A_surface = A_surface_L2 , heat_transfer_coefficient=heat_transfer_coefficient)   # [K/W] Thermal resistance from  to ambient .
 
 # ----------------------------------------#
 # Start of lru_cache
 # ----------------------------------------#
 
-# samples for ONE second (one fundamental-profile second)
-samples_per_second = resolution_per_cycle * f
-t_one = np.arange(0, 1, dt)          # time vector for a single second
-
 @lru_cache(maxsize=1500)
-def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i,P_RMS_i, Q_RMS_i, Ig_RMS_i, T_amb_i):
+def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS_i, Ig_RMS_i, T_amb_i):
+
+    t_one = np.arange(0, 1, dt)  # time vector for a single second
 
     # ----------------------------------------#
     # Electrical model
@@ -124,7 +122,7 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i,P_RMS_i, Q_RMS_
     Vg = np.sqrt(2) * Vg_RMS_i * np.sin(omega * t_one)
 
     # power-factor -> phase shift (constant over the second)
-    pf_inst = np.full(samples_per_second, pf_i)
+    pf_inst = np.full(resolution_per_cycle * f, pf_i)
     phi = np.arccos(np.abs(pf_inst))
     phase_shift = np.sign(pf_inst) * phi
 
@@ -132,7 +130,10 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i,P_RMS_i, Q_RMS_
     Ig_ref = np.sqrt(2) * Ig_RMS_i * np.sin(omega * t_one + phase_shift)
 
     # required inverter voltage (pass single-element arrays, Profile_size=1)
-    Vs_ref = Calculation_functions.compute_Vs_ref_phasor(t=t_one, f=f,Ig_RMS=np.array([Ig_RMS_i]), Vg_RMS=np.array([Vg_RMS_i]), phase_shift=phase_shift, L1=L1_specs["L1"], L2=L2_specs["L2"], C=C_specs["C"],R1=L1_specs["R1"], R2=L2_specs["R2"], R3=C_specs["R3"],Profile_size=1, samples_per_second=samples_per_second)
+    Vs_ref = Calculation_functions.compute_Vs_ref_phasor(t=t_one, f=f, Ig_RMS=np.array([Ig_RMS_i]), Vg_RMS=np.array([Vg_RMS_i]), phase_shift=phase_shift, L1=L1_specs["L1"], L2=L2_specs["L2"], C=C_specs["C"],R1=L1_specs["R1"], R2=L2_specs["R2"], R3=C_specs["R3"],Profile_size=1, samples_per_second=resolution_per_cycle * f)
+
+    # Function to specifically add distortion to the Vs_ref to destroy Vs to see the effect on LCL filter
+    #Vs_ref = Calculation_functions.distort_Vs_ref(Vs_ref=Vs_ref, t=t_one, omega=omega,harmonics={5: 0.08, 7: 0.05, 11: 0.04, 13: 0.03},noise_level=0.02, seed=0)
 
     Calculation_functions.validate_required_inverter_voltage(Vs_ref=Vs_ref, Vo_available=Vo_rated)
 
@@ -154,7 +155,7 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i,P_RMS_i, Q_RMS_
     I_C_RMS = Calculation_functions.Singal_RMS(Signal=I_C, resolution_per_cycle=resolution_per_cycle, f=f)
 
     # Power losses
-    P_total_C = Calculation_functions.Capacitor_total_power_losses(fsw=fsw, f=f, I_C_RMS_harmonics=I_C_RMS_harmonics,tan_delta_0=C_specs["tan_delta_0"], C=C_specs["C"], Rs=C_specs["Rs"])
+    P_total_C = Calculation_functions.Capacitor_total_power_losses(fsw=fsw, f=f, I_C_RMS_harmonics=I_C_RMS_harmonics, tan_delta_0=C_specs["tan_delta_0"], C=C_specs["C"], Rs=C_specs["Rs"])
 
     # Temperature  (T_amb is THIS operating point's ambient)
     T_C = Calculation_functions.Capacitor_hotspot_temperature(T_amb=T_amb_i, P_total_C=P_total_C,Thermal_resistance_C=C_specs["Thermal_resistance_C"])
@@ -228,7 +229,9 @@ I_C_RMS_harmonics, I_C_RMS, P_total_C, T_C, V_C_RMS,
 V_L1_RMS, I_L1_RMS, P_c_L1, P_w_L1, P_total_L1, T_inductor_L1,
 V_L2_RMS, I_L2_RMS, P_c_L2, P_w_L2, P_total_L2, T_inductor_L2) = (np.concatenate(col) for col in zip(*results))
 
-THD_percent = Calculation_functions.compute_THD_I_L2(t=t_one, I_L2=I_L2, Ig_ref=Ig_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
+THD_percent_I_L2 = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=I_L2, Signal_ref=Ig_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
+THD_percent_Vs = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=Vs, Signal_ref=Vs_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
+
 
 # ----------------------------------------#
 # LCL filter middle branch [C]
@@ -245,18 +248,17 @@ Lifetime_C,  Lifetime_consumed_C  = Calculation_functions.miners_rule_modified(L
 # LCL filter inverter side [L1]
 # ----------------------------------------#
 
-# Lifetime Calculations
-Lifetime_L1_series = Calculation_functions.calculate_inductor_lifetime(T_operating = T_inductor_L1, T_rated = L1_specs["T_insulation_rated"], L_rated = L1_specs["L_insulation_rated"], Ea = L1_specs["Ea_insulation"], kb = L1_specs["kb"] )   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
+Lifetime_L1_series = Calculation_functions.calculate_inductor_lifetime(T_operating = T_inductor_L1, T_rated = L1_specs["T_insulation_rated"], L_rated = L1_specs["L_insulation_rated"], Ea = L1_specs["Ea_insulation"], kb = L1_specs["kb"], L_max_years = L1_specs["L_max_years"])   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
 Lifetime_L1, Lifetime_consumed_L1 = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_L1_series, seconds_per_sample=seconds_per_sample)
 
 # ----------------------------------------#
 # LCL filter grid side [L2]
 # ----------------------------------------#
 
-Lifetime_L2_series = Calculation_functions.calculate_inductor_lifetime(T_operating = T_inductor_L2, T_rated = L2_specs["T_insulation_rated"], L_rated = L2_specs["L_insulation_rated"], Ea = L2_specs["Ea_insulation"], kb = L2_specs["kb"] )   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
+Lifetime_L2_series = Calculation_functions.calculate_inductor_lifetime(T_operating = T_inductor_L2, T_rated = L2_specs["T_insulation_rated"], L_rated = L2_specs["L_insulation_rated"], Ea = L2_specs["Ea_insulation"], kb = L2_specs["kb"], L_max_years = L2_specs["L_max_years"])   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
 Lifetime_L2, Lifetime_consumed_L2 = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_L2_series, seconds_per_sample=seconds_per_sample)
 
-'''
+
 def compare_components(C, L1, L2, profile_index=-1, K_to_C=273.15):
     """
     Print a side-by-side comparison of the capacitor (C) and the two inductors (L1, L2).
@@ -387,108 +389,113 @@ C_report = dict(C=C_specs["C"], R_th=C_specs["Thermal_resistance_C"], V_RMS=V_C_
 L1_report = dict(L=L1_specs["L1"], N=N_L1, lg=lg_L1, B_peak=B_peak_L1, B_max=L1_specs["B_max"], Bsat=L1_specs["Bsat"], Ae=Ae_L1, le=le_L1, Ve=Ve_L1, A_surface=A_surface_L1, I_RMS=I_L1_RMS, V_RMS=V_L1_RMS, Rdc=Rdc_L1, N_parallel=N_parallel_wire_L1, A_wire=A_wire_actual_L1, l_turn=l_turn_L1, P_core=P_c_L1, P_winding=P_w_L1, P_total=P_total_L1, R_th=R_th_L1, T=T_inductor_L1, T_rated=L1_specs["T_insulation_rated"], Lifetime=Lifetime_L1, Lifetime_consumed=Lifetime_consumed_L1,)
 L2_report = dict(L=L2_specs["L2"], N=N_L2, lg=lg_L2, B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], Ae=Ae_L2, le=le_L2, Ve=Ve_L2, A_surface=A_surface_L2, I_RMS=I_L2_RMS, V_RMS=V_L2_RMS, Rdc=Rdc_L2, N_parallel=N_parallel_wire_L2, A_wire=A_wire_actual_L2, l_turn=l_turn_L2, P_core=P_c_L2, P_winding=P_w_L2, P_total=P_total_L2, R_th=R_th_L2, T=T_inductor_L2, T_rated=L2_specs["T_insulation_rated"], Lifetime=Lifetime_L2, Lifetime_consumed=Lifetime_consumed_L2, )
 compare_components(C_report, L1_report, L2_report)
-'''
 
-df_1_power_flow_RMS = pd.DataFrame(
-    {
-        "Vdc_RMS": Vdc_RMS,
-        "Vg_RMS": Vg_RMS,
-        "S_RMS": S_RMS,
-        "pf": pf,
-        "P_RMS": P_RMS,
-        "Q_RMS": Q_RMS,
-        "Ig_RMS": Ig_RMS,
-    })
-#df_1_power_flow_RMS.to_parquet(f"{dataframes_dir}/df_1_power_flow_RMS.parquet")
-Plotting_function.plot_df_1_power_flow_RMS(df_1_power_flow_RMS=df_1_power_flow_RMS, figures_dir=figures_dir,xlabel = "Time [day]")
-del df_1_power_flow_RMS
 
-df_2_power_flow_inst = pd.DataFrame(
-    {
-        "pf_inst": pf_inst,
-        "phi": phi,
-        "Ig_ref": Ig_ref,
-        "Vs_ref": Vs_ref,
-        "Vs": Vs,
-        "V_L1": V_L1,
-        "I_L1": I_L1,
-        "V_C": V_C,
-        "I_C": I_C,
-        "V_L2": V_L2,
-        "I_L2": I_L2,
-        "THD_percent": np.where(Profile_size - 1, THD_percent, np.nan),
-    })
-#df_2_power_flow_inst.to_parquet(f"{dataframes_dir}/df_2_power_flow_inst.parquet")
-Plotting_function.plot_df_2_power_flow_inst(df_2_power_flow_inst=df_2_power_flow_inst, figures_dir=figures_dir, resolution_per_cycle=resolution_per_cycle)
-del df_2_power_flow_inst
+blabla = False
+#blabla = True
 
-df_3_C = pd.DataFrame(
-    {
-        "V_C_RMS" : np.atleast_1d(V_C_RMS),
-        "I_C_RMS" : np.atleast_1d(I_C_RMS),
-        "P_total_C" : np.atleast_1d(P_total_C),
-        "T_C" : np.atleast_1d(T_C),
-        "Lifetime_C" : Calculation_functions.last_of_column(Lifetime_C,Profile_size),
-        "Lifetime_consumed_C": Calculation_functions.last_of_column(Lifetime_consumed_C,Profile_size),
-    })
-#df_3_C.to_parquet(f"{dataframes_dir}/df_3_C.parquet")
+if blabla == True:
+    df_1_power_flow_RMS = pd.DataFrame(
+        {
+            "Vdc_RMS": Vdc_RMS,
+            "Vg_RMS": Vg_RMS,
+            "S_RMS": S_RMS,
+            "pf": pf,
+            "P_RMS": P_RMS,
+            "Q_RMS": Q_RMS,
+            "Ig_RMS": Ig_RMS,
+        })
+    #df_1_power_flow_RMS.to_parquet(f"{dataframes_dir}/df_1_power_flow_RMS.parquet")
+    Plotting_function.plot_df_1_power_flow_RMS(df_1_power_flow_RMS=df_1_power_flow_RMS, figures_dir=figures_dir,xlabel = "Time [day]")
+    del df_1_power_flow_RMS
 
-df_4_L1 = pd.DataFrame(
-    {
-        # --- per-second ---
-        "V_L1_RMS":            np.atleast_1d(V_L1_RMS),       # [V]
-        "I_L1_RMS":            np.atleast_1d(I_L1_RMS),       # [A]
-        "P_c_L1":              np.atleast_1d(P_c_L1),         # [W] core loss
-        "P_w_L1":              np.atleast_1d(P_w_L1),         # [W] winding loss
-        "P_total_L1":          np.atleast_1d(P_total_L1),     # [W]
-        "T_inductor_L1":       np.atleast_1d(T_inductor_L1),  # [K]
-        # --- scalars: last row only ---
-        "A_surface_L1":        Calculation_functions.last_of_column(A_surface_L1,Profile_size),           # [m²]
-        "Ae_L1":               Calculation_functions.last_of_column(Ae_L1,Profile_size),                  # [m²]
-        "le_L1":               Calculation_functions.last_of_column(le_L1,Profile_size),                  # [m]
-        "Ve_L1":               Calculation_functions.last_of_column(Ve_L1,Profile_size),                  # [m³]
-        "N_L1":                Calculation_functions.last_of_column(N_L1,Profile_size),                   # [-]
-        "lg_L1":               Calculation_functions.last_of_column(lg_L1,Profile_size),                  # [m]
-        "B_peak_L1":           Calculation_functions.last_of_column(B_peak_L1,Profile_size),              # [T]
-        "N_parallel_wire_L1":  Calculation_functions.last_of_column(N_parallel_wire_L1,Profile_size),     # [-]
-        "A_wire_actual_L1":    Calculation_functions.last_of_column(A_wire_actual_L1,Profile_size),       # [m²]
-        "l_turn_L1":           Calculation_functions.last_of_column(l_turn_L1,Profile_size),              # [m]
-        "Rdc_L1":              Calculation_functions.last_of_column(Rdc_L1,Profile_size),                 # [Ω]
-        "R_th_L1":             Calculation_functions.last_of_column(R_th_L1,Profile_size),                # [K/W]
-        "Lifetime_L1":         Calculation_functions.last_of_column(Lifetime_L1,Profile_size),            # [yr]
-        "Lifetime_consumed_L1":Calculation_functions.last_of_column(Lifetime_consumed_L1,Profile_size),   # [%]
-    })
-#df_4_L1.to_parquet(f"{dataframes_dir}/df_4_L1.parquet")
+    df_2_power_flow_inst = pd.DataFrame(
+        {
+            "pf_inst": pf_inst,
+            "phi": phi,
+            "Ig_ref": Ig_ref,
+            "Vs_ref": Vs_ref,
+            "Vs": Vs,
+            "V_L1": V_L1,
+            "I_L1": I_L1,
+            "V_C": V_C,
+            "I_C": I_C,
+            "V_L2": V_L2,
+            "I_L2": I_L2,
+            "THD_percent_I_L2": np.where(np.arange(len(Vs)) == len(Vs) - 1, THD_percent_I_L2, np.nan),
+            "THD_percent_Vs": np.where(np.arange(len(Vs)) == len(Vs) - 1, THD_percent_Vs, np.nan)
+        })
+    #df_2_power_flow_inst.to_parquet(f"{dataframes_dir}/df_2_power_flow_inst.parquet")
+    Plotting_function.plot_df_2_power_flow_inst(df_2_power_flow_inst=df_2_power_flow_inst, figures_dir=figures_dir, resolution_per_cycle=resolution_per_cycle)
+    del df_2_power_flow_inst
 
-df_5_L2 = pd.DataFrame(
-    {
-        # --- per-second ---
-        "V_L2_RMS"            : np.atleast_1d(V_L2_RMS),       # [V]
-        "I_L2_RMS"            : np.atleast_1d(I_L2_RMS),       # [A]
-        "P_c_L2"              : np.atleast_1d(P_c_L2),         # [W] core loss
-        "P_w_L2"              : np.atleast_1d(P_w_L2),         # [W] winding loss
-        "P_total_L2"          : np.atleast_1d(P_total_L2),     # [W]
-        "T_inductor_L2"       : np.atleast_1d(T_inductor_L2),  # [K]
-        # --- scalars: last row only ---
-        "A_surface_L2"        : Calculation_functions.last_of_column(A_surface_L2,Profile_size),           # [m²]
-        "Ae_L2"               : Calculation_functions.last_of_column(Ae_L2,Profile_size),                  # [m²]
-        "le_L2"               : Calculation_functions.last_of_column(le_L2,Profile_size),                  # [m]
-        "Ve_L2"               : Calculation_functions.last_of_column(Ve_L2,Profile_size),                  # [m³]
-        "N_L2"                : Calculation_functions.last_of_column(N_L2,Profile_size),                   # [-]
-        "lg_L2"               : Calculation_functions.last_of_column(lg_L2,Profile_size),                  # [m]
-        "B_peak_L2"           : Calculation_functions.last_of_column(B_peak_L2,Profile_size),              # [T]
-        "N_parallel_wire_L2"  : Calculation_functions.last_of_column(N_parallel_wire_L2,Profile_size),     # [-]
-        "A_wire_actual_L2"    : Calculation_functions.last_of_column(A_wire_actual_L2,Profile_size),       # [m²]
-        "l_turn_L2"           : Calculation_functions.last_of_column(l_turn_L2,Profile_size),              # [m]
-        "Rdc_L2"              : Calculation_functions.last_of_column(Rdc_L2,Profile_size),                 # [Ω]
-        "R_th_L2"             : Calculation_functions.last_of_column(R_th_L2,Profile_size),                # [K/W]
-        "Lifetime_L2"         : Calculation_functions.last_of_column(Lifetime_L2,Profile_size),            # [yr]
-        "Lifetime_consumed_L2": Calculation_functions.last_of_column(Lifetime_consumed_L2,Profile_size),   # [%]
-    })
-#df_5_L2.to_parquet(f"{dataframes_dir}/df_5_L2.parquet")
+    df_3_C = pd.DataFrame(
+        {
+            "V_C_RMS" : np.atleast_1d(V_C_RMS),
+            "I_C_RMS" : np.atleast_1d(I_C_RMS),
+            "P_total_C" : np.atleast_1d(P_total_C),
+            "T_C" : np.atleast_1d(T_C),
+            "Lifetime_C" : Calculation_functions.last_of_column(Lifetime_C,Profile_size),
+            "Lifetime_consumed_C": Calculation_functions.last_of_column(Lifetime_consumed_C,Profile_size),
+        })
+    #df_3_C.to_parquet(f"{dataframes_dir}/df_3_C.parquet")
 
-Plotting_function.plot_df_components(df_3_C=df_3_C, df_4_L1=df_4_L1, df_5_L2=df_5_L2, figures_dir=figures_dir,xlabel = "Time [day]")
-del df_3_C, df_4_L1, df_5_L2
+    df_4_L1 = pd.DataFrame(
+        {
+            # --- per-second ---
+            "V_L1_RMS":            np.atleast_1d(V_L1_RMS),       # [V]
+            "I_L1_RMS":            np.atleast_1d(I_L1_RMS),       # [A]
+            "P_c_L1":              np.atleast_1d(P_c_L1),         # [W] core loss
+            "P_w_L1":              np.atleast_1d(P_w_L1),         # [W] winding loss
+            "P_total_L1":          np.atleast_1d(P_total_L1),     # [W]
+            "T_inductor_L1":       np.atleast_1d(T_inductor_L1),  # [K]
+            # --- scalars: last row only ---
+            "A_surface_L1":        Calculation_functions.last_of_column(A_surface_L1,Profile_size),           # [m²]
+            "Ae_L1":               Calculation_functions.last_of_column(Ae_L1,Profile_size),                  # [m²]
+            "le_L1":               Calculation_functions.last_of_column(le_L1,Profile_size),                  # [m]
+            "Ve_L1":               Calculation_functions.last_of_column(Ve_L1,Profile_size),                  # [m³]
+            "N_L1":                Calculation_functions.last_of_column(N_L1,Profile_size),                   # [-]
+            "lg_L1":               Calculation_functions.last_of_column(lg_L1,Profile_size),                  # [m]
+            "B_peak_L1":           Calculation_functions.last_of_column(B_peak_L1,Profile_size),              # [T]
+            "N_parallel_wire_L1":  Calculation_functions.last_of_column(N_parallel_wire_L1,Profile_size),     # [-]
+            "A_wire_actual_L1":    Calculation_functions.last_of_column(A_wire_actual_L1,Profile_size),       # [m²]
+            "l_turn_L1":           Calculation_functions.last_of_column(l_turn_L1,Profile_size),              # [m]
+            "Rdc_L1":              Calculation_functions.last_of_column(Rdc_L1,Profile_size),                 # [Ω]
+            "R_th_L1":             Calculation_functions.last_of_column(R_th_L1,Profile_size),                # [K/W]
+            "Lifetime_L1":         Calculation_functions.last_of_column(Lifetime_L1,Profile_size),            # [yr]
+            "Lifetime_consumed_L1":Calculation_functions.last_of_column(Lifetime_consumed_L1,Profile_size),   # [%]
+        })
+    #df_4_L1.to_parquet(f"{dataframes_dir}/df_4_L1.parquet")
+
+    df_5_L2 = pd.DataFrame(
+        {
+            # --- per-second ---
+            "V_L2_RMS"            : np.atleast_1d(V_L2_RMS),       # [V]
+            "I_L2_RMS"            : np.atleast_1d(I_L2_RMS),       # [A]
+            "P_c_L2"              : np.atleast_1d(P_c_L2),         # [W] core loss
+            "P_w_L2"              : np.atleast_1d(P_w_L2),         # [W] winding loss
+            "P_total_L2"          : np.atleast_1d(P_total_L2),     # [W]
+            "T_inductor_L2"       : np.atleast_1d(T_inductor_L2),  # [K]
+            # --- scalars: last row only ---
+            "A_surface_L2"        : Calculation_functions.last_of_column(A_surface_L2,Profile_size),           # [m²]
+            "Ae_L2"               : Calculation_functions.last_of_column(Ae_L2,Profile_size),                  # [m²]
+            "le_L2"               : Calculation_functions.last_of_column(le_L2,Profile_size),                  # [m]
+            "Ve_L2"               : Calculation_functions.last_of_column(Ve_L2,Profile_size),                  # [m³]
+            "N_L2"                : Calculation_functions.last_of_column(N_L2,Profile_size),                   # [-]
+            "lg_L2"               : Calculation_functions.last_of_column(lg_L2,Profile_size),                  # [m]
+            "B_peak_L2"           : Calculation_functions.last_of_column(B_peak_L2,Profile_size),              # [T]
+            "N_parallel_wire_L2"  : Calculation_functions.last_of_column(N_parallel_wire_L2,Profile_size),     # [-]
+            "A_wire_actual_L2"    : Calculation_functions.last_of_column(A_wire_actual_L2,Profile_size),       # [m²]
+            "l_turn_L2"           : Calculation_functions.last_of_column(l_turn_L2,Profile_size),              # [m]
+            "Rdc_L2"              : Calculation_functions.last_of_column(Rdc_L2,Profile_size),                 # [Ω]
+            "R_th_L2"             : Calculation_functions.last_of_column(R_th_L2,Profile_size),                # [K/W]
+            "Lifetime_L2"         : Calculation_functions.last_of_column(Lifetime_L2,Profile_size),            # [yr]
+            "Lifetime_consumed_L2": Calculation_functions.last_of_column(Lifetime_consumed_L2,Profile_size),   # [%]
+        })
+    #df_5_L2.to_parquet(f"{dataframes_dir}/df_5_L2.parquet")
+
+    Plotting_function.plot_df_components(df_3_C=df_3_C, df_4_L1=df_4_L1, df_5_L2=df_5_L2, figures_dir=figures_dir,xlabel = "Time [day]")
+    del df_3_C, df_4_L1, df_5_L2
 
 
 

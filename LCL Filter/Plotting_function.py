@@ -205,8 +205,8 @@ class Plotting_functions_class:
                     "Ig_ref", "tab:orange", "Reference current Ig_ref", "Current [A]",xlabel)
 
 
-        # ---------- Fig_10 : THD_percent (single bar) ----------
-        thd = df["THD_percent"].dropna()
+        # ---------- Fig_10 : THD_percent_I_L2 (single bar) ----------
+        thd = df["THD_percent_I_L2"].dropna()
         thd_val = float(thd.iloc[-1]) if len(thd) else np.nan
         fig, ax = plt.subplots(figsize=(6.4, 4.8))
         ax.bar(["I_L2"], [thd_val], color="tab:cyan", width=0.4)
@@ -216,8 +216,25 @@ class Plotting_functions_class:
         ax.text(0, thd_val, f"{thd_val:.4f} %", ha="center", va="bottom")
         ax.grid(True, axis="y", alpha=0.3)
         fig.tight_layout()
-        fig.savefig(f"{figures_dir}/Fig_10_THD.png", dpi=150)
+        fig.savefig(f"{figures_dir}/Fig_10_THD_I_L2.png", dpi=150)
         plt.close(fig)
+
+
+        # ---------- Fig_10a : THD_percent_Vs (single bar) ----------
+        thd = df["THD_percent_Vs"].dropna()
+        thd_val = float(thd.iloc[-1]) if len(thd) else np.nan
+        fig, ax = plt.subplots(figsize=(6.4, 4.8))
+        ax.bar(["Vs"], [thd_val], color="tab:cyan", width=0.4)
+        ax.set_ylabel("THD [%]")
+        ax.set_title("Total Harmonic Distortion")
+        ax.set_ylim(0, thd_val * (1 + y_margin) if thd_val > 0 else 1.0)
+        ax.text(0, thd_val, f"{thd_val:.4f} %", ha="center", va="bottom")
+        ax.grid(True, axis="y", alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(f"{figures_dir}/Fig_10a_THD_Vs.png", dpi=150)
+        plt.close(fig)
+
+
 
     @staticmethod
     def plot_df_components(df_3_C, df_4_L1, df_5_L2, figures_dir, xlabel, y_margin=0.05):
@@ -422,3 +439,20 @@ class Plotting_functions_class:
         fig19.tight_layout()
         fig19.savefig(f"{figures_dir}/Fig_19_lifetime_consumed.png", dpi=150)
         plt.close(fig19)
+
+        # ---------- Fig_20 : average temperature bar ----------
+        Temp_C = (df_3_C["T_C"].dropna() - 273).mean()
+        Temp_L1 = (df_4_L1["T_inductor_L1"].dropna() - 273).mean()
+        Temp_L2 = (df_5_L2["T_inductor_L2"].dropna() - 273).mean()
+        temps = [Temp_C, Temp_L1, Temp_L2]
+        fig20, ax20 = plt.subplots(figsize=(6.4, 4.8))
+        bars = ax20.bar(["C", "L1", "L2"], temps, color=["tab:green", "tab:blue", "tab:purple"], width=0.5)
+        ax20.set_ylabel("Average temperature [°C]")
+        ax20.set_title("Average temperature per component")
+        ax20.set_ylim(0, max(temps) * (1 + y_margin))
+        for b, v in zip(bars, temps):
+            ax20.text(b.get_x() + b.get_width() / 2, v, f"{v:.2f}", ha="center", va="bottom")
+        ax20.grid(True, axis="y", alpha=0.3)
+        fig20.tight_layout()
+        fig20.savefig(f"{figures_dir}/Fig_20_average_temperature.png", dpi=150)
+        plt.close(fig20)

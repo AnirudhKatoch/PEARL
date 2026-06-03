@@ -48,7 +48,7 @@ class Input_parameters_class:
         # Mission profiles
         # -------------------------#
 
-        self.Profile_size = 365*10                                                # [s] Total duration of the mission profile; each array entry represents one operating point with 1-second resolution
+        self.Profile_size = 365                                               # [s] Total duration of the mission profile; each array entry represents one operating point with 1-second resolution
         self.Vdc_RMS = np.full(self.Profile_size,self.Vdc_rated)               # [V] Mission profile of DC bus voltage sampled at 1-second intervals
         self.M = np.full(self.Profile_size, 1)                         # [-] Mission profile of modulation index sampled at 1-second intervals
         self.Vo = np.full(self.Profile_size, self.Vo_rated)                    # [V] Mission profile of PWM pulse amplitude (instantaneous switched voltage level)
@@ -63,7 +63,8 @@ class Input_parameters_class:
         # Ambient Temperature
         # ----------------------------------------#
 
-        self.T_amb = np.full(self.Profile_size, 273+25)
+        self.T_amb = np.full(self.Profile_size, 273+25) # [K]
+        self.heat_transfer_coefficient = 10             # [W/(m²·K)]
 
         # ----------------------------------------#
         # Time Discretization and Simulation Resolution
@@ -110,12 +111,12 @@ class Input_parameters_class:
             'mu_r': 3000,                   # [-]     relative permeability at 10 kHz. From [A] Fig 12a at 10kHz # Assumed constant for simplicity
 
             # ── Core geometry (scaled 4216L1R-B × 1.55) ──────────────────────────
-            'A_core': 180e-3 * 1.869,    # [m]  Overall width;         outer horizontal dimension;                    from [A] Table 1
-            'B_core': 240e-3 * 1.869,    # [m]  Overall height;        outer vertical dimension;                      from [A] Table 1
-            'D_core': 30e-3 * 1.869,     # [m]  Depth (cast width);    dimension going into the page;                 from [A] Table 1
-            'E_core': 50e-3 * 1.869,     # [m]  Thickness (build);                                                    from [A] Table 1
-            'F_core': 80e-3 * 1.869,     # [m]  Window width;          inner horizontal opening for winding;          from [A] Table 1
-            'G_core': 140e-3 * 1.869,    # [m]  Window height;         inner vertical opening for winding;            from [A] Table 1
+            'A_core': 180e-3 * 1.93,    # [m]  Overall width;         outer horizontal dimension;                    from [A] Table 1
+            'B_core': 240e-3 * 1.93,    # [m]  Overall height;        outer vertical dimension;                      from [A] Table 1
+            'D_core': 30e-3 * 1.93,     # [m]  Depth (cast width);    dimension going into the page;                 from [A] Table 1
+            'E_core': 50e-3 * 1.93,     # [m]  Thickness (build);                                                    from [A] Table 1
+            'F_core': 80e-3 * 1.93,     # [m]  Window width;          inner horizontal opening for winding;          from [A] Table 1
+            'G_core': 140e-3 * 1.93,    # [m]  Window height;         inner vertical opening for winding;            from [A] Table 1
             'kf': 0.82,                 # [-]  Stacking factor;                                                      from [A] Table 2
 
             # ── Winding (Elektrisola Amidester 200 A200 — IEC 60317-8 / NEMA MW 74) ──────
@@ -140,12 +141,15 @@ class Input_parameters_class:
             'mu_0' : 4 * np.pi * 1e-7,  # [H/m]  Permeability of free space (physical constant)
 
             # Inductor series resistance
-            'R1' : 0.05                # [ohm]
+            'R1' : 0.05,                # [ohm]
+
+            'L_max_years' : 30          # [Years] Maximum lifetime possible
         }
 
         # ----------------------------------------#
         # LCL filter grid side [Inductor properties]
         # ----------------------------------------#
+
 
         self.L2_specs = {
 
@@ -166,12 +170,12 @@ class Input_parameters_class:
             'mu_r': 3000,                    # [-]     relative permeability at 10 kHz. From [A] Fig 12a at 10kHz # Assumed constant for simplicity
 
             # ── Core geometry (scaled 4216L1R-B × 1.55) ──────────────────────────
-            'A_core': 180e-3  *  0.7237,  # [m]  Overall width;         outer horizontal dimension;                    from [A] Table 1
-            'B_core': 240e-3 *  0.7237,   # [m]  Overall height;        outer vertical dimension;                      from [A] Table 1
-            'D_core': 30e-3  *  0.7237,   # [m]  Depth (cast width);    dimension going into the page;                 from [A] Table 1
-            'E_core': 50e-3  *  0.7237,   # [m]  Thickness (build);                                                    from [A] Table 1
-            'F_core': 80e-3  *  0.7237,   # [m]  Window width;          inner horizontal opening for winding;          from [A] Table 1
-            'G_core': 140e-3  *  0.7237,  # [m]  Window height;         inner vertical opening for winding;            from [A] Table 1
+            'A_core': 180e-3  *  0.7237375,  # [m]  Overall width;         outer horizontal dimension;                    from [A] Table 1
+            'B_core': 240e-3 *  0.7237375,   # [m]  Overall height;        outer vertical dimension;                      from [A] Table 1
+            'D_core': 30e-3  *  0.7237375,   # [m]  Depth (cast width);    dimension going into the page;                 from [A] Table 1
+            'E_core': 50e-3  *  0.7237375,   # [m]  Thickness (build);                                                    from [A] Table 1
+            'F_core': 80e-3  *  0.7237375,   # [m]  Window width;          inner horizontal opening for winding;          from [A] Table 1
+            'G_core': 140e-3  *  0.7237375,  # [m]  Window height;         inner vertical opening for winding;            from [A] Table 1
             'kf'    : 0.82,    # [-]  Stacking factor;                                                      from [A] Table 2
 
             # ── Winding (Elektrisola Amidester 200 A200 — IEC 60317-8 / NEMA MW 74) ──────
@@ -196,12 +200,15 @@ class Input_parameters_class:
             'mu_0': 4 * np.pi * 1e-7,  # [H/m]  Permeability of free space (physical constant)
 
             # Inductor series resistance
-            'R2': 0.05  # [ohm]
+            'R2': 0.05,  # [ohm]
+
+            'L_max_years' : 30 # [Years]  Maximum lifetime possible
         }
 
         # ----------------------------------------#
         # LCL filter middle [Capacitor properties] and series resistance
         # ----------------------------------------#
+
 
         self.C_specs = {
 
@@ -222,7 +229,7 @@ class Input_parameters_class:
             'Lifetime_Rated': 1e5,            # [hours] Rated lifetime
 
             # Constants
-            'A':8.5,
+            'A':8.5,                
             'n':9.4,
 
             # Thermal
@@ -262,6 +269,65 @@ class Input_parameters_class:
         }
 
 
+        '''
+        self.C_specs = {
+
+            # Product code - B32362A4157J080 # FilterCap MKD AC – Single phase # TDK Electronics
+
+            # Capacitance
+            'C': 150e-6,  # [F]    Capacitance
+
+            # Dimensions
+            'D_case': 85e-3,
+            'H_case': 197e-3,
+
+            # Ratings
+            'I_C_RMS_rated': 50,              # [A]     Rated RMS current
+            'V_C_RMS_Rated': 480,             # [V]     Rated RMS voltage
+            'V_C_Peak_Rated': 680,            # [V]     Rated peak voltage
+            'Temperature_Rated': 273.15 + 70, # [K]     Rated temperature
+            'Lifetime_Rated': 1e5,            # [hours] Rated lifetime
+
+            # Constants
+            'A':8.5,
+            'n':9.4,
+
+            # Thermal
+            'T_C_Rated': 273 + 85,  # [K]    Maximum hotspot temperature
+            'Thermal_resistance_C': None,
+            # [K/W]  Thermal resistance — not given in datasheet; assumed from same company, same dimension (reference product: B32373F5127J030)
+
+            # Loss model
+            'Rs': 1.9e-3,  # [Ohm]  ESR — series resistance of capacitor itself
+            'tan_delta_measured' : 1e-3, # [-]   Total dissipation factor of the capacitor measured at 100 Hz. page 3
+            'f_measured_for_tan_delta':100,  # [Hz] Frequency at which tan_delta_measured was specified page 3
+            'tan_delta_0': None,
+            # [-] Dielectric loss tangent of polypropylene. Derived from datasheet page 3 and page 16:
+            # tan_delta(f) = tan_delta_0 + Rs * omega * C [page 16], tan_delta <= 1.0e-3 at 100 Hz [page 3]
+            # tan_delta_0 = 1e-3 - Rs * 2*pi*100 * C = 1e-3 - 1.9e-3 * 628.3 * 150e-6 = 1e-3 - 1.79e-4 = 8.21e-4
+            # Source: TDK B3236X datasheet page 3 + page 16
+
+            # Lifetime curves — L [hours] vs T [K] at each voltage stress ratio V/V_rated
+            # Source: TDK Electronics datasheet for B32362A4157J080
+            'lifetime_curves': {1.3: {"T": np.array([273 + 85, 273 + 75, 273 + 70, 273 + 65, 273 + 60, 273 + 55, 273 + 50]),
+                                      "L": np.array([0.15 * 1e5, 0.31 * 1e5, 0.5 * 1e5, 0.8 * 1e5, 1e5, 1.6 * 1e5, 2.25 * 1e5])},
+                                1.2: {"T": np.array([273 + 85, 273 + 75, 273 + 70, 273 + 65, 273 + 60, 273 + 55]),
+                                      "L": np.array([0.26 * 1e5, 0.6 * 1e5, 0.85 * 1e5, 1.4 * 1e5, 1.9 * 1e5, 2.5 * 1e5])},
+                                1.1: {"T": np.array([273 + 85, 273 + 75, 273 + 70, 273 + 65]),
+                                      "L": np.array([0.5 * 1e5, 1.1 * 1e5, 1.75 * 1e5, 2.4 * 1e5])},
+                                1.0: {"T": np.array([273 + 85, 273 + 75, 273 + 70]),
+                                      "L": np.array([1e5, 2.1 * 1e5, 3 * 1e5])},
+                                0.9: {"T": np.array([273 + 85, 273 + 80]),
+                                      "L": np.array([2 * 1e5, 2.8 * 1e5])},
+                                0.8: {"T": np.array([273 + 85, 273 + 80]),
+                                      "L": np.array([4.5 * 1e5, 6 * 1e5])}, },
+
+            'Lifetime_calculations':'Analytical', # [-] 'Graphical' or 'Analytical' # 'Graphical' option finds the lifetime graphically and 'Analytical' finds the lifetime of capacitor analytically
+
+            # Damping resistor
+            'R3': 0.010579 # [Ohm]  Series resistance placed in parallel with capacitor for passive damping of LCL resonance (PD-3 method)
+        }
+        '''
 
 
 

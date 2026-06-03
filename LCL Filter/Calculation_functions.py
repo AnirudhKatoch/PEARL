@@ -760,10 +760,12 @@ class Calculation_functions_class:
         return Vs_ref
 
     @staticmethod
-    def compute_THD_I_L2(t, I_L2, Ig_ref, f, dt, resolution_per_cycle, save_path,printing, n_cycles=1, max_harmonic=None, plot=True,):
+    def compute_THD(t, Signal, Signal_ref, f, dt, resolution_per_cycle, save_path, printing, n_cycles=1,
+                    max_harmonic=None,
+                    plot=True, ):
         """
-        Compute the THD of the grid-side current I_L2 over the last n_cycles
-        fundamental periods, and report tracking metrics vs the reference Ig_ref.
+        Compute the THD of the grid-side current Signal over the last n_cycles
+        fundamental periods, and report tracking metrics vs the reference Signal_ref.
 
         The analysis window is selected by integer sample count (not by a
         float-time mask), so every harmonic lands exactly on an FFT bin and
@@ -772,8 +774,8 @@ class Calculation_functions_class:
         Parameters
         ----------
         t : array                  Time vector [s]
-        I_L2 : array               Simulated grid-side current [A]
-        Ig_ref : array             Reference grid current [A]
+        Signal : array               Simulated grid-side current [A]
+        Signal_ref : array             Reference grid current [A]
         f : float                  Fundamental frequency [Hz]
         dt : float                 Simulation time step [s]
         resolution_per_cycle : int Samples per fundamental cycle [-]
@@ -785,41 +787,41 @@ class Calculation_functions_class:
 
         Returns
         -------
-        THD_percent : float        THD of I_L2 [%]
+        THD_percent : float        THD of Signal [%]
         """
 
-        I_L2 = np.asarray(I_L2)
-        Ig_ref = np.asarray(Ig_ref)
+        Signal = np.asarray(Signal)
+        Signal_ref = np.asarray(Signal_ref)
         t = np.asarray(t)
 
         # --- exact-integer-cycle window (last n_cycles periods) ---
         spc = int(round(resolution_per_cycle))  # samples per cycle
         win = n_cycles * spc
-        if win > len(I_L2):
+        if win > len(Signal):
             raise ValueError(
-                f"Window of {win} samples exceeds signal length {len(I_L2)}.")
+                f"Window of {win} samples exceeds signal length {len(Signal)}.")
 
         last = slice(-win, None)
-        I_L2_w = I_L2[last]
-        Ig_ref_w = Ig_ref[last]
+        Signal_w = Signal[last]
+        Signal_ref_w = Signal_ref[last]
         t_w = t[last]
 
         # ── 1. RMS ────────────────────────────────────────────────
-        I_L2_RMS = np.sqrt(np.mean(I_L2_w ** 2))
-        Ig_ref_RMS = np.sqrt(np.mean(Ig_ref_w ** 2))
+        Signal_RMS = np.sqrt(np.mean(Signal_w ** 2))
+        Signal_ref_RMS = np.sqrt(np.mean(Signal_ref_w ** 2))
 
         # ── 2. Tracking error ─────────────────────────────────────
-        error = I_L2_w - Ig_ref_w
+        error = Signal_w - Signal_ref_w
         error_RMS = np.sqrt(np.mean(error ** 2))
         error_peak = np.max(np.abs(error))
-        NRMSE = error_RMS / Ig_ref_RMS * 100
+        NRMSE = error_RMS / Signal_ref_RMS * 100
 
         # ── 3. FFT (DC removed) ───────────────────────────────────
-        N = len(I_L2_w)
+        N = len(Signal_w)
         freqs = np.fft.rfftfreq(N, d=dt)
 
-        fft_L2 = np.fft.rfft(I_L2_w - np.mean(I_L2_w))
-        fft_ref = np.fft.rfft(Ig_ref_w - np.mean(Ig_ref_w))
+        fft_L2 = np.fft.rfft(Signal_w - np.mean(Signal_w))
+        fft_ref = np.fft.rfft(Signal_ref_w - np.mean(Signal_ref_w))
 
         # fundamental sits at bin = n_cycles (n_cycles periods in the window)
         idx_f = n_cycles
@@ -832,7 +834,7 @@ class Calculation_functions_class:
         phase_ref = np.angle(fft_ref[idx_f], deg=True)
         phase_err = (phase_L2 - phase_ref + 180) % 360 - 180  # wrap to ±180
 
-        # ── 4. THD of I_L2 (harmonics 2..max up to Nyquist) ───────
+        # ── 4. THD of Signal (harmonics 2..max up to Nyquist) ───────
         # harmonic h sits exactly on bin h*n_cycles
         nyq_order = (len(fft_L2) - 1) // n_cycles  # highest resolvable order
         top = nyq_order if max_harmonic is None else min(max_harmonic, nyq_order)
@@ -847,8 +849,8 @@ class Calculation_functions_class:
         # ── Print summary (unchanged format) ──────────────────────
         if printing == True:
             print("=" * 46)
-            print(f"  Ig_ref RMS          : {Ig_ref_RMS:>10.4f}  A")
-            print(f"  I_L2   RMS          : {I_L2_RMS:>10.4f}  A")
+            print(f"  Signal_ref RMS          : {Signal_ref_RMS:>10.4f}  A")
+            print(f"  Signal   RMS          : {Signal_RMS:>10.4f}  A")
             print("-" * 46)
             print(f"  Tracking error RMS  : {error_RMS:>10.4f}  A")
             print(f"  Tracking error peak : {error_peak:>10.4f}  A")
@@ -857,23 +859,23 @@ class Calculation_functions_class:
             print(f"  Fundamental amp ref : {amp_ref:>10.4f}  A (RMS)")
             print(f"  Fundamental amp L2  : {amp_L2:>10.4f}  A (RMS)")
             print(f"  Phase ref           : {phase_ref:>10.4f}  deg")
-            print(f"  Phase I_L2          : {phase_L2:>10.4f}  deg")
+            print(f"  Phase Signal          : {phase_L2:>10.4f}  deg")
             print(f"  Phase error         : {phase_err:>10.4f}  deg")
             print("-" * 46)
-            print(f"  THD of I_L2         : {THD_percent:>10.4f}  %")
+            print(f"  THD of Signal         : {THD_percent:>10.4f}  %")
             print("=" * 46)
 
         # ── Plot ──────────────────────────────────────────────────
         if plot:
             fig, axes = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
-            axes[0].plot(t_w, Ig_ref_w, label='Ig_ref', linewidth=1.5)
-            axes[0].plot(t_w, I_L2_w, label='I_L2', linewidth=1.0, linestyle='--')
+            axes[0].plot(t_w, Signal_ref_w, label='Signal_ref', linewidth=1.5)
+            axes[0].plot(t_w, Signal_w, label='Signal', linewidth=1.0, linestyle='--')
             axes[0].set_ylabel("Current [A]")
             axes[0].legend()
             axes[0].set_title("Waveform comparison")
 
             axes[1].plot(t_w, error, color='red', linewidth=1.0,
-                         label='Error (I_L2 − Ig_ref)')
+                         label='Error (Signal − Signal_ref)')
             axes[1].axhline(0, color='k', linewidth=0.5)
             axes[1].set_ylabel("Error [A]")
             axes[1].set_xlabel("Time [s]")
@@ -2278,7 +2280,7 @@ class Calculation_functions_class:
                 f"  (1) Increase N to reduce voltage per turn, or\n")
 
     @staticmethod
-    def calculate_inductor_lifetime(T_operating, T_rated, L_rated, Ea, kb):
+    def calculate_inductor_lifetime(T_operating, T_rated, L_rated, Ea, kb, L_max_years):
 
         """
         Calculate winding insulation lifetime using the Arrhenius thermal aging model.
@@ -2298,6 +2300,8 @@ class Calculation_functions_class:
             Activation energy of insulation degradation [J].
         kb : float
             Boltzmann constant [J/K]
+        L_max_years : float
+            Max Life [years]
 
         Returns
         -------
@@ -2307,6 +2311,7 @@ class Calculation_functions_class:
 
         L = L_rated * np.exp((Ea / kb) * (1 / T_operating - 1 / T_rated))
         L = L / (365 * 24)
+        L = np.minimum(L, L_max_years)  # cap at 30 years
         return L
 
     @staticmethod
@@ -2362,7 +2367,6 @@ class Calculation_functions_class:
         #print(f"Life consumed so far     : {life_consumed_percent:.6e} % out of 100%")
 
         return L_total, life_consumed_percent
-
 
     @staticmethod
     def miners_rule_modified(L_per_second, seconds_per_sample=1.0):
@@ -3022,3 +3026,149 @@ class Calculation_functions_class:
         figures_dir.mkdir(exist_ok=True)
 
         return sim_dir, dataframes_dir, figures_dir
+
+    @staticmethod
+    def distort_Vs_ref(Vs_ref, t, omega, harmonics=None, noise_level=0.0, seed=None):
+        """
+        Inject controllable harmonic distortion into the inverter voltage reference.
+
+        Distorts Vs_ref by adding low-order harmonics (as a fraction of the
+        fundamental amplitude) and/or random noise, so the resulting switched
+        voltage Vs has a higher, controlled THD. Used to study how the LCL filter
+        attenuates voltage distortion into the grid-side current I_L2.
+
+        Parameters
+        ----------
+        Vs_ref : np.ndarray
+            Clean phase-A voltage reference [V] (one fundamental block).
+        t : np.ndarray
+            Time vector [s], same length as Vs_ref.
+        omega : float
+            Fundamental angular frequency [rad/s] (2*pi*f).
+        harmonics : dict, optional
+            Mapping {harmonic_order : relative_amplitude}, where the amplitude is a
+            fraction of the fundamental peak. Example: {5: 0.05, 7: 0.03} adds a 5th
+            harmonic at 5% and a 7th at 3%. In a 3-wire system the 3rd is suppressed
+            by the connection, so 5th/7th/11th/13th are the realistic choices.
+            Default None = no harmonic injection.
+        noise_level : float, optional
+            Std-dev of additive Gaussian noise as a fraction of the fundamental peak.
+            Default 0.0 = no noise.
+        seed : int, optional
+            RNG seed for reproducible noise. Default None.
+
+        Returns
+        -------
+        Vs_ref_distorted : np.ndarray
+            Distorted reference [V], same shape as Vs_ref.
+        """
+        Vs_ref = np.asarray(Vs_ref, dtype=float)
+        t = np.asarray(t, dtype=float)
+        if Vs_ref.shape != t.shape:
+            raise ValueError("Vs_ref and t must have the same shape.")
+
+        # fundamental peak, used as the reference amplitude for relative injection
+        V1_peak = np.sqrt(2.0) * np.sqrt(np.mean(Vs_ref ** 2))
+        if V1_peak == 0:
+            return Vs_ref.copy()
+
+        out = Vs_ref.copy()
+
+        # --- harmonic injection ---
+        if harmonics:
+            for order, rel_amp in harmonics.items():
+                if order <= 1:
+                    raise ValueError(f"Harmonic order must be >= 2, got {order}.")
+                out = out + rel_amp * V1_peak * np.sin(order * omega * t)
+
+        # --- additive noise ---
+        if noise_level > 0.0:
+            rng = np.random.default_rng(seed)
+            out = out + rng.normal(0.0, noise_level * V1_peak, size=out.shape)
+
+        return out
+
+    @staticmethod
+    def compute_THD_Vs(Vs, Vs_ref, resolution_per_cycle, n_cycles=1,
+                       max_harmonic=None, printing=False):
+        """
+        Compute the THD of the switched inverter voltage Vs over the last n_cycles
+        fundamental periods.
+
+        The analysis window is selected by integer sample count, so every harmonic
+        lands exactly on an FFT bin and single-bin extraction is leakage-free.
+        Harmonic content is measured against the fundamental of Vs itself; Vs_ref is
+        used only to report the fundamental tracking amplitude/phase for reference.
+
+        Parameters
+        ----------
+        Vs : array                 Switched inverter voltage [V].
+        Vs_ref : array             Reference (intended) inverter voltage [V].
+        resolution_per_cycle : int Samples per fundamental cycle [-].
+        n_cycles : int, optional   Number of trailing cycles to analyse. Default 1.
+        max_harmonic : int, optional
+            Highest harmonic order included in THD. Default None = up to Nyquist.
+            For baseband distortion studies, cap this (e.g. 50) so the switching
+            harmonics around fsw do not dominate the metric.
+        printing : bool, optional  Print a summary. Default False.
+
+        Returns
+        -------
+        THD_percent : float        THD of Vs [%].
+        """
+
+        Vs = np.asarray(Vs, dtype=float)
+        Vs_ref = np.asarray(Vs_ref, dtype=float)
+
+        # --- exact-integer-cycle window (last n_cycles periods) ---
+        spc = int(round(resolution_per_cycle))  # samples per cycle
+        win = n_cycles * spc
+        if win > len(Vs):
+            raise ValueError(
+                f"Window of {win} samples exceeds signal length {len(Vs)}.")
+
+        last = slice(-win, None)
+        Vs_w = Vs[last]
+        Vs_ref_w = Vs_ref[last]
+
+        # ── RMS ───────────────────────────────────────────────────
+        Vs_RMS = np.sqrt(np.mean(Vs_w ** 2))
+        Vs_ref_RMS = np.sqrt(np.mean(Vs_ref_w ** 2))
+
+        # ── FFT (DC removed) ──────────────────────────────────────
+        N = len(Vs_w)
+        fft_Vs = np.fft.rfft(Vs_w - np.mean(Vs_w))
+        fft_ref = np.fft.rfft(Vs_ref_w - np.mean(Vs_ref_w))
+
+        # fundamental sits at bin = n_cycles (n_cycles periods in the window)
+        idx_f = n_cycles
+
+        # RMS amplitude of fundamental: sqrt(2)|X|/N
+        amp_Vs = np.sqrt(2) * np.abs(fft_Vs[idx_f]) / N
+        amp_ref = np.sqrt(2) * np.abs(fft_ref[idx_f]) / N
+
+        # ── THD of Vs (harmonics 2..max up to Nyquist) ────────────
+        # harmonic h sits exactly on bin h*n_cycles
+        nyq_order = (len(fft_Vs) - 1) // n_cycles
+        top = nyq_order if max_harmonic is None else min(max_harmonic, nyq_order)
+        h_orders = np.arange(2, top + 1)
+        h_bins = h_orders * n_cycles
+
+        P_harmonics = np.sum(np.abs(fft_Vs[h_bins]) ** 2)
+        P_fundamental = np.abs(fft_Vs[idx_f]) ** 2
+        THD = np.sqrt(P_harmonics / P_fundamental)
+        THD_percent = THD * 100
+
+        if printing:
+            print("=" * 46)
+            print(f"  Vs_ref RMS          : {Vs_ref_RMS:>10.4f}  V")
+            print(f"  Vs     RMS          : {Vs_RMS:>10.4f}  V")
+            print("-" * 46)
+            print(f"  Fundamental amp ref : {amp_ref:>10.4f}  V (RMS)")
+            print(f"  Fundamental amp Vs  : {amp_Vs:>10.4f}  V (RMS)")
+            print(f"  Highest order incl. : {top:>10d}")
+            print("-" * 46)
+            print(f"  THD of Vs           : {THD_percent:>10.4f}  %")
+            print("=" * 46)
+
+        return THD_percent
