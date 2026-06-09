@@ -1,0 +1,1 @@
+{'Power_sweep': 100, 'pf_sweep': '0.866025_leads', 'V_L1_RMS': 461.914, 'I_L1_RMS': 847.238, 'V_L2_RMS': 3.208, 'I_L2_RMS': 837.049, 'I_C_RMS': 41.690, 'V_C_RMS': 435.901, 'Vg_RMS': 400.000, 'Vs_RMS': 650.494, 'THD_percent_I_L2': 0.0068, 'PF': 0.864, 'phase_deg': -30.191, 'sense': 'leading'}

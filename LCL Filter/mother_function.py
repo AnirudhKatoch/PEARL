@@ -5,6 +5,8 @@ from LCL_filter_design import LCL_filter_design_function
 from Plotting_function import Plotting_functions_class
 import pandas as pd
 from functools import lru_cache
+import os
+import matplotlib.pyplot as plt
 
 params = Input_parameters_class()
 Calculation_functions = Calculation_functions_class()
@@ -229,9 +231,9 @@ I_C_RMS_harmonics, I_C_RMS, P_total_C, T_C, V_C_RMS,
 V_L1_RMS, I_L1_RMS, P_c_L1, P_w_L1, P_total_L1, T_inductor_L1,
 V_L2_RMS, I_L2_RMS, P_c_L2, P_w_L2, P_total_L2, T_inductor_L2) = (np.concatenate(col) for col in zip(*results))
 
+
 THD_percent_I_L2 = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=I_L2, Signal_ref=Ig_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
 THD_percent_Vs = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=Vs, Signal_ref=Vs_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
-
 
 # ----------------------------------------#
 # LCL filter middle branch [C]
@@ -258,7 +260,7 @@ Lifetime_L1, Lifetime_consumed_L1 = Calculation_functions.miners_rule_modified(L
 Lifetime_L2_series = Calculation_functions.calculate_inductor_lifetime(T_operating = T_inductor_L2, T_rated = L2_specs["T_insulation_rated"], L_rated = L2_specs["L_insulation_rated"], Ea = L2_specs["Ea_insulation"], kb = L2_specs["kb"], L_max_years = L2_specs["L_max_years"])   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
 Lifetime_L2, Lifetime_consumed_L2 = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_L2_series, seconds_per_sample=seconds_per_sample)
 
-
+'''
 def compare_components(C, L1, L2, profile_index=-1, K_to_C=273.15):
     """
     Print a side-by-side comparison of the capacitor (C) and the two inductors (L1, L2).
@@ -389,10 +391,10 @@ C_report = dict(C=C_specs["C"], R_th=C_specs["Thermal_resistance_C"], V_RMS=V_C_
 L1_report = dict(L=L1_specs["L1"], N=N_L1, lg=lg_L1, B_peak=B_peak_L1, B_max=L1_specs["B_max"], Bsat=L1_specs["Bsat"], Ae=Ae_L1, le=le_L1, Ve=Ve_L1, A_surface=A_surface_L1, I_RMS=I_L1_RMS, V_RMS=V_L1_RMS, Rdc=Rdc_L1, N_parallel=N_parallel_wire_L1, A_wire=A_wire_actual_L1, l_turn=l_turn_L1, P_core=P_c_L1, P_winding=P_w_L1, P_total=P_total_L1, R_th=R_th_L1, T=T_inductor_L1, T_rated=L1_specs["T_insulation_rated"], Lifetime=Lifetime_L1, Lifetime_consumed=Lifetime_consumed_L1,)
 L2_report = dict(L=L2_specs["L2"], N=N_L2, lg=lg_L2, B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], Ae=Ae_L2, le=le_L2, Ve=Ve_L2, A_surface=A_surface_L2, I_RMS=I_L2_RMS, V_RMS=V_L2_RMS, Rdc=Rdc_L2, N_parallel=N_parallel_wire_L2, A_wire=A_wire_actual_L2, l_turn=l_turn_L2, P_core=P_c_L2, P_winding=P_w_L2, P_total=P_total_L2, R_th=R_th_L2, T=T_inductor_L2, T_rated=L2_specs["T_insulation_rated"], Lifetime=Lifetime_L2, Lifetime_consumed=Lifetime_consumed_L2, )
 compare_components(C_report, L1_report, L2_report)
+'''
 
-
-blabla = False
-#blabla = True
+#blabla = False
+blabla = True
 
 if blabla == True:
     df_1_power_flow_RMS = pd.DataFrame(

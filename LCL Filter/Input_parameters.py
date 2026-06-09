@@ -53,7 +53,7 @@ class Input_parameters_class:
         self.M = np.full(self.Profile_size, 1)                         # [-] Mission profile of modulation index sampled at 1-second intervals
         self.Vo = np.full(self.Profile_size, self.Vo_rated)                    # [V] Mission profile of PWM pulse amplitude (instantaneous switched voltage level)
         self.Vg_RMS = np.full(self.Profile_size, 400)                  # [V] Mission profile of inverter/grid-side RMS AC voltage sampled at 1-second intervals
-        self.S_RMS = np.full(self.Profile_size,1e6)                    # [VA] Mission profile of apparent power sampled at 1-second intervals
+        self.S_RMS = np.full(self.Profile_size,1e6)                       # [VA] Mission profile of apparent power sampled at 1-second intervals
         self.pf = np.full(self.Profile_size,1)                         # [-] Mission profile of power factor; negative = inductive operation, positive = capacitive operation
         self.P_RMS = self.S_RMS * self.pf                                      # [W] Mission profile of active power computed from apparent power and power factor
         self.Q_RMS = self.S_RMS * np.sqrt(1 - self.pf ** 2) * np.sign(self.pf) # [Var] Mission profile of reactive power computed from apparent power and power factor sign
@@ -70,7 +70,7 @@ class Input_parameters_class:
         # Time Discretization and Simulation Resolution
         # ----------------------------------------#
 
-        self.resolution_per_cycle = 1000                        # [-] Number of discrete simulation samples used to represent one fundamental AC cycle; higher values improve waveform fidelity but increase computational cost, This value is also very important for calculation actual value of Vs_ref
+        self.resolution_per_cycle = 2000                        # [-] Number of discrete simulation samples used to represent one fundamental AC cycle; higher values improve waveform fidelity but increase computational cost, This value is also very important for calculation actual value of Vs_ref
         self.dt = self.T / self.resolution_per_cycle            # [s] Simulation time-step size derived from resolution_per_cycle
         self.samples_per_switching_period = self.Tsw / self.dt  # [-] Number of simulation samples contained within one PWM switching period; determines PWM waveform resolution accuracy
         self.Minimum_required_samples_per_switching_period = 5  # [-] Minimum acceptable PWM numerical resolution required to accurately capture switching events and carrier intersections
@@ -80,13 +80,13 @@ class Input_parameters_class:
         # LCL filter design parameters
         # ----------------------------------------#
 
-        self.Vg_ll_RMS = 690                                        # [V] RMS of fundamental line-to-line grid voltage
-        self.S_rated = 1e6                                          # [VA] Rated apparent Inverter  power
+        self.Vg_ll_RMS = 690                                            # [V] RMS of fundamental line-to-line grid voltage
+        self.S_rated = 1e6                                              # [VA] Rated apparent Inverter  power
         self.I_rated_RMS = self.S_rated / (np.sqrt(3) * self.Vg_ll_RMS) # [A] Rated Inverter  current
         self.I_rated_peak = np.sqrt(2) * self.I_rated_RMS               # [A] Peak current
-        self.current_ripple_limit = 0.30                            # [-] Current ripple is usually limited to 20%–30% of rated current.Here 30% is used.
-        self.delta = 0.19                                           # [-] 20% initial harmonic attenuation ratio recommended for LCL filter design
-        self.omega_sw = 2 * np.pi * self.fsw                        # [rad/s] Switching angular frequency
+        self.current_ripple_limit = 0.30                                # [-] Current ripple is usually limited to 20%–30% of rated current.Here 30% is used.
+        self.delta = 0.19                                               # [-] 20% initial harmonic attenuation ratio recommended for LCL filter design
+        self.omega_sw = 2 * np.pi * self.fsw                            # [rad/s] Switching angular frequency
 
         # ----------------------------------------#
         # LCL filter inverter side [Inductor properties]

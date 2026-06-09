@@ -1,0 +1,405 @@
+Plecs {
+  Name          "buck_converter_2"
+  Version       "4.3"
+  CircuitModel  "ContStateSpace"
+  StartTime     "0.0"
+  StopTime      "1.0"
+  Timeout       ""
+  Solver        "dopri"
+  MaxStep       "1e-3"
+  InitStep      "-1"
+  FixedStep     "1e-3"
+  Refine        "1"
+  ZCStepSize    "1e-9"
+  RelTol        "1e-3"
+  AbsTol        "-1"
+  TurnOnThreshold "0"
+  SyncFixedStepTasks "2"
+  UseSingleCommonBaseRate "2"
+  LossVariableLimitExceededMsg "3"
+  NegativeSwitchLossMsg "3"
+  DivisionByZeroMsg "3"
+  StiffnessDetectionMsg "2"
+  MaxConsecutiveZCs "1000"
+  AlgebraicLoopWithStateMachineMsg "3"
+  AssertionAction "1"
+  InitializationCommands ""
+  InitialState  "1"
+  SystemState   ""
+  CodeGenParameterInlining "2"
+  CodeGenInliningExceptions "AAAACwAAAAAA"
+  CodeGenFloatingPointFormat "2"
+  CodeGenAbsTimeUsageMsg "3"
+  CodeGenBaseName ""
+  CodeGenOutputDir ""
+  CodeGenExtraOpts ""
+  CodeGenTarget "Generic"
+  CodeGenTargetSettings ""
+  ExtendedMatrixPrecision "1"
+  MatrixSignificanceCheck "2"
+  EnableStateSpaceSplitting "2"
+  DisplayStateSpaceSplitting "1"
+  DiscretizationMethod "2"
+  ExternalModeSettings ""
+  AlgebraicLoopMethod "1"
+  AlgebraicLoopTolerance "1e-6"
+  ScriptsDialogGeometry ""
+  ScriptsDialogSplitterPos "0"
+  Schematic {
+    Location      [257, 45; 705, 280]
+    ZoomFactor    1
+    SliderPosition [0, 0]
+    ShowBrowser   off
+    BrowserWidth  100
+    Component {
+      Type          Subsystem
+      Name          "Circuit"
+      Show          on
+      Position      [225, 110]
+      Direction     up
+      Flipped       off
+      Frame         [-35, -30; 35, 30]
+      LabelPosition [0, 33]
+      LabelAlign    up
+      SampleTime    "-1"
+      CodeGenTarget "Generic"
+      MaskIconFrame on
+      MaskIconOpaque off
+      MaskIconRotates on
+      Terminal {
+        Type          Input
+        Position      [-35, 15]
+        Direction     left
+      }
+      Terminal {
+        Type          Input
+        Position      [-35, -15]
+        Direction     left
+      }
+      Terminal {
+        Type          Output
+        Position      [39, -15]
+        Direction     right
+      }
+      Terminal {
+        Type          Output
+        Position      [39, 15]
+        Direction     right
+      }
+      Schematic {
+        Location      [257, 328; 750, 563]
+        ZoomFactor    1
+        SliderPosition [0, 0]
+        ShowBrowser   off
+        BrowserWidth  100
+        Component {
+          Type          Diode
+          Name          "D1"
+          Show          off
+          Position      [200, 135]
+          Direction     down
+          Flipped       off
+          Parameter {
+            Variable      "Vf"
+            Value         "0"
+            Show          off
+          }
+          Parameter {
+            Variable      "Ron"
+            Value         "0"
+            Show          off
+          }
+          Parameter {
+            Variable      "thermal"
+            Value         ""
+            Show          off
+          }
+          Parameter {
+            Variable      "T_init"
+            Value         "0"
+            Show          off
+          }
+        }
+        Component {
+          Type          Inductor
+          Name          "L"
+          Show          off
+          Position      [245, 90]
+          Direction     left
+          Flipped       off
+          Parameter {
+            Variable      "L"
+            Value         "25e-3"
+            Show          on
+          }
+          Parameter {
+            Variable      "i_init"
+            Value         "0"
+            Show          off
+          }
+        }
+        Component {
+          Type          Capacitor
+          Name          "C"
+          Show          off
+          Position      [290, 135]
+          Direction     down
+          Flipped       on
+          Parameter {
+            Variable      "C"
+            Value         "200e-6"
+            Show          on
+          }
+          Parameter {
+            Variable      "v_init"
+            Value         "0"
+            Show          off
+          }
+        }
+        Component {
+          Type          Resistor
+          Name          "R"
+          Show          off
+          Position      [340, 135]
+          Direction     up
+          Flipped       off
+          Parameter {
+            Variable      "R"
+            Value         "2"
+            Show          on
+          }
+        }
+        Component {
+          Type          Voltmeter
+          Name          "Vm1"
+          Show          off
+          Position      [390, 135]
+          Direction     up
+          Flipped       off
+        }
+        Component {
+          Type          Ammeter
+          Name          "Am1"
+          Show          off
+          Position      [165, 90]
+          Direction     left
+          Flipped       off
+        }
+        Component {
+          Type          Switch
+          Name          "S1"
+          Show          on
+          Position      [120, 90]
+          Direction     left
+          Flipped       off
+          Parameter {
+            Variable      "s_init"
+            Value         "0"
+            Show          off
+          }
+        }
+        Component {
+          Type          Input
+          Name          "gate"
+          Show          on
+          Position      [90, 45]
+          Direction     right
+          Flipped       off
+          Parameter {
+            Variable      "Index"
+            Value         "1"
+            Show          on
+          }
+          Parameter {
+            Variable      "Width"
+            Value         "-1"
+            Show          off
+          }
+        }
+        Component {
+          Type          Input
+          Name          "V_src"
+          Show          on
+          Position      [35, 135]
+          Direction     right
+          Flipped       off
+          Parameter {
+            Variable      "Index"
+            Value         "2"
+            Show          on
+          }
+          Parameter {
+            Variable      "Width"
+            Value         "-1"
+            Show          off
+          }
+        }
+        Component {
+          Type          Output
+          Name          "i_src"
+          Show          on
+          Position      [205, 45]
+          Direction     right
+          Flipped       off
+          Parameter {
+            Variable      "Index"
+            Value         "3"
+            Show          on
+          }
+          Parameter {
+            Variable      "Width"
+            Value         "-1"
+            Show          off
+          }
+        }
+        Component {
+          Type          Output
+          Name          "v_load"
+          Show          on
+          Position      [440, 135]
+          Direction     right
+          Flipped       off
+          Parameter {
+            Variable      "Index"
+            Value         "4"
+            Show          on
+          }
+          Parameter {
+            Variable      "Width"
+            Value         "-1"
+            Show          off
+          }
+        }
+        Component {
+          Type          VoltageSource
+          Name          "V_input"
+          Show          on
+          Position      [85, 135]
+          Direction     down
+          Flipped       on
+          Parameter {
+            Variable      "DiscretizationBehavior"
+            Value         "2"
+            Show          off
+          }
+          Parameter {
+            Variable      "StateSpaceInlining"
+            Value         "1"
+            Show          off
+          }
+        }
+        Connection {
+          Type          Wire
+          SrcComponent  "S1"
+          SrcTerminal   1
+          Points        [85, 90]
+          DstComponent  "V_input"
+          DstTerminal   1
+        }
+        Connection {
+          Type          Wire
+          SrcComponent  "V_input"
+          SrcTerminal   2
+          Points        [85, 180; 200, 180]
+          Branch {
+            Points        [290, 180]
+            Branch {
+              DstComponent  "C"
+              DstTerminal   2
+            }
+            Branch {
+              Points        [340, 180]
+              Branch {
+                DstComponent  "R"
+                DstTerminal   2
+              }
+              Branch {
+                Points        [390, 180]
+                DstComponent  "Vm1"
+                DstTerminal   2
+              }
+            }
+          }
+          Branch {
+            DstComponent  "D1"
+            DstTerminal   1
+          }
+        }
+        Connection {
+          Type          Wire
+          SrcComponent  "L"
+          SrcTerminal   2
+          Points        [290, 90]
+          Branch {
+            Points        [340, 90]
+            Branch {
+              DstComponent  "R"
+              DstTerminal   1
+            }
+            Branch {
+              Points        [390, 90]
+              DstComponent  "Vm1"
+              DstTerminal   1
+            }
+          }
+          Branch {
+            DstComponent  "C"
+            DstTerminal   1
+          }
+        }
+        Connection {
+          Type          Wire
+          SrcComponent  "Am1"
+          SrcTerminal   1
+          DstComponent  "S1"
+          DstTerminal   2
+        }
+        Connection {
+          Type          Signal
+          SrcComponent  "gate"
+          SrcTerminal   1
+          Points        [120, 45]
+          DstComponent  "S1"
+          DstTerminal   3
+        }
+        Connection {
+          Type          Signal
+          SrcComponent  "V_src"
+          SrcTerminal   1
+          DstComponent  "V_input"
+          DstTerminal   3
+        }
+        Connection {
+          Type          Signal
+          SrcComponent  "Am1"
+          SrcTerminal   3
+          Points        [165, 45]
+          DstComponent  "i_src"
+          DstTerminal   1
+        }
+        Connection {
+          Type          Signal
+          SrcComponent  "Vm1"
+          SrcTerminal   3
+          DstComponent  "v_load"
+          DstTerminal   1
+        }
+        Connection {
+          Type          Wire
+          SrcComponent  "L"
+          SrcTerminal   1
+          Points        [200, 90]
+          Branch {
+            DstComponent  "D1"
+            DstTerminal   2
+          }
+          Branch {
+            DstComponent  "Am1"
+            DstTerminal   2
+          }
+        }
+      }
+    }
+  }
+}
+DemoSignature "ES/zw87zlrEeSrHOxmtDFCzcPqAXEYKhz3GMvHgKkcU="

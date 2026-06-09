@@ -1,0 +1,1 @@
+put in in doctironary format11:18 AMClaude responded: {'Powersweep': 50, 'pfsweep': '1.{'Power_sweep': 50, 'pf_sweep': '1.0', 'V_L1_RMS': 459.371, 'I_L1_RMS': 420.671, 'V_L2_RMS': 2.710, 'I_L2_RMS': 418.919, 'I_C_RMS': 40.570, 'V_C_RMS': 420.945, 'Vg_RMS': 400.000, 'Vs_RMS': 635.543, 'THD_percent_I_L2': 0.0127, 'PF': 1.000, 'phase_deg': -0.522, 'sense': 'unity'}

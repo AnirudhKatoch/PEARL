@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+from matplotlib.ticker import MultipleLocator
 
 plt.rcParams.update({"font.size": 15, "font.family": "Times New Roman", "axes.labelsize": 15, "axes.titlesize": 15,"xtick.labelsize": 15, "ytick.labelsize": 15, "legend.fontsize": 15})
 
@@ -105,6 +105,7 @@ class Plotting_functions_class:
         """
 
         xlabel = "Time [s]"
+        f = 50 # grid frequency
 
         df = df_2_power_flow_inst
         last = slice(-resolution_per_cycle, None)
@@ -113,8 +114,11 @@ class Plotting_functions_class:
         if t is not None:
             x = np.asarray(t)[last]
         else:
-            x = np.arange(resolution_per_cycle)
-        x_range = (x[0], x[-1])
+            # build real-time axis: one fundamental cycle = resolution_per_cycle samples
+            dt = (1.0 / f) / resolution_per_cycle
+            x = np.arange(resolution_per_cycle) * dt
+        x_range = (x[0], x[-1]+dt)
+        x_tick = (x_range[1] - x_range[0]) / 4.0  # 0.02 s span → ticks every 0.005 s
 
         def ylim_from(*series):
             lo = min(np.min(s) for s in series)
@@ -150,6 +154,7 @@ class Plotting_functions_class:
             axb.grid(True, alpha=0.3)
 
             axb.set_xlim(x_range)
+            axb.xaxis.set_major_locator(MultipleLocator(x_tick))  # in stacked
             fig.tight_layout()
             fig.savefig(f"{figures_dir}/{fname}.png", dpi=150)
             plt.close(fig)
@@ -163,6 +168,7 @@ class Plotting_functions_class:
             ax.set_ylabel(ylabel)
             ax.set_title(title)
             ax.set_xlim(x_range)
+            ax.xaxis.set_major_locator(MultipleLocator(x_tick))  # in single
             ax.set_ylim(ylim_from(y))
             ax.legend()
             ax.grid(True, alpha=0.3)

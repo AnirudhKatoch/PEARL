@@ -1,0 +1,1 @@
+{'Powersweep': 100, 'pfsweep': '0.{'Power_sweep': 100, 'pf_sweep': '0.5_lags', 'V_L1_RMS': 463.071, 'I_L1_RMS': 816.018, 'V_L2_RMS': 3.269, 'I_L2_RMS': 831.668, 'I_C_RMS': 41.856, 'V_C_RMS': 423.916, 'Vg_RMS': 400.000, 'Vs_RMS': 659.158, 'THD_percent_I_L2': 0.0071, 'PF': 0.505, 'phase_deg': 59.697, 'sense': 'lagging'}
