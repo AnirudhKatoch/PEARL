@@ -420,7 +420,6 @@ class Calculation_functions_class:
             
         return V_L1, I_L1, V_C, I_C, V_L2, I_L2
 
-
     @staticmethod
     def validate_grid_phase_voltage_matches_line_to_line_voltage(Vg_RMS, Vg_ll_RMS, tolerance_percent=1.0):
         """
@@ -760,9 +759,7 @@ class Calculation_functions_class:
         return Vs_ref
 
     @staticmethod
-    def compute_THD(t, Signal, Signal_ref, f, dt, resolution_per_cycle, save_path, printing, n_cycles=1,
-                    max_harmonic=None,
-                    plot=True, ):
+    def compute_THD(t, Signal, Signal_ref, f, dt, resolution_per_cycle, save_path, printing, n_cycles=1,max_harmonic=None,plot=True, ):
         """
         Compute the THD of the grid-side current Signal over the last n_cycles
         fundamental periods, and report tracking metrics vs the reference Signal_ref.
@@ -2315,60 +2312,6 @@ class Calculation_functions_class:
         return L
 
     @staticmethod
-    def miners_rule(L_per_second):
-        """
-        Apply Miner's cumulative damage rule to compute expected total lifetime
-        and the fraction of life consumed by one mission profile cycle.
-
-        Miner's rule states that failure occurs when cumulative damage D = 1:
-            D = sum( dt_i / L_i )
-        where dt_i is the time spent at condition i and L_i is the lifetime
-        at that condition. The expected total lifetime is then:
-            L_total = Profile_duration / D_cycle
-
-        Reference
-        ---------
-        Miner, M.A., "Cumulative damage in fatigue",
-        Journal of Applied Mechanics, 1945.
-        IEC 60216-1: Electrical insulating materials — Thermal endurance properties.
-
-        Parameters
-        ----------
-        L_per_second : np.ndarray, shape (Profile_size,)
-            Predicted insulation lifetime [years] at each second of the mission
-            profile, computed from the Arrhenius thermal aging model.
-            L_per_second[i] = lifetime [years] if the inductor operated forever
-            at the temperature of second i.
-
-        Returns
-        -------
-        L_total : float
-            Total predicted insulation lifetime [years].
-            Defined as the time until cumulative damage D reaches 1.0.
-            Computed by repeating the mission profile until failure:
-                L_total = Profile_duration / D_cycle
-
-        life_consumed_percent : float
-            Fraction of total insulation life consumed by ONE complete run
-            of the mission profile [%].
-            Range: 0% to 100%. Failure occurs when cumulative total reaches 100%.
-            life_consumed_percent = (Profile_duration / L_total) * 100
-        """
-
-        dt_profile_years = 1 / (365 * 24 * 3600)  # [years] duration of one second
-        d_i = dt_profile_years / L_per_second  # [-]     fractional damage per second
-        D_cycle = np.sum(d_i)  # [-]     total fractional damage per profile cycle
-        Profile_duration = len(L_per_second) * dt_profile_years  # [years] total duration of mission profile
-        L_total = Profile_duration / D_cycle  # [years] total predicted lifetime
-
-        life_consumed_percent = D_cycle * 100  # [%]     life consumed by one profile cycle
-
-        #print(f"Total predicted lifetime : {L_total:.4f} years")
-        #print(f"Life consumed so far     : {life_consumed_percent:.6e} % out of 100%")
-
-        return L_total, life_consumed_percent
-
-    @staticmethod
     def miners_rule_modified(L_per_second, seconds_per_sample=1.0):
         """
         Apply Miner's cumulative damage rule to compute expected total lifetime
@@ -3089,8 +3032,7 @@ class Calculation_functions_class:
         return out
 
     @staticmethod
-    def compute_THD_Vs(Vs, Vs_ref, resolution_per_cycle, n_cycles=1,
-                       max_harmonic=None, printing=False):
+    def compute_THD_Vs(Vs, Vs_ref, resolution_per_cycle, n_cycles=1, max_harmonic=None, printing=False):
         """
         Compute the THD of the switched inverter voltage Vs over the last n_cycles
         fundamental periods.
@@ -3172,3 +3114,133 @@ class Calculation_functions_class:
             print("=" * 46)
 
         return THD_percent
+
+    @staticmethod
+    def compare_components(C, L1, L2, profile_index=-1, K_to_C=273.15):
+        """
+        Print a side-by-side comparison of the capacitor (C) and the two inductors (L1, L2).
+
+        Each argument is a dict of already-computed results. Values may be scalars or
+        per-second arrays; arrays are reduced to the second given by `profile_index`
+        (default -1 = last second of the mission profile).
+
+        Expected keys
+        -------------
+        C  : C, R_th, V_RMS, V_RMS_rated, I_RMS, P_total, T, T_rated, Lifetime
+        L1 / L2 : L, N, lg, B_peak, B_max, Bsat, Ae, le, Ve, A_surface,
+                  I_RMS, V_RMS, Rdc, N_parallel, A_wire, l_turn,
+                  P_core, P_winding, P_total, R_th, T, T_rated,
+                  Lifetime, Lifetime_consumed
+
+        Missing keys print as a dash, so the function still works on partially-filled dicts.
+        """
+
+        LBL, UNT, COL, RAT = 24, 8, 15, 10
+        line = "-" * (LBL + UNT + 2 * COL + RAT)
+
+        def _val(x, profile_index=-1):
+            if x is None:
+                return None
+            arr = np.atleast_1d(x)
+            if arr.size == 1:
+                return float(arr[0])
+            return float(arr[profile_index])
+
+        def v(d, key):
+            return _val(d.get(key), profile_index)
+
+        def row(label, unit, a, b, scale=1.0, offset=0.0, nfmt="{:.4f}", ratio=False):
+            s1 = nfmt.format(a * scale + offset) if a is not None else "-"
+            s2 = nfmt.format(b * scale + offset) if b is not None else "-"
+            if ratio and a not in (None, 0) and b not in (None, 0):
+                rr = "{:.2f}".format(a / b)
+            else:
+                rr = ""
+            print(f"{label:<{LBL}}{unit:<{UNT}}{s1:>{COL}}{s2:>{COL}}{rr:>{RAT}}")
+
+        # ------------------------------------------------------------------ #
+        # Header
+        # ------------------------------------------------------------------ #
+        print("=" * len(line))
+        print(f"COMPONENT COMPARISON   (mission-profile second index = {profile_index})")
+        print("=" * len(line))
+
+        # ------------------------------------------------------------------ #
+        # Capacitor (standalone block)
+        # ------------------------------------------------------------------ #
+        print("\nCAPACITOR")
+        print(line)
+        C_C = v(C, "C")
+        vrms, vrated = v(C, "V_RMS"), v(C, "V_RMS_rated")
+        tc, trated = v(C, "T"), v(C, "T_rated")
+        print(f"  Capacitance        : {C_C * 1e6:.4f} µF" if C_C is not None else "  Capacitance        : -")
+        if v(C, "R_th") is not None:
+            print(f"  Thermal resistance : {v(C, 'R_th'):.4f} K/W")
+        if vrms is not None:
+            ratio_txt = f"   (rated {vrated:.0f} V, ratio {vrms / vrated:.2f})" if vrated else ""
+            print(f"  V_RMS              : {vrms:.2f} V{ratio_txt}")
+        if v(C, "I_RMS") is not None:
+            print(f"  I_RMS              : {v(C, 'I_RMS'):.2f} A")
+        if v(C, "P_total") is not None:
+            print(f"  P_total            : {v(C, 'P_total'):.4f} W")
+        if tc is not None:
+            margin = f"   (rated {trated - K_to_C:.0f} °C)" if trated else ""
+            print(f"  T_hotspot          : {tc - K_to_C:.2f} °C{margin}")
+        if v(C, "Lifetime") is not None:
+            print(f"  Lifetime           : {v(C, 'Lifetime'):.2f} years")
+        if v(C, "Lifetime_consumed_C") is not None:
+            print(f"  Lifetime consumed  : {v(C, 'Lifetime_consumed_C'):.2f} %")
+
+        # ------------------------------------------------------------------ #
+        # Inductors L1 vs L2 (aligned columns)
+        # ------------------------------------------------------------------ #
+        print("\nINDUCTORS  —  L1 (inverter side)  vs  L2 (grid side)")
+        print(line)
+        print(f"{'Quantity':<{LBL}}{'Unit':<{UNT}}{'L1':>{COL}}{'L2':>{COL}}{'L1/L2':>{RAT}}")
+        print(line)
+
+        print("[ Core geometry ]")
+        row("Inductance", "[µH]", v(L1, "L"), v(L2, "L"), scale=1e6, nfmt="{:.3f}", ratio=True)
+        row("Turns N", "[-]", v(L1, "N"), v(L2, "N"), nfmt="{:.0f}", ratio=True)
+        row("Air gap", "[mm]", v(L1, "lg"), v(L2, "lg"), scale=1e3, nfmt="{:.3f}", ratio=True)
+        row("B_peak", "[T]", v(L1, "B_peak"), v(L2, "B_peak"), nfmt="{:.4f}", ratio=True)
+        # B_peak / Bsat as a percentage
+        bp1 = v(L1, "B_peak");
+        bs1 = v(L1, "Bsat")
+        bp2 = v(L2, "B_peak");
+        bs2 = v(L2, "Bsat")
+        pct1 = (bp1 / bs1) if (bp1 is not None and bs1) else None
+        pct2 = (bp2 / bs2) if (bp2 is not None and bs2) else None
+        row("B_peak / Bsat", "[%]", pct1, pct2, scale=100.0, nfmt="{:.2f}")
+        row("Ae (eff. area)", "[mm²]", v(L1, "Ae"), v(L2, "Ae"), scale=1e6, nfmt="{:.2f}", ratio=True)
+        row("le (path len)", "[mm]", v(L1, "le"), v(L2, "le"), scale=1e3, nfmt="{:.2f}", ratio=True)
+        row("Ve (volume)", "[cm³]", v(L1, "Ve"), v(L2, "Ve"), scale=1e6, nfmt="{:.2f}", ratio=True)
+        row("A_surface", "[cm²]", v(L1, "A_surface"), v(L2, "A_surface"), scale=1e4, nfmt="{:.2f}", ratio=True)
+
+        print("[ Winding ]")
+        row("I_RMS", "[A]", v(L1, "I_RMS"), v(L2, "I_RMS"), nfmt="{:.2f}", ratio=True)
+        row("V_RMS", "[V]", v(L1, "V_RMS"), v(L2, "V_RMS"), nfmt="{:.4f}", ratio=True)
+        row("Rdc", "[mΩ]", v(L1, "Rdc"), v(L2, "Rdc"), scale=1e3, nfmt="{:.4f}", ratio=True)
+        row("Parallel strands", "[-]", v(L1, "N_parallel"), v(L2, "N_parallel"), nfmt="{:.0f}", ratio=True)
+        row("A_wire actual", "[mm²]", v(L1, "A_wire"), v(L2, "A_wire"), scale=1e6, nfmt="{:.2f}", ratio=True)
+        row("Mean turn len", "[mm]", v(L1, "l_turn"), v(L2, "l_turn"), scale=1e3, nfmt="{:.2f}", ratio=True)
+
+        print("[ Power losses ]")
+        row("Core loss  P_c", "[W]", v(L1, "P_core"), v(L2, "P_core"), nfmt="{:.4f}", ratio=True)
+        row("Winding loss P_w", "[W]", v(L1, "P_winding"), v(L2, "P_winding"), nfmt="{:.4f}", ratio=True)
+        row("Total loss P_tot", "[W]", v(L1, "P_total"), v(L2, "P_total"), nfmt="{:.4f}", ratio=True)
+
+        print("[ Thermal ]")
+        row("Thermal R_th", "[K/W]", v(L1, "R_th"), v(L2, "R_th"), nfmt="{:.4f}", ratio=True)
+        row("Temperature", "[°C]", v(L1, "T"), v(L2, "T"), offset=-K_to_C, nfmt="{:.2f}")
+        row("Rated temp", "[°C]", v(L1, "T_rated"), v(L2, "T_rated"), offset=-K_to_C, nfmt="{:.2f}")
+        # Margin = T_rated - T_operating
+        m1 = (v(L1, "T_rated") - v(L1, "T")) if (v(L1, "T_rated") is not None and v(L1, "T") is not None) else None
+        m2 = (v(L2, "T_rated") - v(L2, "T")) if (v(L2, "T_rated") is not None and v(L2, "T") is not None) else None
+        row("Margin below rated", "[K]", m1, m2, nfmt="{:.2f}")
+
+        print("[ Lifetime ]")
+        row("Lifetime", "[yr]", v(L1, "Lifetime"), v(L2, "Lifetime"), nfmt="{:.4f}", ratio=True)
+        row("Lifetime consumed", "[%]", v(L1, "Lifetime_consumed"), v(L2, "Lifetime_consumed"))
+
+        print("=" * len(line))

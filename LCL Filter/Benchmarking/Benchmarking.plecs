@@ -71,7 +71,7 @@ Plecs {
   InvalidNetlistFunctionEvaluationMsg "1"
   IncompatibleInitialConditionMsg "2"
   Schematic {
-    Location      [293, 148; 1619, 1008]
+    Location      [295, 73; 1621, 931]
     ZoomFactor    1.49863
     SliderPosition [0, 0]
     ShowBrowser   off
@@ -80,7 +80,7 @@ Plecs {
       Type          Capacitor
       Name          "C1"
       Show          on
-      Position      [315, 150]
+      Position      [295, 160]
       Direction     down
       Flipped       on
       LabelPosition west
@@ -99,7 +99,7 @@ Plecs {
       Type          Inductor
       Name          "L1"
       Show          on
-      Position      [215, 60]
+      Position      [195, 70]
       Direction     left
       Flipped       off
       LabelPosition north
@@ -118,7 +118,7 @@ Plecs {
       Type          Inductor
       Name          "L2"
       Show          on
-      Position      [400, 60]
+      Position      [380, 70]
       Direction     left
       Flipped       off
       LabelPosition north
@@ -137,7 +137,7 @@ Plecs {
       Type          Resistor
       Name          "R2"
       Show          on
-      Position      [450, 60]
+      Position      [430, 70]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -151,7 +151,7 @@ Plecs {
       Type          Resistor
       Name          "R1"
       Show          on
-      Position      [170, 60]
+      Position      [150, 70]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -165,7 +165,7 @@ Plecs {
       Type          Resistor
       Name          "R3"
       Show          on
-      Position      [315, 195]
+      Position      [295, 205]
       Direction     down
       Flipped       off
       LabelPosition west
@@ -179,7 +179,7 @@ Plecs {
       Type          Ammeter
       Name          "IL_1"
       Show          on
-      Position      [270, 60]
+      Position      [250, 70]
       Direction     left
       Flipped       off
       LabelPosition south
@@ -188,7 +188,7 @@ Plecs {
       Type          Ammeter
       Name          "IL_2"
       Show          on
-      Position      [350, 60]
+      Position      [330, 70]
       Direction     left
       Flipped       off
       LabelPosition south
@@ -197,7 +197,7 @@ Plecs {
       Type          Ammeter
       Name          "IC"
       Show          on
-      Position      [315, 100]
+      Position      [295, 110]
       Direction     up
       Flipped       off
       LabelPosition west
@@ -206,7 +206,7 @@ Plecs {
       Type          Voltmeter
       Name          "VC"
       Show          on
-      Position      [360, 150]
+      Position      [340, 160]
       Direction     up
       Flipped       off
       LabelPosition west
@@ -215,7 +215,7 @@ Plecs {
       Type          Voltmeter
       Name          "VL_1"
       Show          on
-      Position      [215, 100]
+      Position      [195, 110]
       Direction     right
       Flipped       off
       LabelPosition north
@@ -224,7 +224,7 @@ Plecs {
       Type          Voltmeter
       Name          "VL_2"
       Show          on
-      Position      [400, 100]
+      Position      [380, 110]
       Direction     right
       Flipped       off
       LabelPosition north
@@ -233,7 +233,7 @@ Plecs {
       Type          Voltmeter
       Name          "Vg"
       Show          on
-      Position      [525, 150]
+      Position      [505, 160]
       Direction     up
       Flipped       off
       LabelPosition west
@@ -242,7 +242,7 @@ Plecs {
       Type          Voltmeter
       Name          "Vs"
       Show          on
-      Position      [100, 175]
+      Position      [80, 185]
       Direction     down
       Flipped       on
       LabelPosition east
@@ -251,7 +251,7 @@ Plecs {
       Type          Goto
       Name          "Goto"
       Show          off
-      Position      [65, 175]
+      Position      [45, 185]
       Direction     left
       Flipped       off
       LabelPosition north
@@ -321,7 +321,7 @@ Plecs {
       Type          Goto
       Name          "Goto1"
       Show          off
-      Position      [215, 130]
+      Position      [195, 140]
       Direction     down
       Flipped       off
       LabelPosition west
@@ -356,7 +356,7 @@ Plecs {
       Type          Goto
       Name          "Goto2"
       Show          off
-      Position      [435, 135]
+      Position      [415, 145]
       Direction     down
       Flipped       off
       LabelPosition west
@@ -391,7 +391,7 @@ Plecs {
       Type          Goto
       Name          "Goto3"
       Show          off
-      Position      [350, 100]
+      Position      [330, 110]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -426,7 +426,7 @@ Plecs {
       Type          Goto
       Name          "Goto4"
       Show          off
-      Position      [350, 25]
+      Position      [330, 35]
       Direction     up
       Flipped       off
       LabelPosition east
@@ -461,7 +461,7 @@ Plecs {
       Type          Goto
       Name          "Goto5"
       Show          off
-      Position      [270, 25]
+      Position      [250, 35]
       Direction     up
       Flipped       off
       LabelPosition east
@@ -496,7 +496,7 @@ Plecs {
       Type          Goto
       Name          "Goto6"
       Show          off
-      Position      [555, 150]
+      Position      [535, 160]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -531,7 +531,7 @@ Plecs {
       Type          Goto
       Name          "Goto7"
       Show          off
-      Position      [390, 150]
+      Position      [370, 160]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -1948,7 +1948,7 @@ Plecs {
       Type          VoltageSource
       Name          "V1"
       Show          off
-      Position      [480, 150]
+      Position      [460, 160]
       Direction     down
       Flipped       on
       LabelPosition east
@@ -1967,7 +1967,7 @@ Plecs {
       Type          VoltageSource
       Name          "Vs_input"
       Show          off
-      Position      [145, 175]
+      Position      [125, 185]
       Direction     up
       Flipped       off
       LabelPosition west
@@ -1986,7 +1986,7 @@ Plecs {
       Type          FromFile
       Name          "From File1"
       Show          off
-      Position      [205, 175]
+      Position      [185, 185]
       Direction     left
       Flipped       off
       LabelPosition south
@@ -2042,7 +2042,7 @@ Plecs {
       Type          FromFile
       Name          "From File"
       Show          off
-      Position      [420, 185]
+      Position      [400, 195]
       Direction     right
       Flipped       off
       LabelPosition north
@@ -2643,21 +2643,21 @@ Plecs {
       Type          Wire
       SrcComponent  "R3"
       SrcTerminal   1
-      Points        [315, 220]
+      Points        [295, 230]
       Branch {
-        Points        [145, 220; 145, 200]
+        Points        [125, 230; 125, 210]
         Branch {
           DstComponent  "Vs_input"
           DstTerminal   2
         }
         Branch {
-          Points        [100, 200]
+          Points        [80, 210]
           DstComponent  "Vs"
           DstTerminal   2
         }
       }
       Branch {
-        Points        [480, 220; 480, 170]
+        Points        [460, 230; 460, 180]
         Branch {
           DstComponent  "Vg"
           DstTerminal   2
@@ -2672,7 +2672,7 @@ Plecs {
       Type          Wire
       SrcComponent  "IL_1"
       SrcTerminal   2
-      Points        [315, 60]
+      Points        [295, 70]
       Branch {
         DstComponent  "IL_2"
         DstTerminal   1
@@ -2686,7 +2686,7 @@ Plecs {
       Type          Wire
       SrcComponent  "C1"
       SrcTerminal   1
-      Points        [315, 130]
+      Points        [295, 140]
       Branch {
         DstComponent  "IC"
         DstTerminal   2
@@ -2700,7 +2700,7 @@ Plecs {
       Type          Wire
       SrcComponent  "R3"
       SrcTerminal   2
-      Points        [315, 170]
+      Points        [295, 180]
       Branch {
         DstComponent  "C1"
         DstTerminal   2
@@ -2714,14 +2714,14 @@ Plecs {
       Type          Wire
       SrcComponent  "Vs_input"
       SrcTerminal   1
-      Points        [145, 150]
+      Points        [125, 160]
       Branch {
-        Points        [145, 60]
+        Points        [125, 70]
         DstComponent  "R1"
         DstTerminal   2
       }
       Branch {
-        Points        [100, 150]
+        Points        [80, 160]
         DstComponent  "Vs"
         DstTerminal   1
       }
@@ -2737,7 +2737,7 @@ Plecs {
       Type          Wire
       SrcComponent  "L2"
       SrcTerminal   2
-      Points        [420, 60]
+      Points        [400, 70]
       Branch {
         DstComponent  "R2"
         DstTerminal   2
@@ -2751,13 +2751,13 @@ Plecs {
       Type          Wire
       SrcComponent  "IL_1"
       SrcTerminal   1
-      Points        [240, 60]
+      Points        [220, 70]
       Branch {
         DstComponent  "L1"
         DstTerminal   2
       }
       Branch {
-        Points        [240, 100]
+        Points        [220, 110]
         DstComponent  "VL_1"
         DstTerminal   1
       }
@@ -2766,7 +2766,7 @@ Plecs {
       Type          Wire
       SrcComponent  "R1"
       SrcTerminal   1
-      Points        [195, 60]
+      Points        [175, 70]
       Branch {
         DstComponent  "L1"
         DstTerminal   1
@@ -2829,7 +2829,7 @@ Plecs {
       Type          Wire
       SrcComponent  "L2"
       SrcTerminal   1
-      Points        [380, 60]
+      Points        [360, 70]
       Branch {
         DstComponent  "IL_2"
         DstTerminal   2
@@ -3068,7 +3068,7 @@ Plecs {
       Type          Wire
       SrcComponent  "R2"
       SrcTerminal   1
-      Points        [480, 60; 480, 130]
+      Points        [460, 70; 460, 140]
       Branch {
         DstComponent  "Vg"
         DstTerminal   1

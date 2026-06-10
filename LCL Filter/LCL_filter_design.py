@@ -17,6 +17,11 @@ def LCL_filter_design_function(Vg_ll_RMS,
                                num_C_values=100):
 
     """
+
+    Source: Han, Y., Yang, M., Li, H., Yang, P., Xu, L., Coelho, E.A.A. and Guerrero, J.M. (2019)
+    'Modeling and stability analysis of LCL-type grid-connected inverters: a comprehensive overview',
+    IEEE Access, 7, pp. 114975–115001. doi: 10.1109/ACCESS.2019.2935806.
+
     Design the passive components of an LCL filter for a grid-connected inverter.
 
     This function follows the common LCL-filter design procedure used for
@@ -45,7 +50,7 @@ def LCL_filter_design_function(Vg_ll_RMS,
         RMS value of the fundamental line-to-line grid voltage [V].
     S_rated : float
         Rated apparent power of the inverter [VA].
-    I_rated = float
+    I_rated : float
         Rated current of the inverter [A].
     fsw : float
         Inverter switching frequency [Hz].
@@ -85,7 +90,7 @@ def LCL_filter_design_function(Vg_ll_RMS,
     C_max = 0.05 * S_rated / (2 * np.pi * fo * (Vg_ll_RMS ** 2))    # [F] Capacitor's max capacitance value
 
     # Choosing total inductance which is L1 + L2
-    L_T_max = 0.10 * (Vg_ll_RMS ** 2) / (2 * np.pi * fo * S_rated)  # [H] Total inductance value of the two capacitors
+    L_T_max = 0.10 * (Vg_ll_RMS ** 2) / (2 * np.pi * fo * S_rated)  # [H] Total inductance value of the two inductors
 
     # Now for choosing L1
     if inverter_phases == 1:
@@ -143,7 +148,7 @@ def LCL_filter_design_function(Vg_ll_RMS,
     # ----------------------------------------#
 
     if len(valid_indices) > 0:
-        None
+        pass
 
     else:
         # ----------------------------------------#

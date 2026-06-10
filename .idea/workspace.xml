@@ -6,31 +6,30 @@
   <component name="ChangeListManager">
     <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Model_documentation_PEARL_DC_Link_Capacitor.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Model_documentation_PEARL_DC_Link_Capacitor.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking.plecs" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking.plecs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking_table.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/100_0.5_lags/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/100_0.5_lags/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/25_1/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/25_1/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/50_1/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/50_1/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Trial.plecs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/buck_converter_1.plecs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/buck_converter_2.plecs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/buck_converter_3.plecs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/buck_converter_final.plecs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/introduction_standalone.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/rlc_network_1.plecs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/rlc_network_2.plecs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/rlc_network_3.plecs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/rlc_network_final.plecs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/PLECS Benchmarking.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/LCL_filter_design.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/LCL_filter_design.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Plotting_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Plotting_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_10_THD_I_L2.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_10_THD_I_L2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_10a_THD_Vs.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_10a_THD_Vs.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_11_I_L2_vs_Ig_ref.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_12_C_VI.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_12_C_VI.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_13_L1_VI.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_13_L1_VI.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_14_L2_VI.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_14_L2_VI.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_15_P_total.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_15_P_total.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_16_core_winding.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_16_core_winding.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_17_T.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_17_T.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_18_lifetime.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_18_lifetime.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_19_lifetime_consumed.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_1_power_SPQ.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_1_power_SPQ.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_20_average_temperature.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_20_average_temperature.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_3_pf.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_3_pf.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_4_pf_phi.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_4_pf_phi.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_5_Igref_Vsref.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_5_Igref_Vsref.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_6_Vs.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_6_Vs.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_7_L1.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_7_L1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_8_C.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_8_C.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_9_L2.png" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_9_L2.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_10a_THD_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Spec Sheet/Old/Capacitor spec sheet - Copy.pdf" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/mother_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/mother_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/trial.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/trial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/trial.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,6 +73,7 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.All_the_functions.executor": "Run",
+    "Python.Benchmarking_table.executor": "Run",
     "Python.Calculation_functions.executor": "Run",
     "Python.Causer model.executor": "Run",
     "Python.Electrical_model.executor": "Run",

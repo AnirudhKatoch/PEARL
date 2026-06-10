@@ -60,14 +60,17 @@ class Input_parameters_class:
         self.Ig_RMS = self.S_RMS / (self.inverter_phases * self.Vg_RMS)        # Compute the RMS inverter output current required to deliver the specified apparent power to the grid
 
         # ----------------------------------------#
-        # Ambient Temperature
+        # Thermal related parameters
         # ----------------------------------------#
 
         self.T_amb = np.full(self.Profile_size, 273+25) # [K]
         self.heat_transfer_coefficient = 10             # [W/(m²·K)]
+        # Typical values:
+        # 10  W/(m²·K) — natural convection, still air; 50  W/(m²·K) — moderate forced air cooling
+        # 250 W/(m²·K) — high-velocity forced air; 500 W/(m²·K) — Liquid Cooling Source: Incropera et al., Table 1.1
 
         # ----------------------------------------#
-        # Time Discretization and Simulation Resolution
+        # Time Discretization and simulation Resolution
         # ----------------------------------------#
 
         self.resolution_per_cycle = 2000                        # [-] Number of discrete simulation samples used to represent one fundamental AC cycle; higher values improve waveform fidelity but increase computational cost, This value is also very important for calculation actual value of Vs_ref

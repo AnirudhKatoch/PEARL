@@ -88,7 +88,7 @@ class Plotting_functions_class:
         plt.close(fig3)
 
     @staticmethod
-    def plot_df_2_power_flow_inst(df_2_power_flow_inst, figures_dir, resolution_per_cycle, t=None, y_margin=0.05):
+    def plot_df_2_power_flow_inst(df_2_power_flow_inst, figures_dir, resolution_per_cycle, f=50, t=None, y_margin=0.05, xlabel = "Time [s]"):
 
         """
         Plot the last fundamental cycle of the instantaneous waveforms (df_2)
@@ -104,8 +104,7 @@ class Plotting_functions_class:
             Fig_10 : THD_percent          (single bar)          6.4 x 4.8
         """
 
-        xlabel = "Time [s]"
-        f = 50 # grid frequency
+
 
         df = df_2_power_flow_inst
         last = slice(-resolution_per_cycle, None)
@@ -225,7 +224,7 @@ class Plotting_functions_class:
         fig.savefig(f"{figures_dir}/Fig_10_THD_I_L2.png", dpi=150)
         plt.close(fig)
 
-
+        '''
         # ---------- Fig_10a : THD_percent_Vs (single bar) ----------
         thd = df["THD_percent_Vs"].dropna()
         thd_val = float(thd.iloc[-1]) if len(thd) else np.nan
@@ -239,7 +238,42 @@ class Plotting_functions_class:
         fig.tight_layout()
         fig.savefig(f"{figures_dir}/Fig_10a_THD_Vs.png", dpi=150)
         plt.close(fig)
+        
 
+        # ---------- Fig_15 : V_L1 / I_C / V_L2 (switching-dominated waveforms) ----------
+        V_L1 = col("V_L1")
+        I_C = col("I_C")
+        V_L2 = col("V_L2")
+        fig15, (ax15a, ax15b, ax15c) = plt.subplots(3, 1, figsize=(6.4, 4.8 * 3 * 0.5), sharex=True)
+
+        ax15a.plot(x, V_L1, color="tab:red", label="V_L1")
+        ax15a.set_ylabel("Voltage [V]")
+        ax15a.set_title("Inverter-side inductor voltage")
+        ax15a.set_ylim(ylim_from(V_L1))
+        #ax15a.legend()
+        ax15a.grid(True, alpha=0.3)
+
+        ax15b.plot(x, I_C, color="tab:orange", label="I_C")
+        ax15b.set_ylabel("Current [A]")
+        ax15b.set_title("Capacitor current")
+        ax15b.set_ylim(ylim_from(I_C))
+        #ax15b.legend()
+        ax15b.grid(True, alpha=0.3)
+
+        ax15c.plot(x, V_L2, color="tab:purple", label="V_L2")
+        ax15c.set_xlabel(xlabel)
+        ax15c.set_ylabel("Voltage [V]")
+        ax15c.set_title("Grid-side inductor voltage")
+        ax15c.set_ylim(ylim_from(V_L2))
+        #ax15c.legend()
+        ax15c.grid(True, alpha=0.3)
+
+        ax15c.set_xlim(x_range)
+        ax15c.xaxis.set_major_locator(MultipleLocator(x_tick))
+        fig15.tight_layout()
+        fig15.savefig(f"{figures_dir}/Fig_15_switching_waveforms.pdf", dpi=150)
+        plt.close(fig15)
+        '''
 
 
     @staticmethod
