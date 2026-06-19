@@ -5,31 +5,59 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest">
+      <change afterPath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Plotting_pf_sweep.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DC Link Capacitor/Model_documentation_PEARL_DC_Link_Capacitor.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/DC Link Capacitor/Model_documentation_PEARL_DC_Link_Capacitor.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking.plecs" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking.plecs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking_table.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/100_0.5_lags/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/100_0.5_lags/benchmark_values.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/25_1/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/25_1/benchmark_values.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/50_1/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/PLECS/50_1/benchmark_values.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Trial.plecs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/buck_converter_1.plecs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/buck_converter_2.plecs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/buck_converter_3.plecs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/buck_converter_final.plecs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/introduction_standalone.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/rlc_network_1.plecs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/rlc_network_2.plecs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/rlc_network_3.plecs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/introduction_standalone/introduction_standalone/rlc_network_final.plecs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/IL2_comparison.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/IL2_comparison.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/LCL_filter_design.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/LCL_filter_design.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Plotting_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Plotting_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_10a_THD_Vs.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Spec Sheet/Old/Capacitor spec sheet - Copy.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/A practical core loss calculation method of filter inductors in PWM inverters based on the modified Steinmetz equation.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/Ageing and reliability of electrical insulationthe risk of hybrid ACDC grids.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/Core losses analysis of the LCL filter inductor for SiC-based inverter.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/Design and loss analysis of LCL filter inductors for two-level and three-level inverters.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/Note for inductor lifetime.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/0 A General Analytical Formulation for LCL Filter Design for Grid-Connected PWM-Driven Cascaded H-Bridge Inverters.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/1 Modeling and Stability Analysis of LCL-Type Grid-Connected Inverters A Comprehensive Overview.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/16 Design and Comparison of LCL Filters in STATCOM.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/2 An LCL-Filter Design With Optimum Total Inductance and Capacitance.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/6 Reactive Power Impacts on LCL Filter Capacitor Lifetime in Grid-Connected Inverter.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/8 Analysis of Resonant Current Influence on Capacitor Lifetime Variation in LCL-Type Photovoltaic Systems.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/12 Advanced Condition Monitoring for Active Front-End Converter LCL Filter AC Capacitors.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/13 LCL Filter Design for Three Phase AC-DC Converters Considering Semiconductor Modules and Magnetics Components Performance.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/15 Analysis of Capacitor and Reactor Damage Rates on LCL Filters.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/3 A New Design Method of LCL Filter for Single Phase Grid Connected Power Converter.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/4 L vs. LCL Filter for Photovoltaic Grid-Connected Inverter, A Reliability Study.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/5 Reactive Power Impacts on LCL Filter Capacitor Lifetime and Reliability in DFIG Grid-Connected Inverter.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/7 Reliability analysis of grid-interfaced filter capacitors.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Optimal LCL-filter design for a single-phase grid-connected inverter using metaheuristic algorithms.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Optimal Time-Domain Sinusoidal Pulse Width Modulation Technique.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Optimal time-domain pulse width modulation for three-phase inverters Editor’s Pick Open Access.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Optimal time-domain technique for pulse width modulation in power electronics Open Access.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Time-Domain Analysis of PWM Inverters.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Tutorial Grid-Following Inverter for Electrical Power Grid.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_5_Igref_Vsref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Switching_waveforms.pdf" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/mother_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/mother_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/trial.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,7 +122,10 @@
     "Python.Plotting_final_results.executor": "Run",
     "Python.Plotting_function.executor": "Run",
     "Python.Plotting_heat_sink.executor": "Run",
+    "Python.Plotting_pf_sweep.executor": "Run",
     "Python.Plotting_results.executor": "Run",
+    "Python.Temperature_cities.executor": "Run",
+    "Python.Temperature_sweep.executor": "Run",
     "Python.Thermal_model_idea_2.executor": "Run",
     "Python.main - Copy.executor": "Run",
     "Python.main.executor": "Run",
@@ -118,6 +149,35 @@
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="Plotting_pf_sweep" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="PEARL" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/LCL Filter/z/Paper_related" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LCL Filter/z/Paper_related/Plotting_pf_sweep.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.Plotting_pf_sweep" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

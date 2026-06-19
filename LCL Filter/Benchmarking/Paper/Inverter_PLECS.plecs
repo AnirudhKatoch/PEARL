@@ -1,0 +1,855 @@
+Plecs {
+  Name          "Inverter_PLECS"
+  Version       "5.0"
+  CircuitModel  "ContStateSpace"
+  StartTime     "0.0"
+  TimeSpan      "1.0"
+  Timeout       ""
+  Solver        "auto"
+  MaxStep       "1e-3"
+  InitStep      "-1"
+  FixedStep     "1e-3"
+  Refine        "1"
+  ZCStepSize    "1e-9"
+  RelTol        "1e-3"
+  AbsTol        "-1"
+  TurnOnThreshold "0"
+  NonIdealSwitchResistance "1"
+  SyncFixedStepTasks "2"
+  UseSingleCommonBaseRate "2"
+  LossVariableLimitExceededMsg "3"
+  NegativeSwitchLossMsg "3"
+  DivisionByZeroMsg "3"
+  DatatypeOverflowMsg "3"
+  DatatypeInheritanceConflictMsg "2"
+  ContSampleTimeConflictMsg "2"
+  StiffnessDetectionMsg "2"
+  MaxConsecutiveZCs "1000"
+  AlgebraicLoopWithStateMachineMsg "3"
+  AssertionAction "1"
+  FixedPointDatatypeOverride "1"
+  InitializationCommands ""
+  InitialState  "1"
+  SystemState   ""
+  JacobianComputation "2"
+  TaskingMode   "1"
+  TaskConfigurations ""
+  CodeGenParameterInlining "2"
+  CodeGenFloatingPointFormat "2"
+  CodeGenAbsTimeUsageMsg "3"
+  CodeGenBaseName ""
+  CodeGenOutputDir ""
+  CodeGenExtraOpts ""
+  CodeGenTarget "Generic"
+  CodeGenTargetSettings ""
+  ExtendedMatrixPrecision "1"
+  MatrixSignificanceCheck "2"
+  RemoveUnusedStateSpaceOutputs "2"
+  EnableStateSpaceSplitting "2"
+  DisplayStateSpaceSplitting "1"
+  DiscretizationMethod "2"
+  ExternalModeSettings ""
+  AlgebraicLoopMethod "1"
+  AlgebraicLoopTolerance "1e-6"
+  ScriptsDialogGeometry ""
+  ScriptsDialogSplitterPos "0"
+  MixedSignalSolverBypassOperatingPoint "1"
+  MixedSignalSolverInitialConditions "2"
+  MixedSignalSolverMaxNewtonIterations "25"
+  MixedSignalSolverNumThreads "-1"
+  OperatingPointMaxNewtonIterations "50"
+  OperatingPointRelativeNewtonTolerance "1e-3"
+  OperatingPointAbsoluteNewtonTolerance "1e-12"
+  OperatingPointNodalVoltageNewtonTolerance "1e-6"
+  SpiceTemperature "27"
+  SpiceGMin     "0"
+  SpiceInductorRPar "0"
+  SpiceInductorRSer "0"
+  SpiceCapacitorGPar "0"
+  SpiceCapacitorRSer "0"
+  NetlistParserDetails "2"
+  InvalidNetlistFunctionEvaluationMsg "1"
+  IncompatibleInitialConditionMsg "2"
+  Schematic {
+    Location      [0, 24; 1920, 990]
+    ZoomFactor    2.2459
+    SliderPosition [0, 0]
+    ShowBrowser   off
+    BrowserWidth  100
+    Component {
+      Type          Capacitor
+      Name          "Ca"
+      Show          on
+      Position      [380, 170]
+      Direction     down
+      Flipped       on
+      LabelPosition west
+      Parameter {
+        Variable      "C"
+        Value         "150e-6"
+        Show          off
+      }
+      Parameter {
+        Variable      "v_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Inductor
+      Name          "L1a"
+      Show          on
+      Position      [355, 90]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "L"
+        Value         "115e-6"
+        Show          off
+      }
+      Parameter {
+        Variable      "i_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Inductor
+      Name          "L2a"
+      Show          on
+      Position      [485, 90]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "L"
+        Value         "6.54e-6"
+        Show          off
+      }
+      Parameter {
+        Variable      "i_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Resistor
+      Name          "R2a"
+      Show          on
+      Position      [530, 90]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "R"
+        Value         "0.05"
+        Show          off
+      }
+    }
+    Component {
+      Type          Resistor
+      Name          "R1a"
+      Show          on
+      Position      [315, 90]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "R"
+        Value         "0.05"
+        Show          off
+      }
+    }
+    Component {
+      Type          Resistor
+      Name          "R3a"
+      Show          on
+      Position      [380, 200]
+      Direction     down
+      Flipped       off
+      LabelPosition west
+      Parameter {
+        Variable      "R"
+        Value         "0.010579"
+        Show          off
+      }
+    }
+    Component {
+      Type          Capacitor
+      Name          "Cb"
+      Show          on
+      Position      [420, 170]
+      Direction     down
+      Flipped       on
+      LabelPosition west
+      Parameter {
+        Variable      "C"
+        Value         "150e-6"
+        Show          off
+      }
+      Parameter {
+        Variable      "v_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Inductor
+      Name          "L1b"
+      Show          on
+      Position      [355, 120]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "L"
+        Value         "115e-6"
+        Show          off
+      }
+      Parameter {
+        Variable      "i_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Inductor
+      Name          "L2b"
+      Show          on
+      Position      [485, 120]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "L"
+        Value         "6.54e-6"
+        Show          off
+      }
+      Parameter {
+        Variable      "i_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Resistor
+      Name          "R2b"
+      Show          on
+      Position      [530, 120]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "R"
+        Value         "0.05"
+        Show          off
+      }
+    }
+    Component {
+      Type          Resistor
+      Name          "R1b"
+      Show          on
+      Position      [315, 120]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "R"
+        Value         "0.05"
+        Show          off
+      }
+    }
+    Component {
+      Type          Resistor
+      Name          "R3b"
+      Show          on
+      Position      [420, 200]
+      Direction     down
+      Flipped       off
+      LabelPosition west
+      Parameter {
+        Variable      "R"
+        Value         "0.010579"
+        Show          off
+      }
+    }
+    Component {
+      Type          Capacitor
+      Name          "Cc"
+      Show          on
+      Position      [460, 170]
+      Direction     down
+      Flipped       on
+      LabelPosition west
+      Parameter {
+        Variable      "C"
+        Value         "150e-6"
+        Show          off
+      }
+      Parameter {
+        Variable      "v_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Resistor
+      Name          "R3c"
+      Show          on
+      Position      [460, 200]
+      Direction     down
+      Flipped       off
+      LabelPosition west
+      Parameter {
+        Variable      "R"
+        Value         "0.010579"
+        Show          off
+      }
+    }
+    Component {
+      Type          Inductor
+      Name          "L2c"
+      Show          on
+      Position      [485, 150]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "L"
+        Value         "6.54e-6"
+        Show          off
+      }
+      Parameter {
+        Variable      "i_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Resistor
+      Name          "R2c"
+      Show          on
+      Position      [530, 150]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "R"
+        Value         "0.05"
+        Show          off
+      }
+    }
+    Component {
+      Type          Inductor
+      Name          "L1c"
+      Show          on
+      Position      [355, 150]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "L"
+        Value         "115e-6"
+        Show          off
+      }
+      Parameter {
+        Variable      "i_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Resistor
+      Name          "R1c"
+      Show          on
+      Position      [315, 150]
+      Direction     left
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "R"
+        Value         "0.05"
+        Show          off
+      }
+    }
+    Component {
+      Type          IgbtWithDiode
+      Name          "IGBTD2"
+      Show          off
+      Position      [285, 70]
+      Direction     up
+      Flipped       off
+      LabelPosition east
+      Parameter {
+        Variable      "s_init"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "thermal"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "Rth"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "T_init"
+        Value         ""
+        Show          off
+      }
+    }
+    Component {
+      Type          IgbtWithDiode
+      Name          "IGBTD5"
+      Show          off
+      Position      [285, 190]
+      Direction     up
+      Flipped       off
+      LabelPosition east
+      Parameter {
+        Variable      "s_init"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "thermal"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "Rth"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "T_init"
+        Value         ""
+        Show          off
+      }
+    }
+    Component {
+      Type          IgbtWithDiode
+      Name          "IGBTD3"
+      Show          off
+      Position      [230, 70]
+      Direction     up
+      Flipped       off
+      LabelPosition east
+      Parameter {
+        Variable      "s_init"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "thermal"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "Rth"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "T_init"
+        Value         ""
+        Show          off
+      }
+    }
+    Component {
+      Type          IgbtWithDiode
+      Name          "IGBTD6"
+      Show          off
+      Position      [230, 190]
+      Direction     up
+      Flipped       off
+      LabelPosition east
+      Parameter {
+        Variable      "s_init"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "thermal"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "Rth"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "T_init"
+        Value         ""
+        Show          off
+      }
+    }
+    Component {
+      Type          IgbtWithDiode
+      Name          "IGBTD4"
+      Show          off
+      Position      [170, 70]
+      Direction     up
+      Flipped       off
+      LabelPosition east
+      Parameter {
+        Variable      "s_init"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "thermal"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "Rth"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "T_init"
+        Value         ""
+        Show          off
+      }
+    }
+    Component {
+      Type          IgbtWithDiode
+      Name          "IGBTD7"
+      Show          off
+      Position      [170, 190]
+      Direction     up
+      Flipped       off
+      LabelPosition east
+      Parameter {
+        Variable      "s_init"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "thermal"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "Rth"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "T_init"
+        Value         ""
+        Show          off
+      }
+    }
+    Component {
+      Type          Capacitor
+      Name          "C4"
+      Show          off
+      Position      [145, 140]
+      Direction     down
+      Flipped       on
+      LabelPosition west
+      Parameter {
+        Variable      "C"
+        Value         "100e-6"
+        Show          off
+      }
+      Parameter {
+        Variable      "v_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          ThreePhaseVoltageSource
+      Name          "Vg"
+      Show          on
+      Position      [575, 120]
+      Direction     down
+      Flipped       off
+      LabelPosition north
+      Parameter {
+        Variable      "V"
+        Value         "1"
+        Show          off
+      }
+      Parameter {
+        Variable      "w"
+        Value         "50"
+        Show          off
+      }
+      Parameter {
+        Variable      "phi"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "neutral"
+        Value         "2"
+        Show          off
+      }
+    }
+    Component {
+      Type          DCVoltageSource
+      Name          "Vdc"
+      Show          off
+      Position      [120, 140]
+      Direction     down
+      Flipped       on
+      LabelPosition east
+      Parameter {
+        Variable      "V"
+        Value         "1"
+        Show          off
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R3a"
+      SrcTerminal   2
+      DstComponent  "Ca"
+      DstTerminal   2
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "L1a"
+      SrcTerminal   2
+      Points        [380, 90]
+      Branch {
+        DstComponent  "L2a"
+        DstTerminal   1
+      }
+      Branch {
+        DstComponent  "Ca"
+        DstTerminal   1
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R3b"
+      SrcTerminal   2
+      DstComponent  "Cb"
+      DstTerminal   2
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "L1b"
+      SrcTerminal   2
+      Points        [420, 120]
+      Branch {
+        DstComponent  "L2b"
+        DstTerminal   1
+      }
+      Branch {
+        DstComponent  "Cb"
+        DstTerminal   1
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R3c"
+      SrcTerminal   2
+      DstComponent  "Cc"
+      DstTerminal   2
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "L2c"
+      SrcTerminal   1
+      Points        [460, 150]
+      Branch {
+        DstComponent  "Cc"
+        DstTerminal   1
+      }
+      Branch {
+        DstComponent  "L1c"
+        DstTerminal   2
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "IGBTD2"
+      SrcTerminal   1
+      Points        [230, 50]
+      Branch {
+        Points        [170, 50]
+        Branch {
+          Points        [145, 50]
+          Branch {
+            DstComponent  "C4"
+            DstTerminal   1
+          }
+          Branch {
+            Points        [120, 50]
+            DstComponent  "Vdc"
+            DstTerminal   1
+          }
+        }
+        Branch {
+          DstComponent  "IGBTD4"
+          DstTerminal   1
+        }
+      }
+      Branch {
+        DstComponent  "IGBTD3"
+        DstTerminal   1
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "IGBTD5"
+      SrcTerminal   2
+      Points        [285, 220; 230, 220]
+      Branch {
+        Points        [170, 220]
+        Branch {
+          Points        [145, 220]
+          Branch {
+            DstComponent  "C4"
+            DstTerminal   2
+          }
+          Branch {
+            Points        [120, 220]
+            DstComponent  "Vdc"
+            DstTerminal   2
+          }
+        }
+        Branch {
+          DstComponent  "IGBTD7"
+          DstTerminal   2
+        }
+      }
+      Branch {
+        DstComponent  "IGBTD6"
+        DstTerminal   2
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R3a"
+      SrcTerminal   1
+      Points        [420, 220]
+      Branch {
+        DstComponent  "R3c"
+        DstTerminal   1
+      }
+      Branch {
+        DstComponent  "R3b"
+        DstTerminal   1
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "L2a"
+      SrcTerminal   2
+      DstComponent  "R2a"
+      DstTerminal   1
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "L2b"
+      SrcTerminal   2
+      DstComponent  "R2b"
+      DstTerminal   1
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "L2c"
+      SrcTerminal   2
+      DstComponent  "R2c"
+      DstTerminal   1
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R2b"
+      SrcTerminal   2
+      DstComponent  "Vg"
+      DstTerminal   2
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R2a"
+      SrcTerminal   2
+      Points        [555, 90]
+      DstComponent  "Vg"
+      DstTerminal   3
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R2c"
+      SrcTerminal   2
+      Points        [555, 150]
+      DstComponent  "Vg"
+      DstTerminal   1
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R1c"
+      SrcTerminal   2
+      DstComponent  "L1c"
+      DstTerminal   1
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R1b"
+      SrcTerminal   2
+      DstComponent  "L1b"
+      DstTerminal   1
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R1a"
+      SrcTerminal   2
+      DstComponent  "L1a"
+      DstTerminal   1
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "IGBTD4"
+      SrcTerminal   2
+      Points        [170, 90]
+      Branch {
+        DstComponent  "IGBTD7"
+        DstTerminal   1
+      }
+      Branch {
+        DstComponent  "R1a"
+        DstTerminal   1
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "IGBTD3"
+      SrcTerminal   2
+      Points        [230, 120]
+      Branch {
+        DstComponent  "IGBTD6"
+        DstTerminal   1
+      }
+      Branch {
+        DstComponent  "R1b"
+        DstTerminal   1
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "IGBTD2"
+      SrcTerminal   2
+      Points        [285, 150]
+      Branch {
+        DstComponent  "IGBTD5"
+        DstTerminal   1
+      }
+      Branch {
+        DstComponent  "R1c"
+        DstTerminal   1
+      }
+    }
+  }
+}

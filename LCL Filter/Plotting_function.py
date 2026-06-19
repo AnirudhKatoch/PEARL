@@ -47,7 +47,7 @@ class Plotting_functions_class:
         ax1.legend()
         ax1.grid(True, alpha=0.3)
         fig1.tight_layout()
-        fig1.savefig(f"{figures_dir}/Fig_1_power_SPQ.png", dpi=150)
+        fig1.savefig(f"{figures_dir}/Fig_1_power_SPQ.png", dpi=300)
         plt.close(fig1)
 
         # ---------- Fig_2 : Vg_RMS / Ig_RMS (stacked, taller) ----------
@@ -70,7 +70,7 @@ class Plotting_functions_class:
 
         ax2b.set_xlim(x_range)
         fig2.tight_layout()
-        fig2.savefig(f"{figures_dir}/Fig_2_Vg_Ig.png", dpi=150)
+        fig2.savefig(f"{figures_dir}/Fig_2_Vg_Ig.png", dpi=300)
         plt.close(fig2)
 
         # ---------- Fig_3 : pf ----------
@@ -84,8 +84,23 @@ class Plotting_functions_class:
         ax3.legend()
         ax3.grid(True, alpha=0.3)
         fig3.tight_layout()
-        fig3.savefig(f"{figures_dir}/Fig_3_pf.png", dpi=150)
+        fig3.savefig(f"{figures_dir}/Fig_3_pf.png", dpi=300)
         plt.close(fig3)
+
+
+        # ---------- Fig_3 : pf ----------
+        fig3a, ax3a = plt.subplots(figsize=(6.4, 4.8))
+        ax3a.plot(x, df["T_amb"]-273, color="blue", label="T_amb")
+        ax3.set_xlabel(xlabel)
+        ax3a.set_ylabel("Temperature [°C]")
+        ax3a.set_title("Ambient Temperature")
+        ax3a.set_xlim(x_range)
+        #ax3a.set_ylim(min(df["T_amb"]),max(df["T_amb"]))
+        ax3a.legend()
+        ax3a.grid(True, alpha=0.3)
+        fig3a.tight_layout()
+        fig3a.savefig(f"{figures_dir}/Fig_3a_T_amb.png", dpi=300)
+        plt.close(fig3a)
 
     @staticmethod
     def plot_df_2_power_flow_inst(df_2_power_flow_inst, figures_dir, resolution_per_cycle, f=50, t=None, y_margin=0.05, xlabel = "Time [s]"):
@@ -155,7 +170,7 @@ class Plotting_functions_class:
             axb.set_xlim(x_range)
             axb.xaxis.set_major_locator(MultipleLocator(x_tick))  # in stacked
             fig.tight_layout()
-            fig.savefig(f"{figures_dir}/{fname}.png", dpi=150)
+            fig.savefig(f"{figures_dir}/{fname}.png", dpi=300)
             plt.close(fig)
 
             # ---- helper for a single-axes figure ----
@@ -172,7 +187,7 @@ class Plotting_functions_class:
             ax.legend()
             ax.grid(True, alpha=0.3)
             fig.tight_layout()
-            fig.savefig(f"{figures_dir}/{fname}.png", dpi=150)
+            fig.savefig(f"{figures_dir}/{fname}.png", dpi=300)
             plt.close(fig)
 
         # ---------- Fig_4 : pf_inst / phi ----------
@@ -181,9 +196,9 @@ class Plotting_functions_class:
                     "phi", "tab:purple", "Phase angle", "Phase angle [rad]",xlabel)
 
         # ---------- Fig_5 : Ig_ref / Vs_ref ----------
-        stacked("Fig_5_Igref_Vsref",
+        stacked("Fig_5_Igref_Vg",
                     "Ig_ref", "tab:orange", "Reference grid current", "Current [A]",
-                    "Vs_ref", "tab:blue", "Reference inverter voltage", "Voltage [V]",xlabel)
+                    "Vg", "tab:blue", "Grid voltage", "Voltage [V]",xlabel)
 
         # ---------- Fig_6 : Vs ----------
         single("Fig_6_Vs", "Vs", "tab:blue",
@@ -221,7 +236,7 @@ class Plotting_functions_class:
         ax.text(0, thd_val, f"{thd_val:.4f} %", ha="center", va="bottom")
         ax.grid(True, axis="y", alpha=0.3)
         fig.tight_layout()
-        fig.savefig(f"{figures_dir}/Fig_10_THD_I_L2.png", dpi=150)
+        fig.savefig(f"{figures_dir}/Fig_10_THD_I_L2.png", dpi=300)
         plt.close(fig)
 
         '''
@@ -236,7 +251,7 @@ class Plotting_functions_class:
         ax.text(0, thd_val, f"{thd_val:.4f} %", ha="center", va="bottom")
         ax.grid(True, axis="y", alpha=0.3)
         fig.tight_layout()
-        fig.savefig(f"{figures_dir}/Fig_10a_THD_Vs.png", dpi=150)
+        fig.savefig(f"{figures_dir}/Fig_10a_THD_Vs.png", dpi=300)
         plt.close(fig)
         
 
@@ -271,10 +286,9 @@ class Plotting_functions_class:
         ax15c.set_xlim(x_range)
         ax15c.xaxis.set_major_locator(MultipleLocator(x_tick))
         fig15.tight_layout()
-        fig15.savefig(f"{figures_dir}/Fig_15_switching_waveforms.pdf", dpi=150)
+        fig15.savefig(f"{figures_dir}/Fig_15_switching_waveforms.pdf", dpi=300)
         plt.close(fig15)
         '''
-
 
     @staticmethod
     def plot_df_components(df_3_C, df_4_L1, df_5_L2, figures_dir, xlabel, y_margin=0.05):
@@ -315,7 +329,7 @@ class Plotting_functions_class:
         ax12b.grid(True, alpha=0.3)
         ax12b.set_xlim(x_range)
         fig12.tight_layout()
-        fig12.savefig(f"{figures_dir}/Fig_12_C_VI.png", dpi=150)
+        fig12.savefig(f"{figures_dir}/Fig_12_C_VI.png", dpi=300)
         plt.close(fig12)
 
         # ---------- Fig_13 : V_L1_RMS / I_L1_RMS ----------
@@ -337,7 +351,7 @@ class Plotting_functions_class:
         ax13b.grid(True, alpha=0.3)
         ax13b.set_xlim(x_range)
         fig13.tight_layout()
-        fig13.savefig(f"{figures_dir}/Fig_13_L1_VI.png", dpi=150)
+        fig13.savefig(f"{figures_dir}/Fig_13_L1_VI.png", dpi=300)
         plt.close(fig13)
 
         # ---------- Fig_14 : V_L2_RMS / I_L2_RMS ----------
@@ -359,7 +373,7 @@ class Plotting_functions_class:
         ax14b.grid(True, alpha=0.3)
         ax14b.set_xlim(x_range)
         fig14.tight_layout()
-        fig14.savefig(f"{figures_dir}/Fig_14_L2_VI.png", dpi=150)
+        fig14.savefig(f"{figures_dir}/Fig_14_L2_VI.png", dpi=300)
         plt.close(fig14)
 
         # ---------- Fig_15 : P_total C / L1 / L2 ----------
@@ -388,7 +402,7 @@ class Plotting_functions_class:
         ax15c.grid(True, alpha=0.3)
         ax15c.set_xlim(x_range)
         fig15.tight_layout()
-        fig15.savefig(f"{figures_dir}/Fig_15_P_total.png", dpi=150)
+        fig15.savefig(f"{figures_dir}/Fig_15_P_total.png", dpi=300)
         plt.close(fig15)
 
         # ---------- Fig_16 : core / winding losses (L1, L2) ----------
@@ -414,7 +428,7 @@ class Plotting_functions_class:
         ax16b.grid(True, alpha=0.3)
         ax16b.set_xlim(x_range)
         fig16.tight_layout()
-        fig16.savefig(f"{figures_dir}/Fig_16_core_winding.png", dpi=150)
+        fig16.savefig(f"{figures_dir}/Fig_16_core_winding.png", dpi=300)
         plt.close(fig16)
 
         # ---------- Fig_17 : temperatures C / L1 / L2 ----------
@@ -443,7 +457,7 @@ class Plotting_functions_class:
         ax17c.grid(True, alpha=0.3)
         ax17c.set_xlim(x_range)
         fig17.tight_layout()
-        fig17.savefig(f"{figures_dir}/Fig_17_T.png", dpi=150)
+        fig17.savefig(f"{figures_dir}/Fig_17_T.png", dpi=300)
         plt.close(fig17)
 
         # ---------- Fig_18 : lifetime bar ----------
@@ -460,7 +474,7 @@ class Plotting_functions_class:
             ax18.text(b.get_x() + b.get_width() / 2, v, f"{v:.2f}", ha="center", va="bottom")
         ax18.grid(True, axis="y", alpha=0.3)
         fig18.tight_layout()
-        fig18.savefig(f"{figures_dir}/Fig_18_lifetime.png", dpi=150)
+        fig18.savefig(f"{figures_dir}/Fig_18_lifetime.png", dpi=300)
         plt.close(fig18)
 
         # ---------- Fig_19 : lifetime consumed bar ----------
@@ -477,7 +491,7 @@ class Plotting_functions_class:
             ax19.text(b.get_x() + b.get_width() / 2, v,f"{v:.2f}", ha="center", va="bottom")
         ax19.grid(True, axis="y", alpha=0.3)
         fig19.tight_layout()
-        fig19.savefig(f"{figures_dir}/Fig_19_lifetime_consumed.png", dpi=150)
+        fig19.savefig(f"{figures_dir}/Fig_19_lifetime_consumed.png", dpi=300)
         plt.close(fig19)
 
         # ---------- Fig_20 : average temperature bar ----------
@@ -494,5 +508,133 @@ class Plotting_functions_class:
             ax20.text(b.get_x() + b.get_width() / 2, v, f"{v:.2f}", ha="center", va="bottom")
         ax20.grid(True, axis="y", alpha=0.3)
         fig20.tight_layout()
-        fig20.savefig(f"{figures_dir}/Fig_20_average_temperature.png", dpi=150)
+        fig20.savefig(f"{figures_dir}/Fig_20_average_temperature.png", dpi=300)
         plt.close(fig20)
+
+
+    '''
+    @staticmethod
+    def plot_Ig_ref_vs_I_L2(df_2_power_flow_inst, figures_dir, resolution_per_cycle, y_margin, f=50, t=None,xlabel="Time [s]"):
+        """
+        Compare the reference grid current (Ig_ref) against the delivered
+        grid-side current (I_L2) over the last fundamental cycle, overlaid
+        on a single axes. Ig_ref is drawn as a continuous line and I_L2 as
+        sparse hollow markers on top. Saves Fig_I_ref_vs_IL_2.png in figures_dir.
+        """
+
+        df = df_2_power_flow_inst
+        last = slice(-resolution_per_cycle, None)
+
+        # x-axis: real time if provided, else build one fundamental cycle
+        if t is not None:
+            x = np.asarray(t)[last]
+            dt = x[1] - x[0]
+        else:
+            dt = (1.0 / f) / resolution_per_cycle
+            x = np.arange(resolution_per_cycle) * dt
+        x_range = (x[0], x[-1] + dt)
+        x_tick = (x_range[1] - x_range[0]) / 4.0
+
+        def col(name):
+            return df[name].to_numpy()[last]
+
+        def ylim_from(*series):
+            lo = min(np.min(s) for s in series)
+            hi = max(np.max(s) for s in series)
+            if lo == hi:
+                pad = abs(lo) * y_margin or 1.0
+            else:
+                pad = (hi - lo) * y_margin
+            return lo - pad, hi + pad
+
+        Ig_ref = col("Ig_ref")
+        I_L2 = col("I_L2")
+        n = len(x)
+        step = max(1, n // 50)  # ~50 markers across the cycle
+
+        # ---------- Overlay: Ig_ref line + I_L2 sparse hollow markers ----------
+        fig, ax = plt.subplots(figsize=(6.4, 4.8 * 0.525))
+
+        ax.plot(x[::step], I_L2[::step], color="red",
+                linestyle="none", marker="o", markersize=5,
+                markerfacecolor="none", markeredgewidth=1.6,
+                label="Actual current")
+        ax.plot(x, Ig_ref, color="blue", linewidth=1.6, label="Reference current")
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel("Current [A]")
+        #ax.set_title("Reference vs delivered grid current")
+        ax.set_xlim(x_range)
+        ax.xaxis.set_major_locator(MultipleLocator(x_tick))
+        ax.set_ylim(-1300,1300)
+        ax.legend()
+        #ax.grid(True, alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(f"{figures_dir}/Fig_I_ref_vs_IL_2.pdf", dpi=300)
+        plt.close(fig)
+
+    @staticmethod
+    def plot_six_waveforms(df_2_power_flow_inst, figures_dir, resolution_per_cycle, f=50, t=None, y_margin=0.05,xlabel="Time [s]"):
+        """
+        Plot the six LCL branch waveforms over the last fundamental cycle in a
+        single 6-row, 1-column figure:
+
+            Row 1 : V_L1   Row 2 : I_L1
+            Row 3 : V_C    Row 4 : I_C
+            Row 5 : V_L2   Row 6 : I_L2
+
+        Saves Fig_six_waveforms.png in figures_dir.
+        """
+
+        df = df_2_power_flow_inst
+        last = slice(-resolution_per_cycle, None)
+
+        # x-axis: real time if provided, else build one fundamental cycle
+        if t is not None:
+            x = np.asarray(t)[last]
+            dt = x[1] - x[0]
+        else:
+            dt = (1.0 / f) / resolution_per_cycle
+            x = np.arange(resolution_per_cycle) * dt
+        x_range = (x[0], x[-1] + dt)
+        x_tick = (x_range[1] - x_range[0]) / 4.0
+
+        def col(name):
+            return df[name].to_numpy()[last]
+
+        def ylim_from(s):
+            lo, hi = np.min(s), np.max(s)
+            if lo == hi:
+                pad = abs(lo) * y_margin or 1.0
+            else:
+                pad = (hi - lo) * y_margin
+            return lo - pad, hi + pad
+
+        # name, color, ylabel, title
+        rows = [
+            ("V_L1", "blue", "Voltage [V]", r"Inverter-side inductor voltage ($V_{L1}$)"),
+            ("I_L1", "red", "Current [A]", r"Inverter-side inductor current ($I_{L1}$)"),
+            ("V_C", "blue", "Voltage [V]", r"Capacitor voltage ($V_{C}$)"),
+            ("I_C", "red", "Current [A]", r"Capacitor current ($I_{C}$)"),
+            ("V_L2", "blue", "Voltage [V]", r"Grid-side inductor voltage ($V_{L2}$)"),
+            ("I_L2", "red", "Current [A]", r"Grid-side inductor current ($I_{L2}$)"),
+        ]
+
+        fig, axes = plt.subplots(6, 1, figsize=(6.4, 4.8 * 6 * 0.33), sharex=True)
+
+        for ax, (name, color, ylabel, title) in zip(axes, rows):
+            y = col(name)
+            ax.plot(x, y, color=color, label=name)
+            ax.set_ylabel(ylabel)
+            ax.set_title(title)
+            ax.set_ylim(ylim_from(y))
+            #ax.legend(loc="upper right")
+            ax.grid(True, alpha=0.3)
+
+        axes[-1].set_xlabel(xlabel)
+        axes[-1].set_xlim(x_range)
+        axes[-1].xaxis.set_major_locator(MultipleLocator(x_tick))
+
+        fig.tight_layout()
+        fig.savefig(f"{figures_dir}/Python_benchmarking_visualization.pdf", dpi=300)
+        plt.close(fig)
+    '''

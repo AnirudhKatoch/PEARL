@@ -2308,7 +2308,7 @@ class Calculation_functions_class:
 
         L = L_rated * np.exp((Ea / kb) * (1 / T_operating - 1 / T_rated))
         L = L / (365 * 24)
-        L = np.minimum(L, L_max_years)  # cap at 30 years
+        #L = np.minimum(L, L_max_years)  # cap at 30 years
         return L
 
     @staticmethod

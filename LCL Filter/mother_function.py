@@ -8,6 +8,7 @@ from functools import lru_cache
 import os
 import matplotlib.pyplot as plt
 
+
 params = Input_parameters_class()
 Calculation_functions = Calculation_functions_class()
 Plotting_function = Plotting_functions_class()
@@ -21,11 +22,14 @@ C_specs = params.C_specs
 L2_specs = params.L2_specs
 Vg_ll_RMS = params.Vg_ll_RMS; S_rated = params.S_rated; I_rated_RMS = params.I_rated_RMS; I_rated_peak = params.I_rated_peak; current_ripple_limit = params.current_ripple_limit; delta = params.delta; omega_sw = params.omega_sw
 
-#sim_dir, dataframes_dir, figures_dir = Calculation_functions.create_simulation_folders(base="Results")
 
-sim_dir = "Results/Simulation_1"
-dataframes_dir = "Results/Simulation_1/Dataframes"
-figures_dir = "Results/Simulation_1/Figures"
+sim_dir, dataframes_dir, figures_dir = Calculation_functions.create_simulation_folders(base="Results")
+
+
+
+#sim_dir = "Results/Simulation_1"
+#dataframes_dir = "Results/Simulation_1/Dataframes"
+#figures_dir = "Results/Simulation_1/Figures"
 
 # ----------------------------------------#
 # Input validation and safety checks
@@ -123,12 +127,12 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
     # grid voltage waveform (one second)
     Vg = np.sqrt(2) * Vg_RMS_i * np.sin(omega * t_one)
 
-    # power-factor -> phase shift (constant over the second)
     pf_inst = np.full(resolution_per_cycle * f, pf_i)
-    phi = np.arccos(np.abs(pf_inst))
-    phase_shift = np.sign(pf_inst) * phi
+    phi = np.arccos(np.clip(np.abs(pf_inst), 0.0, 1.0))
+    sign = np.where(pf_inst >= 0, 1.0, -1.0)  # 0 -> +1, so the 90° shift survives
+    phase_shift = sign * phi
 
-    # current reference waveform
+
     Ig_ref = np.sqrt(2) * Ig_RMS_i * np.sin(omega * t_one + phase_shift)
 
     # required inverter voltage (pass single-element arrays, Profile_size=1)
@@ -159,14 +163,13 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
     # Power losses
     P_total_C = Calculation_functions.Capacitor_total_power_losses(fsw=fsw, f=f, I_C_RMS_harmonics=I_C_RMS_harmonics, tan_delta_0=C_specs["tan_delta_0"], C=C_specs["C"], Rs=C_specs["Rs"])
 
+
     # Temperature  (T_amb is THIS operating point's ambient)
     T_C = Calculation_functions.Capacitor_hotspot_temperature(T_amb=T_amb_i, P_total_C=P_total_C,Thermal_resistance_C=C_specs["Thermal_resistance_C"])
 
     V_C_RMS = Calculation_functions.Singal_RMS(Signal=V_C, resolution_per_cycle=resolution_per_cycle, f=f)
 
-    Calculation_functions.validate_capacitor_operating_limits(T_C=T_C, V_C_RMS=V_C_RMS, V_C=V_C,T_C_Rated=C_specs["T_C_Rated"],
-                                                              V_C_RMS_Rated=C_specs["V_C_RMS_Rated"],V_C_Peak_Rated=C_specs["V_C_Peak_Rated"],
-                                                              V_RMS_overvoltage_factor=1.5, V_peak_overvoltage_factor=1.5)
+    Calculation_functions.validate_capacitor_operating_limits(T_C=T_C, V_C_RMS=V_C_RMS, V_C=V_C,T_C_Rated=C_specs["T_C_Rated"],V_C_RMS_Rated=C_specs["V_C_RMS_Rated"],V_C_Peak_Rated=C_specs["V_C_Peak_Rated"],V_RMS_overvoltage_factor=1.5, V_peak_overvoltage_factor=1.5)
 
     # ----------------------------------------#
     # LCL filter inverter side [L1]
@@ -232,6 +235,60 @@ V_L1_RMS, I_L1_RMS, P_c_L1, P_w_L1, P_total_L1, T_inductor_L1,
 V_L2_RMS, I_L2_RMS, P_c_L2, P_w_L2, P_total_L2, T_inductor_L2) = (np.concatenate(col) for col in zip(*results))
 
 
+def compare_fundamental(signal_ref, signal_meas, f, resolution_per_cycle):
+    """
+    Compare two single-cycle (or multi-cycle) waveforms at the fundamental
+    frequency by extracting their complex phasors via a single-bin DFT.
+
+    Returns the magnitude (RMS) error and the phase error between them.
+
+    Parameters
+    ----------
+    signal_ref : np.ndarray
+        Reference waveform (e.g. Ig_ref).
+    signal_meas : np.ndarray
+        Measured/computed waveform to compare (e.g. I_L2).
+    f : float
+        Fundamental frequency [Hz].
+    resolution_per_cycle : int
+        Samples per fundamental cycle.
+
+    Returns
+    -------
+    rms_error_percent : float
+        |(|X_meas| - |X_ref|)| / |X_ref| * 100  [%]
+    phase_error_deg : float
+        Signed phase difference (meas - ref), wrapped to (-180, 180]  [deg]
+    """
+    # Use a whole number of cycles so the fundamental lands exactly on a DFT bin
+    samples_per_cycle = resolution_per_cycle
+    n_cycles = len(signal_ref) // samples_per_cycle
+    N = n_cycles * samples_per_cycle
+
+    ref = np.asarray(signal_ref[:N], dtype=float)
+    meas = np.asarray(signal_meas[:N], dtype=float)
+
+    # Single-bin DFT at the fundamental: bin index = number of cycles
+    k = n_cycles
+    n = np.arange(N)
+    basis = np.exp(-1j * 2 * np.pi * k * n / N)
+
+    X_ref = np.dot(ref, basis)
+    X_meas = np.dot(meas, basis)
+
+    # Magnitude error (RMS scales linearly with phasor magnitude, so the ratio is identical)
+    mag_ref = np.abs(X_ref)
+    mag_meas = np.abs(X_meas)
+    rms_error_percent = abs(mag_meas - mag_ref) / mag_ref * 100.0
+
+    # Phase error, wrapped to (-180, 180]
+    phase_error_deg = np.degrees(np.angle(X_meas) - np.angle(X_ref))
+    phase_error_deg = (phase_error_deg + 180.0) % 360.0 - 180.0
+
+    return rms_error_percent, phase_error_deg
+
+
+
 THD_percent_I_L2 = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=I_L2, Signal_ref=Ig_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
 THD_percent_Vs = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=Vs, Signal_ref=Vs_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
 
@@ -261,11 +318,11 @@ Lifetime_L2_series = Calculation_functions.calculate_inductor_lifetime(T_operati
 Lifetime_L2, Lifetime_consumed_L2 = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_L2_series, seconds_per_sample=seconds_per_sample)
 
 
-
 C_report = dict(C=C_specs["C"], R_th=C_specs["Thermal_resistance_C"], V_RMS=V_C_RMS, V_RMS_rated=C_specs["V_C_RMS_Rated"], I_RMS=I_C_RMS, P_total=P_total_C, T=T_C, T_rated=C_specs["T_C_Rated"], Lifetime=Lifetime_C,Lifetime_consumed_C=Lifetime_consumed_C)
 L1_report = dict(L=L1_specs["L1"], N=N_L1, lg=lg_L1, B_peak=B_peak_L1, B_max=L1_specs["B_max"], Bsat=L1_specs["Bsat"], Ae=Ae_L1, le=le_L1, Ve=Ve_L1, A_surface=A_surface_L1, I_RMS=I_L1_RMS, V_RMS=V_L1_RMS, Rdc=Rdc_L1, N_parallel=N_parallel_wire_L1, A_wire=A_wire_actual_L1, l_turn=l_turn_L1, P_core=P_c_L1, P_winding=P_w_L1, P_total=P_total_L1, R_th=R_th_L1, T=T_inductor_L1, T_rated=L1_specs["T_insulation_rated"], Lifetime=Lifetime_L1, Lifetime_consumed=Lifetime_consumed_L1,)
 L2_report = dict(L=L2_specs["L2"], N=N_L2, lg=lg_L2, B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], Ae=Ae_L2, le=le_L2, Ve=Ve_L2, A_surface=A_surface_L2, I_RMS=I_L2_RMS, V_RMS=V_L2_RMS, Rdc=Rdc_L2, N_parallel=N_parallel_wire_L2, A_wire=A_wire_actual_L2, l_turn=l_turn_L2, P_core=P_c_L2, P_winding=P_w_L2, P_total=P_total_L2, R_th=R_th_L2, T=T_inductor_L2, T_rated=L2_specs["T_insulation_rated"], Lifetime=Lifetime_L2, Lifetime_consumed=Lifetime_consumed_L2, )
-Calculation_functions.compare_components(C_report, L1_report, L2_report)
+#Calculation_functions.compare_components(C_report, L1_report, L2_report)
+
 
 
 #blabla = False
@@ -281,8 +338,9 @@ if blabla == True:
             "P_RMS": P_RMS,
             "Q_RMS": Q_RMS,
             "Ig_RMS": Ig_RMS,
+            "T_amb":T_amb
         })
-    #df_1_power_flow_RMS.to_parquet(f"{dataframes_dir}/df_1_power_flow_RMS.parquet")
+    df_1_power_flow_RMS.to_parquet(f"{dataframes_dir}/df_1_power_flow_RMS.parquet")
     Plotting_function.plot_df_1_power_flow_RMS(df_1_power_flow_RMS=df_1_power_flow_RMS, figures_dir=figures_dir,xlabel = "Time [day]")
     del df_1_power_flow_RMS
 
@@ -290,6 +348,7 @@ if blabla == True:
         {
             "pf_inst": pf_inst,
             "phi": phi,
+            "Vg":Vg,
             "Ig_ref": Ig_ref,
             "Vs_ref": Vs_ref,
             "Vs": Vs,
@@ -302,8 +361,10 @@ if blabla == True:
             "THD_percent_I_L2": np.where(np.arange(len(Vs)) == len(Vs) - 1, THD_percent_I_L2, np.nan),
             "THD_percent_Vs": np.where(np.arange(len(Vs)) == len(Vs) - 1, THD_percent_Vs, np.nan)
         })
-    #df_2_power_flow_inst.to_parquet(f"{dataframes_dir}/df_2_power_flow_inst.parquet")
+    df_2_power_flow_inst.to_parquet(f"{dataframes_dir}/df_2_power_flow_inst.parquet")
     Plotting_function.plot_df_2_power_flow_inst(df_2_power_flow_inst=df_2_power_flow_inst, figures_dir=figures_dir, resolution_per_cycle=resolution_per_cycle)
+    #Plotting_function.plot_Ig_ref_vs_I_L2(df_2_power_flow_inst, figures_dir, resolution_per_cycle, f=50, t=None, y_margin=0.05,xlabel="Time [s]")
+    #Plotting_function.plot_six_waveforms(df_2_power_flow_inst, figures_dir, resolution_per_cycle, f=50, t=None, y_margin=0.05,xlabel="Time [s]")
     del df_2_power_flow_inst
 
     df_3_C = pd.DataFrame(
@@ -315,7 +376,7 @@ if blabla == True:
             "Lifetime_C" : Calculation_functions.last_of_column(Lifetime_C,Profile_size),
             "Lifetime_consumed_C": Calculation_functions.last_of_column(Lifetime_consumed_C,Profile_size),
         })
-    #df_3_C.to_parquet(f"{dataframes_dir}/df_3_C.parquet")
+    df_3_C.to_parquet(f"{dataframes_dir}/df_3_C.parquet")
 
     df_4_L1 = pd.DataFrame(
         {
@@ -342,7 +403,7 @@ if blabla == True:
             "Lifetime_L1":         Calculation_functions.last_of_column(Lifetime_L1,Profile_size),            # [yr]
             "Lifetime_consumed_L1":Calculation_functions.last_of_column(Lifetime_consumed_L1,Profile_size),   # [%]
         })
-    #df_4_L1.to_parquet(f"{dataframes_dir}/df_4_L1.parquet")
+    df_4_L1.to_parquet(f"{dataframes_dir}/df_4_L1.parquet")
 
     df_5_L2 = pd.DataFrame(
         {
@@ -369,14 +430,9 @@ if blabla == True:
             "Lifetime_L2"         : Calculation_functions.last_of_column(Lifetime_L2,Profile_size),            # [yr]
             "Lifetime_consumed_L2": Calculation_functions.last_of_column(Lifetime_consumed_L2,Profile_size),   # [%]
         })
-    #df_5_L2.to_parquet(f"{dataframes_dir}/df_5_L2.parquet")
-
+    df_5_L2.to_parquet(f"{dataframes_dir}/df_5_L2.parquet")
     Plotting_function.plot_df_components(df_3_C=df_3_C, df_4_L1=df_4_L1, df_5_L2=df_5_L2, figures_dir=figures_dir,xlabel = "Time [day]")
     del df_3_C, df_4_L1, df_5_L2
-
-
-
-
 
 
 

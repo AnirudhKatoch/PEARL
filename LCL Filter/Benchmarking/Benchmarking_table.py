@@ -135,7 +135,6 @@ df.round(2).to_csv(r"E:\PEARL\LCL Filter\Benchmarking\Results\comparison_python_
 
 
 
-
 def plot_IL2_comparison(python_root, plecs_root, scenario, save_path=None, n_cycles=1, f=50, resolution_per_cycle=5000):
     """Overlay PLECS and Python I_L2 for one scenario to show their agreement."""
     py_path = os.path.join(python_root, scenario, "IL2_waveform.csv")
@@ -178,3 +177,70 @@ def plot_IL2_comparison(python_root, plecs_root, scenario, save_path=None, n_cyc
 
 
 plot_IL2_comparison(python_root, plecs_root, "100_1",save_path=r"E:\PEARL\LCL Filter\Benchmarking\Results\IL2_comparison.pdf")
+
+
+
+def print_raw_values(python_root, plecs_root, scenarios=None):
+    """
+    Print two tables of the original (raw) benchmark values:
+    one for PLECS, one for Python. Same metrics and scenario
+    layout as compare_python_vs_plecs.
+    """
+    metrics = ["V_L1_RMS", "I_L1_RMS", "I_C_RMS", "V_C_RMS",
+               "V_L2_RMS", "I_L2_RMS", "PF", "THD_percent_I_L2"]
+
+    if scenarios is None:
+        scenarios = ["100_1", "75_1", "50_1", "25_1",
+                     "100_0.866025_lags", "100_0.5_lags",
+                     "100_0.866025_leads", "100_0.5_leads"]
+
+    python = {s: load_benchmark(os.path.join(python_root, s, "benchmark_values.txt"))
+              for s in scenarios}
+    plecs  = {s: load_benchmark(os.path.join(plecs_root,  s, "benchmark_values.txt"))
+              for s in scenarios}
+
+    # PLECS stores THD as a fraction; Python stores it as percent → align units
+    for s in scenarios:
+        if plecs[s].get("THD_percent_I_L2") is not None:
+            plecs[s]["THD_percent_I_L2"] *= 100.0
+
+    metric_labels = {
+        "V_L1_RMS": "V_L1 RMS [V]",
+        "I_L1_RMS": "I_L1 RMS [A]",
+        "V_L2_RMS": "V_L2 RMS [V]",
+        "I_L2_RMS": "I_L2 RMS [A]",
+        "I_C_RMS":  "I_C RMS [A]",
+        "V_C_RMS":  "V_C RMS [V]",
+        "PF":       "pf [-]",
+        "THD_percent_I_L2": "THD [%]"}
+
+    scenario_labels = {
+        "100_1": "1.00 MVA, pf=1.0",
+        "75_1":  "0.75 MVA, pf=1.0",
+        "50_1":  "0.50 MVA, pf=1.0",
+        "25_1":  "0.25 MVA, pf=1.0",
+        "100_0.866025_lags":  "1.00 MVA, pf=0.866 lag",
+        "100_0.5_lags":       "1.00 MVA, pf=0.5 lag",
+        "100_0.866025_leads": "1.00 MVA, pf=0.866 lead",
+        "100_0.5_leads":      "1.00 MVA, pf=0.5 lead"}
+
+    def build_df(data):
+        rows = {m: [data[s].get(m) for s in scenarios] for m in metrics}
+        df = pd.DataFrame(rows, index=scenarios).T
+        return df.rename(index=metric_labels, columns=scenario_labels)
+
+    df_plecs  = build_df(plecs)
+    df_python = build_df(python)
+
+    pd.set_option("display.float_format", lambda v: f"{v:.4f}")
+    pd.set_option("display.max_columns", None)
+    pd.set_option("display.width", None)
+
+    print("\n=== PLECS (reference) raw values ===")
+    print(df_plecs.to_string())
+    print("\n=== Python raw values ===")
+    print(df_python.to_string())
+
+    return df_plecs, df_python
+
+df_plecs, df_python = print_raw_values(python_root, plecs_root)
