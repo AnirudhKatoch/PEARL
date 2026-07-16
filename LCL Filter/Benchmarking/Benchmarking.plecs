@@ -3,7 +3,7 @@ Plecs {
   Version       "5.0"
   CircuitModel  "ContStateSpace"
   StartTime     "0.0"
-  TimeSpan      "0.2"
+  TimeSpan      "10"
   Timeout       ""
   Solver        "auto"
   MaxStep       "4e-6"
@@ -71,7 +71,7 @@ Plecs {
   InvalidNetlistFunctionEvaluationMsg "1"
   IncompatibleInitialConditionMsg "2"
   Schematic {
-    Location      [295, 73; 1621, 931]
+    Location      [0, 23; 1920, 989]
     ZoomFactor    1.49863
     SliderPosition [0, 0]
     ShowBrowser   off
@@ -1992,8 +1992,8 @@ Plecs {
       LabelPosition south
       Parameter {
         Variable      "Filename"
-        Value         "'E:\\PEARL\\LCL Filter\\Benchmarking\\CSV_inputs\\Vs_10"
-"0_0.5_leads'"
+        Value         "'E:\\PEARL\\LCL Filter\\Benchmarking\\NEW\\Results\\Sim"
+"ulation_1\\Vs'"
         Show          off
         Evaluate      on
       }
@@ -2049,7 +2049,7 @@ Plecs {
       Parameter {
         Variable      "Filename"
         Value         "'E:\\PEARL\\LCL Filter\\Benchmarking\\CSV_inputs\\Vg_10"
-"0_0.5_leads'"
+"0_0.5_lags'"
         Show          off
         Evaluate      on
       }
@@ -2590,11 +2590,11 @@ Plecs {
       Flipped       off
       LabelPosition south
       Frame         [-15, -15; 15, 15]
-      Location      [456, 190; 1216, 926]
+      Location      [456, 190; 1216, 935]
       State         "AAAA/wAAAAD9AAAAAgAAAAEAAAC0AAABPvwCAAAAA/sAAAAQAFoAbwBvA"
 "G0AQQByAGUAYQAAAAAA/////wAAADAA////+wAAABQAUwBhAHYAZQBkAFYAaQBlAHcAcwAAAAA0AA"
-"ABPgAAAGIA////+wAAAAwAVAByAGEAYwBlAHMAAAAAAP////8AAABiAP///wAAAAMAAAL4AAAAVvw"
-"BAAAAAfsAAAAUAEQAYQB0AGEAVwBpAGQAZwBlAHQBAAAAAAAAAvgAAABEAP///wAAAvgAAAJlAAAA"
+"ABPgAAAGIA////+wAAAAwAVAByAGEAYwBlAHMAAAAAAP////8AAABiAP///wAAAAMAAAL4AAAAUfw"
+"BAAAAAfsAAAAUAEQAYQB0AGEAVwBpAGQAZwBlAHQBAAAAAAAAAvgAAABEAP///wAAAvgAAAJzAAAA"
 "BAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAOAFQAbwBvAGwAQgBhAHIBAAAAAP////8AAAAAA"
 "AAAAA=="
       SavedViews    "AAAAAgAAAAA="

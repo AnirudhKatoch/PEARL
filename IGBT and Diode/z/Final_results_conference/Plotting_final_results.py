@@ -15,8 +15,17 @@ if str(PROJECT_ROOT) not in sys.path:
 from Calculation_functions import Calculation_functions_class
 Calculation_functions = Calculation_functions_class()
 
-plt.rcParams.update({"font.size": 15, "font.family": "Times New Roman", "axes.labelsize": 15, "axes.titlesize": 15,
-                     "xtick.labelsize": 15, "ytick.labelsize": 15, "legend.fontsize": 15})
+import matplotlib.font_manager as fm
+
+
+# register the TUM font from the ttf file
+tum_font_path = "fonts/TUMNeueHelvetica-Regular.ttf"   # adjust path to your ttf
+fm.fontManager.addfont(tum_font_path)
+tum_name = fm.FontProperties(fname=tum_font_path).get_name()
+
+#plt.rcParams.update({"font.size": 17.5, "font.family": "Times New Roman", "axes.labelsize": 17.5, "axes.titlesize": 17.5, "xtick.labelsize": 17.5, "ytick.labelsize": 17.5, "legend.fontsize": 17.5})
+
+plt.rcParams.update({"font.size": 17.5, "font.family": tum_name, "axes.labelsize": 17.5, "axes.titlesize": 17.5, "xtick.labelsize": 17.5, "ytick.labelsize": 17.5, "legend.fontsize": 17.5})
 
 def IGBT_and_Diode_Current():
 
@@ -1616,28 +1625,29 @@ def plot_case_study1_summary_4x1():
     fig, axes = plt.subplots(4, 1, figsize=(6.4, 4.8 * 2.0), sharex=True)
 
     def draw(ax, yI_cap, yI_ind, yD_cap, yD_ind, ylabel, title):
-        ax.plot(pf_grid, yI_cap, "-",  marker="o", linewidth=2.5, markersize=9, color="tab:blue",   label="IGBT (capacitive)")
-        ax.plot(pf_grid, yI_ind, "--", marker="o", linewidth=1.5, markersize=5, color="tab:orange", label="IGBT (inductive)")
-        ax.plot(pf_grid, yD_cap, "-",  marker="s", linewidth=2.5, markersize=9, color="tab:green",  label="Diode (capacitive)")
-        ax.plot(pf_grid, yD_ind, "--", marker="s", linewidth=1.5, markersize=5, color="tab:red",    label="Diode (inductive)")
+        ax.plot(pf_grid, yI_cap, "-",  marker="o", linewidth=2.5, markersize=9, color="blue",   label="IGBT (capacitive)")
+        ax.plot(pf_grid, yI_ind, "--", marker="o", linewidth=1.25, markersize=5, color="orange", label="IGBT (inductive)")
+        ax.plot(pf_grid, yD_cap, "-",  marker="s", linewidth=2.5, markersize=9, color="green",  label="Diode (capacitive)")
+        ax.plot(pf_grid, yD_ind, "--", marker="s", linewidth=1.25, markersize=5, color="red",    label="Diode (inductive)")
         ax.set_ylabel(ylabel)
         ax.set_title(title)  # ← HERE
-        ax.grid(True)
+        #ax.grid(True)
         ax.set_xlim(0, 1)
 
-    draw(axes[0], Icap, Iind, Dcap, Dind, "Current [A]","(a) Average IGBT and diode current")
-    draw(axes[1], Pcap, Pind, PDcap, PDind, "Power losses [W]","(b) Average IGBT and diode total power losses")
-    draw(axes[2], Tcap, Tind, TDcap, TDind, "Temperature [°C]","(c) Average IGBT and diode junction temperature")
+    draw(axes[0], Icap, Iind, Dcap, Dind, "Current [A]","Average IGBT and diode current")
+    draw(axes[1], Pcap, Pind, PDcap, PDind, "Power losses [W]","Average IGBT and diode total power losses")
+    draw(axes[2], Tcap, Tind, TDcap, TDind, "Temperature [°C]","Average IGBT and diode junction temperature")
 
     # lifetime uses pf_grid_L (same set, but keep robust)
-    axes[3].plot(pf_grid_L, LI_cap, "-",  marker="o", linewidth=2.5, markersize=9, color="tab:blue",   label="IGBT (capacitive)")
-    axes[3].plot(pf_grid_L, LI_ind, "--", marker="o", linewidth=1.5, markersize=5, color="tab:orange", label="IGBT (inductive)")
-    axes[3].plot(pf_grid_L, LD_cap, "-",  marker="s", linewidth=2.5, markersize=9, color="tab:green",  label="Diode (capacitive)")
-    axes[3].plot(pf_grid_L, LD_ind, "--", marker="s", linewidth=1.5, markersize=5, color="tab:red",    label="Diode (inductive)")
+    axes[3].plot(pf_grid_L, LI_cap, "-",  marker="o", linewidth=2.5, markersize=9, color="blue",   label="IGBT (capacitive)")
+    axes[3].plot(pf_grid_L, LI_ind, "--", marker="o", linewidth=1.25, markersize=5, color="orange", label="IGBT (inductive)")
+    axes[3].plot(pf_grid_L, LD_cap, "-",  marker="s", linewidth=2.5, markersize=9, color="green",  label="Diode (capacitive)")
+    axes[3].plot(pf_grid_L, LD_ind, "--", marker="s", linewidth=1.25, markersize=5, color="red",    label="Diode (inductive)")
     axes[3].set_ylabel("Lifetime [years]")
     axes[3].set_xlabel("Power factor [-]")
-    axes[3].set_title("(d) IGBT and diode estimated lifetime")
-    axes[3].grid(True)
+    #axes[3].set_title("(d) IGBT and diode estimated lifetime")
+    axes[3].set_title("IGBT and diode estimated lifetime")
+    #axes[3].grid(True)
     axes[3].set_xlim(0, 1)
 
     handles, labels = axes[0].get_legend_handles_labels()
@@ -1647,4 +1657,376 @@ def plot_case_study1_summary_4x1():
     plt.savefig("Paper_figures/CaseStudy1_summary_4x1.pdf")
     plt.close(fig)
 
-plot_case_study1_summary_4x1()
+#plot_case_study1_summary_4x1()
+
+
+
+
+def plot_case_study1_summary_2x2():
+    pf_values = [1, 0, 0.9, -0.9, 0.8, -0.8, 0.7, -0.7, 0.6, -0.6,
+                 0.5, -0.5, 0.4, -0.4, 0.3, -0.3, 0.2, -0.2, 0.1, -0.1]
+
+    sim_base = Path("z/Final_results_conference/Simulation_results")
+
+    # ---- (1) Avg device current ----
+    pf_grid, Icap, Iind, Dcap, Dind = _load_metric_vs_pf(
+        pf_values=pf_values,
+        sim_base=sim_base,
+        df_subfolder="df_electrical_loss",
+        value_getter=lambda df: (df["is_I"].mean(), df["is_D"].mean()),
+    )
+
+    # ---- (2) Avg total losses ----
+    _, Pcap, Pind, PDcap, PDind = _load_metric_vs_pf(
+        pf_values=pf_values,
+        sim_base=sim_base,
+        df_subfolder="df_electrical_loss",
+        value_getter=lambda df: (df["P_I"].mean(), df["P_D"].mean()),
+    )
+
+    # ---- (3) Avg junction temperature ----
+    _, Tcap, Tind, TDcap, TDind = _load_metric_vs_pf(
+        pf_values=pf_values,
+        sim_base=sim_base,
+        df_subfolder="df_thermal",
+        value_getter=lambda df: ((df["Tj_igbt"] - 273.15).mean(),
+                                 (df["Tj_diode"] - 273.15).mean()),
+    )
+
+    # ---- (4) Lifetime ----
+    # lifetime is stored differently, so do a small custom loader
+    lifetime_store = {}
+    for i, pf in enumerate(pf_values, start=1):
+        base = Path("Simulation_results") / f"Simulation_{i}"
+        df_igbt  = pd.read_parquet(base / "df_lifetime_IGBT" / "df_IGBT_final.parquet")
+        df_diode = pd.read_parquet(base / "df_lifetime_Diode" / "df_Diode_final.parquet")
+
+        prefix = _pf_key_prefix(pf)
+        lifetime_store[f"{prefix}_I"] = float(df_igbt["lifetime_years_igbt_actual"].iloc[0])
+        lifetime_store[f"{prefix}_D"] = float(df_diode["lifetime_years_diode_actual"].iloc[0])
+
+    # synthetic pf=0,1 inductive
+    for pf in (0, 1):
+        cap_prefix = f"pf_{pf}"; ind_prefix = f"pf__{pf}"
+        if f"{cap_prefix}_I" in lifetime_store and f"{ind_prefix}_I" not in lifetime_store:
+            lifetime_store[f"{ind_prefix}_I"] = lifetime_store[f"{cap_prefix}_I"]
+            lifetime_store[f"{ind_prefix}_D"] = lifetime_store[f"{cap_prefix}_D"]
+
+    pf_abs_list, LI_list, LD_list, ind_flag_list = [], [], [], []
+    for k in lifetime_store:
+        if k.endswith("_I"):
+            pf_abs, is_ind = _extract_pf_abs_and_flag_from_key(k.replace("_I", ""))
+            pf_abs_list.append(pf_abs)
+            ind_flag_list.append(is_ind)
+            LI_list.append(lifetime_store[k])
+            LD_list.append(lifetime_store[k.replace("_I", "_D")])
+
+    pf_abs = np.array(pf_abs_list); LI = np.array(LI_list); LD = np.array(LD_list); ind_f = np.array(ind_flag_list)
+    idx = np.argsort(pf_abs)
+    pf_abs, LI, LD, ind_f = pf_abs[idx], LI[idx], LD[idx], ind_f[idx]
+    pf_grid_L = np.unique(pf_abs)
+
+    LI_cap = np.full_like(pf_grid_L, np.nan, dtype=float)
+    LI_ind = np.full_like(pf_grid_L, np.nan, dtype=float)
+    LD_cap = np.full_like(pf_grid_L, np.nan, dtype=float)
+    LD_ind = np.full_like(pf_grid_L, np.nan, dtype=float)
+
+    for j, pfv in enumerate(pf_grid_L):
+        m = (pf_abs == pfv)
+        LIv = LI[m]; LDv = LD[m]; flags = ind_f[m]
+        if np.any(~flags):
+            LI_cap[j] = LIv[~flags][0]; LD_cap[j] = LDv[~flags][0]
+        if np.any(flags):
+            LI_ind[j] = LIv[flags][0];  LD_ind[j] = LDv[flags][0]
+
+    # ---- PLOT 2x2 ----
+    fig, axes = plt.subplots(2, 2, figsize=(6.4 * 2.0, 4.8 * 1.5))
+    axes = axes.ravel()   # flatten so axes[0..3] indexing still works
+
+    def draw(ax, yI_cap, yI_ind, yD_cap, yD_ind, ylabel, title):
+        ax.plot(pf_grid, yI_cap, "-",  marker="o", linewidth=2.5, markersize=9, color="blue",   label="IGBT (capacitive)")
+        ax.plot(pf_grid, yI_ind, "--", marker="o", linewidth=1.25, markersize=5, color="orange", label="IGBT (inductive)")
+        ax.plot(pf_grid, yD_cap, "-",  marker="s", linewidth=2.5, markersize=9, color="green",  label="Diode (capacitive)")
+        ax.plot(pf_grid, yD_ind, "--", marker="s", linewidth=1.25, markersize=5, color="red",    label="Diode (inductive)")
+        ax.set_ylabel(ylabel)
+        ax.set_xlabel("Power factor [-]")
+        ax.set_title(title)
+        #ax.grid(True)
+        ax.set_xlim(0, 1)
+
+    draw(axes[0], Icap, Iind, Dcap, Dind, "Current [A]","Average IGBT and diode current")
+    draw(axes[1], Pcap, Pind, PDcap, PDind, "Power losses [W]","Average IGBT and diode total power losses")
+    draw(axes[2], Tcap, Tind, TDcap, TDind, "Temperature [°C]","Average IGBT and diode junction temperature")
+
+    # lifetime uses pf_grid_L (same set, but keep robust)
+    axes[3].plot(pf_grid_L, LI_cap, "-",  marker="o", linewidth=2.5, markersize=9, color="blue",   label="IGBT (capacitive)")
+    axes[3].plot(pf_grid_L, LI_ind, "--", marker="o", linewidth=1.25, markersize=5, color="orange", label="IGBT (inductive)")
+    axes[3].plot(pf_grid_L, LD_cap, "-",  marker="s", linewidth=2.5, markersize=9, color="green",  label="Diode (capacitive)")
+    axes[3].plot(pf_grid_L, LD_ind, "--", marker="s", linewidth=1.25, markersize=5, color="red",    label="Diode (inductive)")
+    axes[3].set_ylabel("Lifetime [years]")
+    axes[3].set_xlabel("Power factor [-]")
+    axes[3].set_title("IGBT and diode estimated lifetime")
+    #axes[3].grid(True)
+    axes[3].set_xlim(0, 1)
+
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=4, frameon=True)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.9375])
+    plt.savefig("Paper_figures/CaseStudy1_summary_2x2.pdf")
+    plt.close(fig)
+
+#plot_case_study1_summary_2x2()
+
+
+
+def plot_case_study1_summary_5plots():
+    from matplotlib.gridspec import GridSpec
+
+    pf_values = [1, 0, 0.9, -0.9, 0.8, -0.8, 0.7, -0.7, 0.6, -0.6, 0.5, -0.5, 0.4, -0.4, 0.3, -0.3, 0.2, -0.2, 0.1, -0.1]
+
+    sim_base = Path("z/Final_results_conference/Simulation_results")
+
+    # ---- (1) Avg device current ----
+    pf_grid, Icap, Iind, Dcap, Dind = _load_metric_vs_pf(
+        pf_values=pf_values, sim_base=sim_base,
+        df_subfolder="df_electrical_loss",
+        value_getter=lambda df: (df["is_I"].mean(), df["is_D"].mean()),)
+
+    # ---- (2) Avg total losses ----
+    _, Pcap, Pind, PDcap, PDind = _load_metric_vs_pf(
+        pf_values=pf_values, sim_base=sim_base,
+        df_subfolder="df_electrical_loss",
+        value_getter=lambda df: (df["P_I"].mean(), df["P_D"].mean()),)
+
+    # ---- (3) Avg junction temperature ----
+    _, Tcap, Tind, TDcap, TDind = _load_metric_vs_pf(
+        pf_values=pf_values, sim_base=sim_base,
+        df_subfolder="df_thermal",
+        value_getter=lambda df: ((df["Tj_igbt"] - 273.15).mean(),
+                                 (df["Tj_diode"] - 273.15).mean()),)
+
+    # ---- (4) + (5) Lifetime ----
+    lifetime_store = {}
+    for i, pf in enumerate(pf_values, start=1):
+        base = Path("Simulation_results") / f"Simulation_{i}"
+        df_igbt  = pd.read_parquet(base / "df_lifetime_IGBT" / "df_IGBT_final.parquet")
+        df_diode = pd.read_parquet(base / "df_lifetime_Diode" / "df_Diode_final.parquet")
+        prefix = _pf_key_prefix(pf)
+        lifetime_store[f"{prefix}_I"] = float(df_igbt["lifetime_years_igbt_actual"].iloc[0])
+        lifetime_store[f"{prefix}_D"] = float(df_diode["lifetime_years_diode_actual"].iloc[0])
+
+    for pf in (0, 1):
+        cap_prefix = f"pf_{pf}"; ind_prefix = f"pf__{pf}"
+        if f"{cap_prefix}_I" in lifetime_store and f"{ind_prefix}_I" not in lifetime_store:
+            lifetime_store[f"{ind_prefix}_I"] = lifetime_store[f"{cap_prefix}_I"]
+            lifetime_store[f"{ind_prefix}_D"] = lifetime_store[f"{cap_prefix}_D"]
+
+    pf_abs_list, LI_list, LD_list, ind_flag_list = [], [], [], []
+    for k in lifetime_store:
+        if k.endswith("_I"):
+            pf_abs, is_ind = _extract_pf_abs_and_flag_from_key(k.replace("_I", ""))
+            pf_abs_list.append(pf_abs)
+            ind_flag_list.append(is_ind)
+            LI_list.append(lifetime_store[k])
+            LD_list.append(lifetime_store[k.replace("_I", "_D")])
+
+    pf_abs = np.array(pf_abs_list); LI = np.array(LI_list); LD = np.array(LD_list); ind_f = np.array(ind_flag_list)
+    idx = np.argsort(pf_abs)
+    pf_abs, LI, LD, ind_f = pf_abs[idx], LI[idx], LD[idx], ind_f[idx]
+    pf_grid_L = np.unique(pf_abs)
+
+    LI_cap = np.full_like(pf_grid_L, np.nan, dtype=float)
+    LI_ind = np.full_like(pf_grid_L, np.nan, dtype=float)
+    LD_cap = np.full_like(pf_grid_L, np.nan, dtype=float)
+    LD_ind = np.full_like(pf_grid_L, np.nan, dtype=float)
+
+    for j, pfv in enumerate(pf_grid_L):
+        m = (pf_abs == pfv)
+        LIv = LI[m]; LDv = LD[m]; flags = ind_f[m]
+        if np.any(~flags):
+            LI_cap[j] = LIv[~flags][0]; LD_cap[j] = LDv[~flags][0]
+        if np.any(flags):
+            LI_ind[j] = LIv[flags][0];  LD_ind[j] = LDv[flags][0]
+
+    # ---- (5) Switch bottleneck lifetime = min(IGBT, Diode) ----
+    Lsw_cap = np.minimum(LI_cap, LD_cap)
+    Lsw_ind = np.minimum(LI_ind, LD_ind)
+
+    # ---- PLOT: 2x2 on top, 1 centered below ----
+    fig = plt.figure(figsize=(6.4 * 2.0, 4.8 * 3 * 0.66))
+    gs = GridSpec(3, 4, figure=fig)   # 4 columns so bottom can span middle 2
+
+    axes = [
+        fig.add_subplot(gs[0, 0:2]),   # top-left      -> current
+        fig.add_subplot(gs[0, 2:4]),   # top-right     -> losses
+        fig.add_subplot(gs[1, 0:2]),   # mid-left      -> temperature
+        fig.add_subplot(gs[1, 2:4]),   # mid-right     -> lifetime
+        fig.add_subplot(gs[2, 1:3]),   # bottom-CENTER -> switch lifetime
+    ]
+
+    def draw(ax, yI_cap, yI_ind, yD_cap, yD_ind, ylabel, title):
+        ax.plot(pf_grid, yI_cap, "-",  marker="o", linewidth=2.5, markersize=9, color="blue",   label="IGBT (capacitive)")
+        ax.plot(pf_grid, yI_ind, "--", marker="o", linewidth=1.25, markersize=5, color="orange", label="IGBT (inductive)")
+        ax.plot(pf_grid, yD_cap, "-",  marker="s", linewidth=2.5, markersize=9, color="green",  label="Diode (capacitive)")
+        ax.plot(pf_grid, yD_ind, "--", marker="s", linewidth=1.25, markersize=5, color="red",    label="Diode (inductive)")
+        ax.set_ylabel(ylabel)
+        ax.set_xlabel("Power factor [-]")
+        ax.set_title(title)
+        ax.set_xlim(0, 1)
+
+    draw(axes[0], Icap, Iind, Dcap, Dind, "Current [A]", "Average IGBT and diode current")
+    draw(axes[1], Pcap, Pind, PDcap, PDind, "Power losses [W]", "Average IGBT and diode total power losses")
+    draw(axes[2], Tcap, Tind, TDcap, TDind, "Temperature [°C]", "Average IGBT and diode junction temperature")
+
+    # (4) lifetime
+    axes[3].plot(pf_grid_L, LI_cap, "-",  marker="o", linewidth=2.5, markersize=9, color="blue",   label="IGBT (capacitive)")
+    axes[3].plot(pf_grid_L, LI_ind, "--", marker="o", linewidth=1.25, markersize=5, color="orange", label="IGBT (inductive)")
+    axes[3].plot(pf_grid_L, LD_cap, "-",  marker="s", linewidth=2.5, markersize=9, color="green",  label="Diode (capacitive)")
+    axes[3].plot(pf_grid_L, LD_ind, "--", marker="s", linewidth=1.25, markersize=5, color="red",    label="Diode (inductive)")
+    axes[3].set_ylabel("Lifetime [years]")
+    axes[3].set_xlabel("Power factor [-]")
+    axes[3].set_title("IGBT and diode estimated lifetime")
+    axes[3].set_xlim(0, 1)
+
+    # (5) switch bottleneck lifetime = min(IGBT, Diode)
+    axes[4].plot(pf_grid_L, Lsw_cap, "-",  marker="o", linewidth=2.5, markersize=9, color="blue", label="Capacitive")
+    axes[4].plot(pf_grid_L, Lsw_ind, "--", marker="o", linewidth=2.0, markersize=5, color="red",  label="Inductive")
+    axes[4].set_ylabel("Lifetime [years]")
+    axes[4].set_xlabel("Power factor [-]")
+    axes[4].set_title("Switch lifetime = min(IGBT, Diode)")
+    axes[4].set_xlim(0, 1)
+    axes[4].legend(loc="upper right")
+
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=4, frameon=True)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.966])
+    plt.savefig("Paper_figures/CaseStudy1_summary_5plots.pdf")
+    plt.close(fig)
+
+#plot_case_study1_summary_5plots()
+
+
+def plot_case_study1_summary_5plots_one_column():
+
+    pf_values = [1, 0, 0.9, -0.9, 0.8, -0.8, 0.7, -0.7, 0.6, -0.6, 0.5, -0.5, 0.4, -0.4, 0.3, -0.3, 0.2, -0.2, 0.1, -0.1]
+
+    sim_base = Path("z/Final_results_conference/Simulation_results")
+
+    # ---- (1) Avg device current ----
+    pf_grid, Icap, Iind, Dcap, Dind = _load_metric_vs_pf(
+        pf_values=pf_values, sim_base=sim_base,
+        df_subfolder="df_electrical_loss",
+        value_getter=lambda df: (df["is_I"].mean(), df["is_D"].mean()),)
+
+    # ---- (2) Avg total losses ----
+    _, Pcap, Pind, PDcap, PDind = _load_metric_vs_pf(
+        pf_values=pf_values, sim_base=sim_base,
+        df_subfolder="df_electrical_loss",
+        value_getter=lambda df: (df["P_I"].mean(), df["P_D"].mean()),)
+
+    # ---- (3) Avg junction temperature ----
+    _, Tcap, Tind, TDcap, TDind = _load_metric_vs_pf(
+        pf_values=pf_values, sim_base=sim_base,
+        df_subfolder="df_thermal",
+        value_getter=lambda df: ((df["Tj_igbt"] - 273.15).mean(),
+                                 (df["Tj_diode"] - 273.15).mean()),)
+
+    # ---- (4) + (5) Lifetime ----
+    lifetime_store = {}
+    for i, pf in enumerate(pf_values, start=1):
+        base = Path("Simulation_results") / f"Simulation_{i}"
+        df_igbt  = pd.read_parquet(base / "df_lifetime_IGBT" / "df_IGBT_final.parquet")
+        df_diode = pd.read_parquet(base / "df_lifetime_Diode" / "df_Diode_final.parquet")
+        prefix = _pf_key_prefix(pf)
+        lifetime_store[f"{prefix}_I"] = float(df_igbt["lifetime_years_igbt_actual"].iloc[0])
+        lifetime_store[f"{prefix}_D"] = float(df_diode["lifetime_years_diode_actual"].iloc[0])
+
+    for pf in (0, 1):
+        cap_prefix = f"pf_{pf}"; ind_prefix = f"pf__{pf}"
+        if f"{cap_prefix}_I" in lifetime_store and f"{ind_prefix}_I" not in lifetime_store:
+            lifetime_store[f"{ind_prefix}_I"] = lifetime_store[f"{cap_prefix}_I"]
+            lifetime_store[f"{ind_prefix}_D"] = lifetime_store[f"{cap_prefix}_D"]
+
+    pf_abs_list, LI_list, LD_list, ind_flag_list = [], [], [], []
+    for k in lifetime_store:
+        if k.endswith("_I"):
+            pf_abs, is_ind = _extract_pf_abs_and_flag_from_key(k.replace("_I", ""))
+            pf_abs_list.append(pf_abs)
+            ind_flag_list.append(is_ind)
+            LI_list.append(lifetime_store[k])
+            LD_list.append(lifetime_store[k.replace("_I", "_D")])
+
+    pf_abs = np.array(pf_abs_list); LI = np.array(LI_list); LD = np.array(LD_list); ind_f = np.array(ind_flag_list)
+    idx = np.argsort(pf_abs)
+    pf_abs, LI, LD, ind_f = pf_abs[idx], LI[idx], LD[idx], ind_f[idx]
+    pf_grid_L = np.unique(pf_abs)
+
+    LI_cap = np.full_like(pf_grid_L, np.nan, dtype=float)
+    LI_ind = np.full_like(pf_grid_L, np.nan, dtype=float)
+    LD_cap = np.full_like(pf_grid_L, np.nan, dtype=float)
+    LD_ind = np.full_like(pf_grid_L, np.nan, dtype=float)
+
+    for j, pfv in enumerate(pf_grid_L):
+        m = (pf_abs == pfv)
+        LIv = LI[m]; LDv = LD[m]; flags = ind_f[m]
+        if np.any(~flags):
+            LI_cap[j] = LIv[~flags][0]; LD_cap[j] = LDv[~flags][0]
+        if np.any(flags):
+            LI_ind[j] = LIv[flags][0];  LD_ind[j] = LDv[flags][0]
+
+    # ---- (5) Switch bottleneck lifetime = min(IGBT, Diode) ----
+    Lsw_cap = np.minimum(LI_cap, LD_cap)
+    Lsw_ind = np.minimum(LI_ind, LD_ind)
+
+    # ---- PLOT: 5 stacked rows, single column ----
+    fig, axes = plt.subplots(5, 1, figsize=(6.4, 4.8 * 5 * 0.66))
+
+    def draw(ax, yI_cap, yI_ind, yD_cap, yD_ind, ylabel, title):
+        ax.plot(pf_grid, yI_cap, "-",  marker="o", linewidth=2.5*1.25, markersize=9*1.25, color="blue",   label="IGBT (capacitive)")
+        ax.plot(pf_grid, yI_ind, "--", marker="o", linewidth=1.5*1.25, markersize=5*1.25, color="orange", label="IGBT (inductive)")
+        ax.plot(pf_grid, yD_cap, "-",  marker="s", linewidth=2.5*1.25, markersize=9*1.25, color="green",  label="Diode (capacitive)")
+        ax.plot(pf_grid, yD_ind, "--", marker="s", linewidth=1.5*1.25, markersize=5*1.25, color="red",    label="Diode (inductive)")
+        ax.set_ylabel(ylabel)
+        ax.set_xlabel("Power factor [-]")
+        ax.set_title(title)
+        ax.set_xlim(0, 1)
+
+    draw(axes[0], Icap, Iind, Dcap, Dind, "Current [A]", "Average IGBT and diode current")
+    draw(axes[1], Pcap, Pind, PDcap, PDind, "Power losses [W]", "Average IGBT and diode total power losses")
+    draw(axes[2], Tcap, Tind, TDcap, TDind, "Temperature [°C]", "Average IGBT and diode junction temperature")
+
+    # (4) lifetime
+    axes[3].plot(pf_grid_L, LI_cap, "-",  marker="o", linewidth=2.5*1.25, markersize=9*1.25, color="blue",   label="IGBT (capacitive)")
+    axes[3].plot(pf_grid_L, LI_ind, "--", marker="o", linewidth=1.5*1.25, markersize=5*1.25, color="orange", label="IGBT (inductive)")
+    axes[3].plot(pf_grid_L, LD_cap, "-",  marker="s", linewidth=2.5*1.25, markersize=9*1.25, color="green",  label="Diode (capacitive)")
+    axes[3].plot(pf_grid_L, LD_ind, "--", marker="s", linewidth=1.5*1.25, markersize=5*1.25, color="red",    label="Diode (inductive)")
+    axes[3].set_ylabel("Lifetime [years]")
+    axes[3].set_xlabel("Power factor [-]")
+    axes[3].set_title("IGBT and diode estimated lifetime")
+    axes[3].set_xlim(0, 1)
+
+    # (5) switch bottleneck lifetime = min(IGBT, Diode)
+    axes[4].plot(pf_grid_L, Lsw_cap, "-",  marker="o", linewidth=2.5*1.25, markersize=9*1.25, color="blue", label="Cap")
+    axes[4].plot(pf_grid_L, Lsw_ind, "--", marker="o", linewidth=2.5*1.25, markersize=5*1.25, color="red",  label="Ind")
+    axes[4].set_ylabel("Lifetime [years]")
+    axes[4].set_xlabel("Power factor [-]")
+    axes[4].set_title("Switch lifetime = min(IGBT, Diode)")
+    axes[4].set_xlim(0, 1)
+    axes[4].legend(loc="upper right")
+
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=2, frameon=True)
+
+    #fig.legend(handles=handles,loc="upper center",ncol=4,frameon=True,
+    #    columnspacing=0.5,  # tighten gaps between columns
+    #    handlelength=1.0,  # shorter line samples
+    #    bbox_to_anchor=(0.5, 1.0)  # nudge above the axes
+    #    )
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.savefig("Paper_figures/CaseStudy1_summary_5plots_column.pdf")
+    plt.close(fig)
+
+plot_case_study1_summary_5plots_one_column()

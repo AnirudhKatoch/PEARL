@@ -2371,7 +2371,11 @@ class Calculation_functions_class:
         return L_total, life_consumed_percent
 
     @staticmethod
-    def calculate_capacitor_thermal_resistance(method, D_case=None, H_case=None, heat_transfer_coefficient=None, R_th_user=None):
+    def calculate_capacitor_thermal_resistance(method, case_shape=None,
+                                               D_case=None, H_case=None,
+                                               W_case=None, L_case=None,
+                                               heat_transfer_coefficient=None,
+                                               R_th_user=None):
         """
         Calculate thermal resistance of the capacitor to ambient.
 
@@ -2381,10 +2385,24 @@ class Calculation_functions_class:
             User provides R_th directly from datasheet or measurement.
 
         Method 2 — "surface_area":
-            R_th computed from cylindrical capacitor can geometry and
-            convective heat transfer coefficient:
-                A_surface = pi*D*H + pi*D²/2   [m²]  (cylinder lateral + two end caps)
-                R_th      = 1 / (h * A_surface) [K/W]
+            R_th computed from the capacitor case geometry and the convective
+            heat-transfer coefficient. The case may be a cylindrical can or a
+            rectangular box, selected via case_shape:
+
+            case_shape = "cylinder":
+                A_surface = pi*D*H + 2*pi*(D/2)^2     [m²]
+                            (lateral side + two circular end caps)
+                Requires: D_case, H_case
+                Source: TDK B3236X datasheet (cylindrical can), column D, H.
+
+            case_shape = "box":
+                A_surface = 2*(W*H + W*L + H*L)        [m²]
+                            (all six rectangular faces)
+                Requires: W_case, H_case, L_case
+                Source: TDK B32354S datasheet, dimensions w x h x l.
+
+            In both cases:
+                R_th = 1 / (h * A_surface)             [K/W]
             Reference: Incropera et al., "Fundamentals of Heat and Mass Transfer",
                        7th Ed., Wiley, 2011, Table 1.1
 
@@ -2392,16 +2410,19 @@ class Calculation_functions_class:
         ----------
         method : str
             Calculation method. One of: "user", "surface_area".
+        case_shape : str, optional
+            Capacitor case shape when method = "surface_area".
+            One of: "cylinder", "box".
         D_case : float, optional
-            Outer diameter of capacitor can [m].
-            Required when method = "surface_area".
-            Source: TDK B3236X datasheet page 10, column D.
+            Outer diameter of cylindrical can [m]. Required for case_shape="cylinder".
         H_case : float, optional
-            Height of capacitor can [m].
-            Required when method = "surface_area".
-            Source: TDK B3236X datasheet page 10, column H.
+            Height of the case [m]. Required for both shapes.
+        W_case : float, optional
+            Width of rectangular box [m]. Required for case_shape="box".
+        L_case : float, optional
+            Length (depth) of rectangular box [m]. Required for case_shape="box".
         heat_transfer_coefficient : float, optional
-            Convective heat transfer coefficient [W/(m²·K)].
+            Convective heat-transfer coefficient [W/(m²·K)].
             Required when method = "surface_area".
             Typical values:
                 10  W/(m²·K) — natural convection, still air
@@ -2409,8 +2430,7 @@ class Calculation_functions_class:
                 250 W/(m²·K) — high-velocity forced air
             Source: Incropera et al., Table 1.1
         R_th_user : float, optional
-            User-supplied thermal resistance [K/W].
-            Required when method = "user".
+            User-supplied thermal resistance [K/W]. Required when method = "user".
 
         Returns
         -------
@@ -2424,12 +2444,30 @@ class Calculation_functions_class:
             R_th = R_th_user
 
         elif method == "surface_area":
-            if D_case is None or H_case is None or heat_transfer_coefficient is None:
-                raise ValueError("method='surface_area' requires D_case, H_case, "
-                                 "and heat_transfer_coefficient.")
-            A_lateral = np.pi * D_case * H_case  # [m²] cylindrical side
-            A_end_caps = 2 * np.pi * (D_case / 2) ** 2  # [m²] two circular ends
-            A_surface = A_lateral + A_end_caps  # [m²] total surface area
+            if heat_transfer_coefficient is None:
+                raise ValueError("method='surface_area' requires heat_transfer_coefficient.")
+            if case_shape is None:
+                raise ValueError("method='surface_area' requires case_shape "
+                                 "('cylinder' or 'box').")
+
+            if case_shape == "cylinder":
+                if D_case is None or H_case is None:
+                    raise ValueError("case_shape='cylinder' requires D_case and H_case.")
+                A_lateral = np.pi * D_case * H_case  # [m²] cylindrical side
+                A_end_caps = 2 * np.pi * (D_case / 2) ** 2  # [m²] two circular ends
+                A_surface = A_lateral + A_end_caps  # [m²] total surface area
+
+            elif case_shape == "box":
+                if W_case is None or H_case is None or L_case is None:
+                    raise ValueError("case_shape='box' requires W_case, H_case, and L_case.")
+                A_surface = 2 * (W_case * H_case
+                                 + W_case * L_case
+                                 + H_case * L_case)  # [m²] six rectangular faces
+
+            else:
+                raise ValueError(f"Unknown case_shape '{case_shape}'. "
+                                 "Choose from: 'cylinder', 'box'.")
+
             R_th = 1 / (heat_transfer_coefficient * A_surface)  # [K/W]
 
         else:
@@ -3191,6 +3229,8 @@ class Calculation_functions_class:
         if v(C, "Lifetime_consumed_C") is not None:
             print(f"  Lifetime consumed  : {v(C, 'Lifetime_consumed_C'):.2f} %")
 
+
+
         # ------------------------------------------------------------------ #
         # Inductors L1 vs L2 (aligned columns)
         # ------------------------------------------------------------------ #
@@ -3244,3 +3284,204 @@ class Calculation_functions_class:
         row("Lifetime consumed", "[%]", v(L1, "Lifetime_consumed"), v(L2, "Lifetime_consumed"))
 
         print("=" * len(line))
+
+
+    @staticmethod
+    def normal_distribution_function(value, frac_sigma, n_samples, rng):
+        """Draw n_samples ~ N(value, (frac_sigma*|value|)^2)."""
+        sigma = frac_sigma * abs(value)
+        return rng.normal(value, sigma, n_samples)
+
+    @staticmethod
+    def build_lifetime_curves_samples(lifetime_curves, frac_sigma, number_of_samples, rng):
+        """
+        Build a list of `number_of_samples` perturbed copies of the lifetime-curves
+        dictionary. Keys (voltage ratios) and T-arrays are kept fixed as the grid;
+        only the L-values are randomized, each point ~ N(L, (frac_sigma*|L|)^2).
+
+        Returns
+        -------
+        list of dict, length = number_of_samples
+            Each element has the same structure as `lifetime_curves`.
+        """
+        samples = []
+        for _ in range(number_of_samples):
+            perturbed = {}
+            for ratio, curve in lifetime_curves.items():
+                T_arr = curve["T"]  # grid — keep fixed
+                L_arr = curve["L"]
+                sigma = frac_sigma * np.abs(L_arr)
+                L_pert = rng.normal(L_arr, sigma)  # jitter each L point
+                L_pert = np.clip(L_pert, 1e-6, None)  # keep physical (no neg lifetime)
+                perturbed[ratio] = {"T": T_arr.copy(), "L": L_pert}
+            samples.append(perturbed)
+        return samples
+
+    @staticmethod
+    def equivalent_temperature(L_eq_years, T_rated, L_rated_hours, Ea, kb):
+        """
+        Constant temperature T_eq that reproduces the Miner-aggregated lifetime
+        via the Arrhenius model:  L = L_rated * exp[(Ea/kb)(1/T - 1/T_rated)]
+        Inverted: 1/T_eq = 1/T_rated + (kb/Ea) ln(L_eq / L_rated)
+        Units: L_eq and L_rated MUST be in the same unit -> convert years to hours.
+        """
+        L_eq_hours = L_eq_years * 365 * 24
+        inv_T = 1.0 / T_rated + (kb / Ea) * np.log(L_eq_hours / L_rated_hours)
+        return 1.0 / inv_T
+
+    @staticmethod
+    def equivalent_temperature_capacitor(L_eq_years, V_C_RMS, V_C_RMS_Rated, t1, T1, A, n):
+        """
+        Constant temperature T_eq [K] that reproduces the Miner-aggregated capacitor
+        lifetime via the TDK analytical model:
+            t2 = t1 * exp((T1 - T2)/A) * (V1/V2)^n
+        Inverted for T2 at a fixed operating voltage V2 = V_C_RMS:
+            T2 = T1 - A * ln( t2 / ( t1 * (V1/V2)^n ) )
+
+        Units:
+            - L_eq_years -> converted to HOURS (t1 is in hours)
+            - T1 passed in KELVIN, converted to °C internally (formula is in °C),
+              result converted back to KELVIN.
+        """
+        # match the forward function's internal unit handling
+        T1_C = T1 - 273.15  # K -> °C
+        L_eq_hours = L_eq_years * 365 * 24  # years -> hours (t1 is hours)
+
+        voltage_ratio = V_C_RMS_Rated / V_C_RMS  # V1 / V2  (fixed operating voltage)
+        voltage_term = voltage_ratio ** n
+
+        # invert the thermal term
+        T2_C = T1_C - A * np.log(L_eq_hours / (t1 * voltage_term))
+
+        return T2_C + 273.15  # °C -> K
+
+    @staticmethod
+    def compute_THD_v2(Signal, resolution_per_cycle, n_cycles):
+        """
+        Compute the THD of a signal over the last n_cycles fundamental periods.
+
+        Definition
+        ----------
+            THD = harmonic_RMS / fundamental_RMS
+        where the fundamental is the single exact FFT bin at the fundamental
+        frequency and the harmonic content is ALL remaining (non-DC, non-
+        fundamental) energy, obtained by Parseval:
+            harmonic_RMS = sqrt(total_RMS^2 - DC^2 - fundamental_RMS^2)
+
+        This captures every non-fundamental component, including the switching-
+        frequency sidebands, without relying on an explicit harmonic-bin list.
+        The integer-cycle window guarantees the fundamental lands exactly on a
+        bin, so the single-bin extraction is leakage-free.
+
+        Parameters
+        ----------
+        Signal : array
+            Time-domain signal (e.g. grid-side current) [A].
+        resolution_per_cycle : int
+            Samples per fundamental cycle [-].
+        n_cycles : int, optional
+            Number of trailing fundamental cycles to analyse. Default 1.
+
+        Returns
+        -------
+        THD_percent : float
+            THD of Signal [%].
+        """
+        x = np.asarray(Signal, dtype=float)
+        x = x[np.isfinite(x)]
+
+        spc = int(round(resolution_per_cycle))
+        win = n_cycles * spc
+        if win > len(x):
+            raise ValueError(
+                f"Window of {win} samples exceeds signal length {len(x)}.")
+
+        x = x[-win:]
+        N = len(x)
+
+        # total and DC
+        total_rms = np.sqrt(np.mean(x ** 2))
+        dc = np.mean(x)
+
+        # fundamental sits exactly on bin k = n_cycles
+        k = n_cycles
+        n = np.arange(N)
+        basis = np.exp(-1j * 2 * np.pi * k * n / N)
+        X = np.dot(x, basis)
+        fund_rms = (2.0 * np.abs(X) / N) / np.sqrt(2)
+
+        # harmonic content = everything except DC and fundamental (Parseval)
+        harmonic_rms = np.sqrt(max(total_rms ** 2 - dc ** 2 - fund_rms ** 2, 0.0))
+
+        THD_percent = 100.0 * harmonic_rms / fund_rms
+        return THD_percent
+
+    @staticmethod
+    def spectral_split_IL2_Ig(I_L2, Ig_ref, resolution_per_cycle, n_cycles):
+        """
+        Fundamental / harmonic spectral split of I_L2 and Ig_ref over the last
+        n_cycles fundamental periods.
+
+        For each signal, over the trailing window:
+          - fundamental_RMS = RMS of the single exact FFT bin at the fundamental.
+          - harmonic_RMS    = all remaining (non-DC, non-fundamental) energy,
+                              via Parseval: sqrt(total^2 - DC^2 - fund^2).
+
+        The bin index is derived from the actual window length (k = round(N/spc)),
+        so the extraction stays leakage-free even if the trailing window is not
+        perfectly period-aligned. Use n_cycles large enough (e.g. n_cycles = f)
+        that the window spans many whole periods.
+
+        Parameters
+        ----------
+        I_L2, Ig_ref : array
+            Grid-side current and reference grid current [A].
+        resolution_per_cycle : int
+            Samples per fundamental cycle [-].
+        n_cycles : int
+            Number of trailing fundamental cycles to analyse.
+
+        Returns
+        -------
+        dict with keys:
+            IL2_fund, IL2_hrm, IL2_total,
+            Ig_fund,  Ig_hrm,  Ig_total,
+            THD_IL2_self  : harmonic_RMS(I_L2) / fundamental_RMS(I_L2)  [%]
+            THD_IL2_ref   : harmonic_RMS(I_L2) / fundamental_RMS(Ig_ref) [%]
+        """
+        spc = int(round(resolution_per_cycle))
+        win = n_cycles * spc
+
+        def _split(a):
+            a = np.asarray(a, dtype=float)
+            a = a[np.isfinite(a)]
+            if win > len(a):
+                raise ValueError(
+                    f"Window of {win} samples exceeds signal length {len(a)}.")
+            a = a[-win:]
+            N = len(a)
+
+            k = int(round(N / spc))  # cycles in window = fund bin
+            n = np.arange(N)
+            X = np.dot(a, np.exp(-1j * 2 * np.pi * k * n / N))
+            fund_rms = (2.0 * np.abs(X) / N) / np.sqrt(2)
+
+            total_rms = np.sqrt(np.mean(a ** 2))
+            dc = np.mean(a)
+            hrm_rms = np.sqrt(max(total_rms ** 2 - dc ** 2 - fund_rms ** 2, 0.0))
+
+            return fund_rms, hrm_rms, total_rms
+
+        IL2_fund, IL2_hrm, IL2_total = _split(I_L2)
+        Ig_fund, Ig_hrm, Ig_total = _split(Ig_ref)
+
+        return {
+            "IL2_fund": IL2_fund,
+            "IL2_hrm": IL2_hrm,
+            "IL2_total": IL2_total,
+            "Ig_fund": Ig_fund,
+            "Ig_hrm": Ig_hrm,
+            "Ig_total": Ig_total,
+            "THD_IL2_self": 100.0 * IL2_hrm / IL2_fund,
+            "THD_IL2_ref": 100.0 * IL2_hrm / Ig_fund,
+        }

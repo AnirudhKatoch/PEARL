@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import MultipleLocator
+from scipy.stats import gaussian_kde
+import matplotlib
+matplotlib.use("Agg")   # non-interactive backend, no tkinter windows
 
 plt.rcParams.update({"font.size": 15, "font.family": "Times New Roman", "axes.labelsize": 15, "axes.titlesize": 15,"xtick.labelsize": 15, "ytick.labelsize": 15, "legend.fontsize": 15})
 
@@ -240,19 +243,6 @@ class Plotting_functions_class:
         plt.close(fig)
 
         '''
-        # ---------- Fig_10a : THD_percent_Vs (single bar) ----------
-        thd = df["THD_percent_Vs"].dropna()
-        thd_val = float(thd.iloc[-1]) if len(thd) else np.nan
-        fig, ax = plt.subplots(figsize=(6.4, 4.8))
-        ax.bar(["Vs"], [thd_val], color="tab:cyan", width=0.4)
-        ax.set_ylabel("THD [%]")
-        ax.set_title("Total Harmonic Distortion")
-        ax.set_ylim(0, thd_val * (1 + y_margin) if thd_val > 0 else 1.0)
-        ax.text(0, thd_val, f"{thd_val:.4f} %", ha="center", va="bottom")
-        ax.grid(True, axis="y", alpha=0.3)
-        fig.tight_layout()
-        fig.savefig(f"{figures_dir}/Fig_10a_THD_Vs.png", dpi=300)
-        plt.close(fig)
         
 
         # ---------- Fig_15 : V_L1 / I_C / V_L2 (switching-dominated waveforms) ----------
@@ -511,8 +501,87 @@ class Plotting_functions_class:
         fig20.savefig(f"{figures_dir}/Fig_20_average_temperature.png", dpi=300)
         plt.close(fig20)
 
+    @staticmethod
+    def plot_lifetime_monte_carlo(Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, Lifetime_LCL_MC,figures_dir,
+                                  B10_C=None, B10_L1=None, B10_L2=None, B10_LCL=None,plot_type="histogram", bins=50):
+
+        """
+        Plot Monte Carlo lifetime distributions as four separate figures
+        (Capacitor, L1, L2, LCL filter), each saved individually to figures_dir.
+
+        Parameters
+        ----------
+        Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, Lifetime_LCL_MC : np.ndarray
+            Monte Carlo lifetime samples [years].
+        figures_dir : str
+            Directory to save the figures into (created if missing).
+        plot_type : str
+            "histogram" -> bar histogram
+            "line"      -> smooth density curve (line)
+        bins : int
+            Histogram bin count (also used to build the line curve).
+        """
+
+        panels = [
+            ("Capacitor C", Lifetime_C_MC, "Fig_21_lifetime_MC_C", "red"),
+            ("Inverter-side inductor L1", Lifetime_L1_MC, "Fig_22_lifetime_MC_L1", "red"),
+            ("Grid-side inductor L2", Lifetime_L2_MC, "Fig_23_lifetime_MC_L2", "red"),
+            ("LCL filter", Lifetime_LCL_MC, "Fig_24_lifetime_MC_LCL", "red"),
+        ]
+
+        for title, data, fname, color in panels:
+            data = np.asarray(data, dtype=float)
+            data = data[np.isfinite(data)]  # drop NaN/inf
+
+            fig, ax = plt.subplots(figsize=(6.4, 4.8))
+
+            if plot_type == "histogram":
+                ax.hist(data, bins=bins, color=color, edgecolor="black", linewidth=0.8)
+                ax.set_ylabel("Count")
+
+            elif plot_type == "line":
+                # smooth density curve via Gaussian KDE
+
+                kde = gaussian_kde(data)
+                x = np.linspace(data.min(), data.max())
+                ax.plot(x, kde(x), color=color)
+                # ax.fill_between(x, kde(x), color=color, alpha=0.15)
+                ax.set_ylabel("Probability density")
+
+            else:
+                raise ValueError("plot_type must be 'histogram' or 'line'.")
+
+            ax.set_title(title)
+            ax.set_xlabel("Lifetime [years]")
+            #ax.grid(True, alpha=0.3)
+
+            fig.tight_layout()
+            fig.savefig(f"{figures_dir}/{fname}.png", dpi=300)
+            plt.close(fig)
+
+            # ── B10 bar chart ─────────────────────────────────────────────
+        B10_values = [B10_C, B10_L1, B10_L2, B10_LCL]
+        if all(v is not None for v in B10_values):
+            labels = ["Capacitor C", "Inductor L1", "Inductor L2", "LCL filter"]
+            colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
+
+            fig, ax = plt.subplots(figsize=(6.4, 4.8))
+            bars = ax.bar(labels, B10_values, color=colors, edgecolor="black", linewidth=0.8)
+
+            # annotate each bar with its value
+            for bar, val in zip(bars, B10_values):
+                ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height(),
+                        f"{val:.1f}", ha="center", va="bottom")
+
+            ax.set_ylabel(r"$B_{10}$ lifetime [years]")
+            ax.set_ylim(0, max(B10_values) * 1.15)  # headroom for labels
+
+            fig.tight_layout()
+            fig.savefig(f"{figures_dir}/Fig_25_B10_bar.png", dpi=300)
+            plt.close(fig)
 
     '''
+
     @staticmethod
     def plot_Ig_ref_vs_I_L2(df_2_power_flow_inst, figures_dir, resolution_per_cycle, y_margin, f=50, t=None,xlabel="Time [s]"):
         """
@@ -588,6 +657,9 @@ class Plotting_functions_class:
         df = df_2_power_flow_inst
         last = slice(-resolution_per_cycle, None)
 
+
+        df = df.groupby(np.arange(len(df)) // 3).transform('mean')
+
         # x-axis: real time if provided, else build one fundamental cycle
         if t is not None:
             x = np.asarray(t)[last]
@@ -627,14 +699,16 @@ class Plotting_functions_class:
             ax.set_ylabel(ylabel)
             ax.set_title(title)
             ax.set_ylim(ylim_from(y))
+
             #ax.legend(loc="upper right")
-            ax.grid(True, alpha=0.3)
+            #ax.grid(True, alpha=0.3)
 
         axes[-1].set_xlabel(xlabel)
         axes[-1].set_xlim(x_range)
         axes[-1].xaxis.set_major_locator(MultipleLocator(x_tick))
 
         fig.tight_layout()
+        #fig.subplots_adjust(hspace=1.0, top=1.0, bottom=0.0, left=0.0, right=1.0)
         fig.savefig(f"{figures_dir}/Python_benchmarking_visualization.pdf", dpi=300)
         plt.close(fig)
     '''

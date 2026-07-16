@@ -1,0 +1,35 @@
+E:\Python_environments\PEARL_environment\Scripts\python.exe "E:\PEARL\LCL Filter\mother_function_trial_pf_sweep.py" 
+Results\Simulation_1 1.0
+[warn] refinement did not converge; using best iteration, rel_err=1.47e-04
+Results\Simulation_2 0.9
+Results\Simulation_3 0.8
+Results\Simulation_4 0.7
+Results\Simulation_5 0.6
+Results\Simulation_6 0.5
+Results\Simulation_7 0.4
+Results\Simulation_8 0.3
+Results\Simulation_9 0.2
+Results\Simulation_10 0.1
+Results\Simulation_11 0.001
+Results\Simulation_12 -0.1
+[warn] refinement did not converge; using best iteration, rel_err=1.35e-04
+Results\Simulation_13 -0.2
+[warn] refinement did not converge; using best iteration, rel_err=1.46e-04
+Results\Simulation_14 -0.3
+[warn] refinement did not converge; using best iteration, rel_err=1.55e-04
+Results\Simulation_15 -0.4
+[warn] refinement did not converge; using best iteration, rel_err=1.63e-04
+Results\Simulation_16 -0.5
+[warn] refinement did not converge; using best iteration, rel_err=1.70e-04
+Results\Simulation_17 -0.6
+[warn] refinement did not converge; using best iteration, rel_err=1.76e-04
+Results\Simulation_18 -0.7
+[warn] refinement did not converge; using best iteration, rel_err=1.80e-04
+Results\Simulation_19 -0.8
+[warn] refinement did not converge; using best iteration, rel_err=1.81e-04
+Results\Simulation_20 -0.9
+[warn] refinement did not converge; using best iteration, rel_err=1.77e-04
+Results\Simulation_21 -0.001
+[warn] refinement did not converge; using best iteration, rel_err=1.24e-04
+
+Process finished with exit code 0

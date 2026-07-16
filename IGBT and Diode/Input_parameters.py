@@ -5,13 +5,13 @@ class Input_parameters_class:
 
     def __init__(self,P,Q,T_env):
 
-        #Profile_size = 000  # This is just to make a profile , one should put its own profile. # 31536000
+        # Profile_size = 000  # This is just to make a profile , one should put its own profile. # 31536000
 
         # ----------------------------------------#
         # Model Parameters
         # ----------------------------------------#
 
-        self.dt = 0.001                 # Simulation step size
+        self.dt = 0.001                   # Simulation step size
         self.chunk_seconds = int(86400)   # chunking to reduce the RAM usage
         self.Plotting_electrical_flag = True # True False
         self.Plotting_lifetime_flag = True
@@ -20,7 +20,6 @@ class Input_parameters_class:
         self.Plotting_Monte_Carlo_flag = True
         self.T0_init = None  # None for first chunk
         self.Cauer_model_accuracy = 1e-3  # 1e-3 is the optimum balance between accuracy and computation
-
 
         # -----------------------------
         # Power Cycle Model Parameters
@@ -63,7 +62,6 @@ class Input_parameters_class:
         # ----------------------------------------#
         # Thermal Parameters
         # ----------------------------------------#
-
 
         self.deltaT_min = 30             # As LESIT model is invalid below 30 K hence we are going to clamp any value below 30 K as 30 K
         #self.T_env = np.full(Profile_size, 298.15, dtype=np.float64)  # [K] Ambient Temperature
@@ -118,17 +116,16 @@ class Input_parameters_class:
         # IGBT
 
         self.f_sw = 10 * 1000  # [Hz] Inverter switching frequency
-        self.t_on = 60e-9  # [s] Effective turn-on time = td(on) + tr ≈ 23 ns + 37 ns (td is delay period and tr is rising time)  [Note: Value is temperature dependent, author assumes constant temp of 25°C] [Page 5 datasheet]
-        self.t_off = 259e-9  # [s] Effective turn-off time = td(off) + tf ≈ 235 ns + 24 ns (td is delay period and tf is fall time) [Note: Value is temperature dependent, author assumes constant temp of 25°C] [Page 5 datasheet]
+        self.t_on = 60e-9      # [s] Effective turn-on time = td(on) + tr ≈ 23 ns + 37 ns (td is delay period and tr is rising time)  [Note: Value is temperature dependent, author assumes constant temp of 25°C] [Page 5 datasheet]
+        self.t_off = 259e-9    # [s] Effective turn-off time = td(off) + tf ≈ 235 ns + 24 ns (td is delay period and tf is fall time) [Note: Value is temperature dependent, author assumes constant temp of 25°C] [Page 5 datasheet]
 
         # Diode
 
-        self.I_ref = 30.0  # [A] Reference test current for diode reverse recovery  [Note: Value is temperature dependent, author assumes constant temp of 25°C] [Page 6 datasheet]
+        self.I_ref = 30.0   # [A] Reference test current for diode reverse recovery  [Note: Value is temperature dependent, author assumes constant temp of 25°C] [Page 6 datasheet]
         self.V_ref = 400.0  # [V] Reference test voltage for diode reverse recovery  [Note: Value is temperature dependent, author assumes constant temp of 25°C] [Page 6 datasheet]
 
-        Q_rr = 0.88e-6        # [C] reverse recovery charge #  [Note: Value is temperature dependent, author assumes constant temp of 25°C] [Page 5 datasheet]
+        Q_rr = 0.88e-6                  # [C] reverse recovery charge #  [Note: Value is temperature dependent, author assumes constant temp of 25°C] [Page 5 datasheet]
         self.Err_D = Q_rr * self.V_ref  # [J] Reverse recovery energy per switching event
-
 
         # ----------------------------------------#
         # Conduction losses

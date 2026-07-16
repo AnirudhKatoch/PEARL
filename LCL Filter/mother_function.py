@@ -5,9 +5,6 @@ from LCL_filter_design import LCL_filter_design_function
 from Plotting_function import Plotting_functions_class
 import pandas as pd
 from functools import lru_cache
-import os
-import matplotlib.pyplot as plt
-
 
 params = Input_parameters_class()
 Calculation_functions = Calculation_functions_class()
@@ -22,10 +19,7 @@ C_specs = params.C_specs
 L2_specs = params.L2_specs
 Vg_ll_RMS = params.Vg_ll_RMS; S_rated = params.S_rated; I_rated_RMS = params.I_rated_RMS; I_rated_peak = params.I_rated_peak; current_ripple_limit = params.current_ripple_limit; delta = params.delta; omega_sw = params.omega_sw
 
-
 sim_dir, dataframes_dir, figures_dir = Calculation_functions.create_simulation_folders(base="Results")
-
-
 
 #sim_dir = "Results/Simulation_1"
 #dataframes_dir = "Results/Simulation_1/Dataframes"
@@ -57,7 +51,8 @@ Calculation_functions.check_within_tolerance({"L1": (L1_specs["L1"], L1_optimum)
 # ----------------------------------------#
 
 if C_specs["Thermal_resistance_C"] == None:
-    C_specs["Thermal_resistance_C"] = Calculation_functions.calculate_capacitor_thermal_resistance(method="surface_area", D_case=C_specs["D_case"], H_case=C_specs["H_case"], heat_transfer_coefficient=heat_transfer_coefficient)  # [W/m²K] natural convection
+    C_specs["Thermal_resistance_C"] = Calculation_functions.calculate_capacitor_thermal_resistance(method="surface_area", case_shape="cylinder", D_case=C_specs["D_case"], H_case=C_specs["H_case"], heat_transfer_coefficient=heat_transfer_coefficient)
+    #C_specs["Thermal_resistance_C"] = Calculation_functions.calculate_capacitor_thermal_resistance(method="surface_area", case_shape="box", W_case=C_specs["W_case"], H_case=C_specs["H_case"], L_case=C_specs["L_case"],heat_transfer_coefficient=heat_transfer_coefficient)
 if C_specs["tan_delta_0"] == None:
     C_specs["tan_delta_0"] = Calculation_functions.calculate_tan_delta_0(tan_delta_measured = C_specs["tan_delta_measured"],  Rs = C_specs["Rs"],C = C_specs["C"], f_measured = C_specs["f_measured_for_tan_delta"])
 
@@ -81,7 +76,7 @@ Calculation_functions.safety_checks(B_peak=B_peak_L1, B_max=L1_specs["B_max"], B
 A_wire_L1_minimum, d_wire_L1_minimum = Calculation_functions.calculate_minimum_required_wire_area(I_RMS_rated = I_rated_RMS, J_max = L1_specs["J_max"]) # [m²] Minimum copper cross-section required to carry the rated current
 N_parallel_wire_L1 = Calculation_functions.calculate_parallel_strands(A_wire_minimum = A_wire_L1_minimum, A_strand = L1_specs["A_strand"])             # [-] The number of parallel strands required to achieve the minimum copper cross-section from individual strand area
 A_wire_actual_L1 = Calculation_functions.calculate_actual_wire_area(N_parallel = N_parallel_wire_L1, A_strand = L1_specs["A_strand"])                  # [m²] Actual total copper cross-section after rounding up
-Calculation_functions.check_window_fill(N_turns = N_L1, N_parallel = N_parallel_wire_L1, A_wire_bare = L1_specs["A_strand"], F_core = L1_specs["F_core"], G_core = L1_specs["G_core"], kf_window_max= 0.4) # Check whether the winding physically fits inside the core window.
+Calculation_functions.check_window_fill(N_turns = N_L1, N_parallel = N_parallel_wire_L1, A_wire_bare = L1_specs["A_strand"], F_core = L1_specs["F_core"], G_core = L1_specs["G_core"], kf_window_max= 0.5) # Check whether the winding physically fits inside the core window.
 l_turn_L1 = Calculation_functions.calculate_l_turn(D_core=L1_specs["D_core"], E_core=L1_specs["E_core"])                                               # [m] Estimate mean length of one turn for a rectangular toroidal core.
 Rdc_L1 = Calculation_functions.calculate_Rdc(rho=L1_specs["rho"], N=N_L1, l_turn=l_turn_L1, A_wire=A_wire_actual_L1)                                   # [ohm] float  DC winding resistance # Assumed  no Skin or Proximity Effect
 R_th_L1 = Calculation_functions.calculate_inductor_thermal_resistance(method="surface_area", A_surface=A_surface_L1,heat_transfer_coefficient=heat_transfer_coefficient)      # [K/W] Thermal resistance from  to ambient.
@@ -106,7 +101,7 @@ Calculation_functions.safety_checks(B_peak=B_peak_L2, B_max=L2_specs["B_max"], B
 A_wire_L2_minimum, d_wire_L2_minimum = Calculation_functions.calculate_minimum_required_wire_area(I_RMS_rated = I_rated_RMS, J_max = L2_specs["J_max"]) # [m²] Minimum copper cross-section required to carry the rated current
 N_parallel_wire_L2 = Calculation_functions.calculate_parallel_strands(A_wire_minimum = A_wire_L2_minimum, A_strand = L2_specs["A_strand"])             # [-] The number of parallel strands required to achieve the minimum copper cross-section from individual strand area
 A_wire_actual_L2 = Calculation_functions.calculate_actual_wire_area(N_parallel = N_parallel_wire_L2, A_strand = L2_specs["A_strand"])                  # [m²] Actual total copper cross-section after rounding up
-Calculation_functions.check_window_fill(N_turns = N_L2, N_parallel = N_parallel_wire_L2, A_wire_bare = L2_specs["A_strand"], F_core = L2_specs["F_core"], G_core = L2_specs["G_core"], kf_window_max= 0.45) # Check whether the winding physically fits inside the core window.
+Calculation_functions.check_window_fill(N_turns = N_L2, N_parallel = N_parallel_wire_L2, A_wire_bare = L2_specs["A_strand"], F_core = L2_specs["F_core"], G_core = L2_specs["G_core"], kf_window_max= 0.5) # Check whether the winding physically fits inside the core window.
 l_turn_L2 = Calculation_functions.calculate_l_turn(D_core=L2_specs["D_core"], E_core=L2_specs["E_core"])                                               # [m] Estimate mean length of one turn for a rectangular toroidal core.
 Rdc_L2 = Calculation_functions.calculate_Rdc(rho=L2_specs["rho"], N=N_L2, l_turn=l_turn_L2, A_wire=A_wire_actual_L2)                                                         # [ohm] float  DC winding resistance # Assumed  no Skin or Proximity Effect
 R_th_L2 = Calculation_functions.calculate_inductor_thermal_resistance(method = "surface_area", A_surface = A_surface_L2 , heat_transfer_coefficient=heat_transfer_coefficient)   # [K/W] Thermal resistance from  to ambient .
@@ -119,7 +114,6 @@ R_th_L2 = Calculation_functions.calculate_inductor_thermal_resistance(method = "
 def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS_i, Ig_RMS_i, T_amb_i):
 
     t_one = np.arange(0, 1, dt)  # time vector for a single second
-
     # ----------------------------------------#
     # Electrical model
     # ----------------------------------------#
@@ -145,6 +139,7 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
 
     # switching output (Vo passed as single-element array, Profile_size=1)
     Vs = Calculation_functions.Three_phase_switching_output(t=t_one, Vs_ref=Vs_ref, Vo=np.array([Vo_i]), Tsw=Tsw, f=f, Profile_size=1)
+    Vs = Vs_ref
 
     _ = Calculation_functions.check_Vs_quality(t=t_one, Vs=Vs, Vs_ref=Vs_ref, f=f, fsw=fsw, Profile_size=1, raise_on_fail=True)
 
@@ -226,14 +221,12 @@ results = [solve_setpoint(round(float(Vdc_RMS[i]), 3), round(float(M[i]), 4), ro
                           round(float(T_amb[i]), 2),)
     for i in range(Profile_size)]
 
-
 # transpose: turn a list-of-tuples into a tuple-of-lists, then concatenate each
 (Vg, pf_inst, phi, phase_shift, Ig_ref, Vs_ref, Vs,
 V_L1, I_L1, V_C, I_C, V_L2, I_L2,
 I_C_RMS_harmonics, I_C_RMS, P_total_C, T_C, V_C_RMS,
 V_L1_RMS, I_L1_RMS, P_c_L1, P_w_L1, P_total_L1, T_inductor_L1,
 V_L2_RMS, I_L2_RMS, P_c_L2, P_w_L2, P_total_L2, T_inductor_L2) = (np.concatenate(col) for col in zip(*results))
-
 
 def compare_fundamental(signal_ref, signal_meas, f, resolution_per_cycle):
     """
@@ -287,10 +280,9 @@ def compare_fundamental(signal_ref, signal_meas, f, resolution_per_cycle):
 
     return rms_error_percent, phase_error_deg
 
-
-
 THD_percent_I_L2 = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=I_L2, Signal_ref=Ig_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
 THD_percent_Vs = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=Vs, Signal_ref=Vs_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
+
 
 # ----------------------------------------#
 # LCL filter middle branch [C]
@@ -321,7 +313,8 @@ Lifetime_L2, Lifetime_consumed_L2 = Calculation_functions.miners_rule_modified(L
 C_report = dict(C=C_specs["C"], R_th=C_specs["Thermal_resistance_C"], V_RMS=V_C_RMS, V_RMS_rated=C_specs["V_C_RMS_Rated"], I_RMS=I_C_RMS, P_total=P_total_C, T=T_C, T_rated=C_specs["T_C_Rated"], Lifetime=Lifetime_C,Lifetime_consumed_C=Lifetime_consumed_C)
 L1_report = dict(L=L1_specs["L1"], N=N_L1, lg=lg_L1, B_peak=B_peak_L1, B_max=L1_specs["B_max"], Bsat=L1_specs["Bsat"], Ae=Ae_L1, le=le_L1, Ve=Ve_L1, A_surface=A_surface_L1, I_RMS=I_L1_RMS, V_RMS=V_L1_RMS, Rdc=Rdc_L1, N_parallel=N_parallel_wire_L1, A_wire=A_wire_actual_L1, l_turn=l_turn_L1, P_core=P_c_L1, P_winding=P_w_L1, P_total=P_total_L1, R_th=R_th_L1, T=T_inductor_L1, T_rated=L1_specs["T_insulation_rated"], Lifetime=Lifetime_L1, Lifetime_consumed=Lifetime_consumed_L1,)
 L2_report = dict(L=L2_specs["L2"], N=N_L2, lg=lg_L2, B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], Ae=Ae_L2, le=le_L2, Ve=Ve_L2, A_surface=A_surface_L2, I_RMS=I_L2_RMS, V_RMS=V_L2_RMS, Rdc=Rdc_L2, N_parallel=N_parallel_wire_L2, A_wire=A_wire_actual_L2, l_turn=l_turn_L2, P_core=P_c_L2, P_winding=P_w_L2, P_total=P_total_L2, R_th=R_th_L2, T=T_inductor_L2, T_rated=L2_specs["T_insulation_rated"], Lifetime=Lifetime_L2, Lifetime_consumed=Lifetime_consumed_L2, )
-#Calculation_functions.compare_components(C_report, L1_report, L2_report)
+Calculation_functions.compare_components(C_report, L1_report, L2_report)
+
 
 
 
@@ -361,6 +354,7 @@ if blabla == True:
             "THD_percent_I_L2": np.where(np.arange(len(Vs)) == len(Vs) - 1, THD_percent_I_L2, np.nan),
             "THD_percent_Vs": np.where(np.arange(len(Vs)) == len(Vs) - 1, THD_percent_Vs, np.nan)
         })
+
     df_2_power_flow_inst.to_parquet(f"{dataframes_dir}/df_2_power_flow_inst.parquet")
     Plotting_function.plot_df_2_power_flow_inst(df_2_power_flow_inst=df_2_power_flow_inst, figures_dir=figures_dir, resolution_per_cycle=resolution_per_cycle)
     #Plotting_function.plot_Ig_ref_vs_I_L2(df_2_power_flow_inst, figures_dir, resolution_per_cycle, f=50, t=None, y_margin=0.05,xlabel="Time [s]")
@@ -435,8 +429,90 @@ if blabla == True:
     del df_3_C, df_4_L1, df_5_L2
 
 
+# ----------------------------------------#
+# Monte Carlo Simulations
+# ----------------------------------------#
+
+# Inputs
+
+number_of_samples = 1000
+normal_distribution = 0.01
+rng = np.random.default_rng(42)
+
+# Capacitor
+
+if C_specs["Lifetime_calculations"] == "Graphical":
+
+    T_C_samples = Calculation_functions.normal_distribution_function(np.mean(T_C), normal_distribution, number_of_samples, rng)
+    V_C_samples = Calculation_functions.normal_distribution_function(np.mean(V_C_RMS), normal_distribution, number_of_samples, rng)
+    V_C_RMS_Rated_samples = Calculation_functions.normal_distribution_function(C_specs["V_C_RMS_Rated"], normal_distribution,number_of_samples, rng)
+    lifetime_curves_samples = Calculation_functions.build_lifetime_curves_samples(C_specs["lifetime_curves"], normal_distribution, number_of_samples, rng)
+
+    Lifetime_C_MC = np.empty(number_of_samples)
+    for i in range(number_of_samples):
+        Lifetime_C_MC[i] = Calculation_functions.Capacitor_lifetime_graphical(T_C=T_C_samples[i], V_C_RMS=V_C_samples[i], V_C_RMS_Rated=V_C_RMS_Rated_samples[i], lifetime_curves=lifetime_curves_samples[i],)
+
+elif C_specs["Lifetime_calculations"] == "Analytical":
+
+    T_eq_C = Calculation_functions.equivalent_temperature_capacitor(L_eq_years=Lifetime_C,  V_C_RMS=np.mean(V_C_RMS), V_C_RMS_Rated=C_specs["V_C_RMS_Rated"],
+                                              t1=C_specs["Lifetime_Rated"], T1=C_specs["Temperature_Rated"], A=C_specs["A"], n=C_specs["n"])
+
+    T_C_samples   = Calculation_functions.normal_distribution_function(T_eq_C, normal_distribution, number_of_samples, rng)
+    V_C_samples   = Calculation_functions.normal_distribution_function(np.mean(V_C_RMS), normal_distribution, number_of_samples, rng)
+    V_C_RMS_Rated_samples = Calculation_functions.normal_distribution_function(C_specs["V_C_RMS_Rated"], normal_distribution, number_of_samples, rng)
+    t1_samples   = Calculation_functions.normal_distribution_function(C_specs["Lifetime_Rated"], normal_distribution, number_of_samples, rng)
+    T1_samples   = Calculation_functions.normal_distribution_function(C_specs["Temperature_Rated"], normal_distribution, number_of_samples, rng)
+    A_samples     = Calculation_functions.normal_distribution_function(C_specs["A"],    normal_distribution, number_of_samples, rng)
+    n_samples     = Calculation_functions.normal_distribution_function(C_specs["n"],    normal_distribution, number_of_samples, rng)
+
+    Lifetime_C_MC = Calculation_functions.calculate_capacitor_lifetime_analytical(T_operating = T_C_samples,V_C_RMS = V_C_samples,
+                                                                                  V_C_RMS_Rated = V_C_RMS_Rated_samples,t1 = t1_samples,
+                                                                                  T1 = T1_samples, A = A_samples,n = n_samples,)
+
+L_eq_L1_years = Lifetime_L1
+L_eq_L2_years = Lifetime_L2
+
+T_eq_L1 = Calculation_functions.equivalent_temperature(L_eq_L1_years, L1_specs["T_insulation_rated"],L1_specs["L_insulation_rated"], L1_specs["Ea_insulation"],L1_specs["kb"])
+T_eq_L2 = Calculation_functions.equivalent_temperature(L_eq_L2_years, L2_specs["T_insulation_rated"],L2_specs["L_insulation_rated"], L2_specs["Ea_insulation"],L2_specs["kb"])
 
 
+# Inductor L1
 
+T_L1_samples      = Calculation_functions.normal_distribution_function(T_eq_L1,    normal_distribution, number_of_samples, rng)
+T_rated_L1_samples = Calculation_functions.normal_distribution_function(L1_specs["T_insulation_rated"], normal_distribution, number_of_samples, rng)
+L_rated_L1_samples = Calculation_functions.normal_distribution_function(L1_specs["L_insulation_rated"], normal_distribution, number_of_samples, rng)
+Ea_L1_samples     = Calculation_functions.normal_distribution_function(L1_specs["Ea_insulation"], normal_distribution, number_of_samples, rng)
 
+Lifetime_L1_MC = Calculation_functions.calculate_inductor_lifetime(T_operating = T_L1_samples,T_rated = T_rated_L1_samples,
+                                                                   L_rated = L_rated_L1_samples, Ea = Ea_L1_samples,
+                                                                   kb = L1_specs["kb"], L_max_years = L1_specs["L_max_years"],)
+
+# Inductor 2
+
+T_L2_samples      = Calculation_functions.normal_distribution_function(T_eq_L2, normal_distribution, number_of_samples, rng)
+T_rated_L2_samples = Calculation_functions.normal_distribution_function(L2_specs["T_insulation_rated"], normal_distribution, number_of_samples, rng)
+L_rated_L2_samples = Calculation_functions.normal_distribution_function(L2_specs["L_insulation_rated"], normal_distribution, number_of_samples, rng)
+Ea_L2_samples = Calculation_functions.normal_distribution_function(L2_specs["Ea_insulation"], normal_distribution, number_of_samples, rng)
+
+Lifetime_L2_MC = Calculation_functions.calculate_inductor_lifetime(T_operating = T_L2_samples,T_rated = T_rated_L2_samples,
+                                                                   L_rated = L_rated_L2_samples, Ea = Ea_L2_samples,
+                                                                   kb = L2_specs["kb"], L_max_years = L2_specs["L_max_years"],)
+
+Lifetime_LCL_MC = np.minimum.reduce([Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, ])
+
+df_6_MC = pd.DataFrame(
+    {
+        "Lifetime_C_MC": Lifetime_C_MC,  # [Years]
+        "Lifetime_L1_MC": Lifetime_L1_MC,  # [Years]
+        "Lifetime_L2_MC": Lifetime_L2_MC,  # [Years]
+        "Lifetime_LCL_MC": Lifetime_LCL_MC,  # [Years]
+        "B10_C": B10_C,  # [-]
+        "B10_L1": B10_L1,  # [-]
+        "B10_L2": B10_L2,  # [-]
+        "B10_LCL": B10_LCL,  # [-]
+    })
+df_6_MC.to_parquet(f"{dataframes_dir}/df_6_MC.parquet")
+Plotting_function.plot_lifetime_monte_carlo(Lifetime_C_MC=Lifetime_C_MC, Lifetime_L1_MC=Lifetime_L1_MC,
+                                            Lifetime_L2_MC=Lifetime_L2_MC,Lifetime_LCL_MC=Lifetime_LCL_MC, figures_dir=figures_dir, B10_C=B10_C,
+                                            B10_L1=B10_L1,B10_L2=B10_L2, B10_LCL=B10_LCL, plot_type="histogram", bins=50)
 

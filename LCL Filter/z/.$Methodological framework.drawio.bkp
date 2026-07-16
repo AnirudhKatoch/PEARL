@@ -1,0 +1,19 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="bUISpwBjdefO8w3UBz8R">
+    <mxGraphModel dx="808" dy="481" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="716" pageHeight="400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2jaAVnirs4eBzSQX1P52-19" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Mission profiles" vertex="1">
+          <mxGeometry height="40" width="120" x="10" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="2jaAVnirs4eBzSQX1P52-20" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;LCL filter design&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="10" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2jaAVnirs4eBzSQX1P52-21" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;Component Specs&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="10" y="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

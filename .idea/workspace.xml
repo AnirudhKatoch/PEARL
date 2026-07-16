@@ -5,59 +5,951 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest">
-      <change afterPath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Plotting_pf_sweep.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/NEW/Python_building.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/Mother_function_trial_temp_sweep.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/mother_function_trial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/mother_function_trial_pf_sweep.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/z/Load profiles/Load_data.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/z/Temperature cities/Plotting_final_results.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking_table.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/Input_parameters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/CaseStudy1_summary_4x1.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/CaseStudy1_summary_4x1.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Electro_thermal_chain_pf1_pf0.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Electro_thermal_chain_pf1_pf0.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Electro_thermal_chain_pf1_pf0.png" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Electro_thermal_chain_pf1_pf0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_case_study_2.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_case_study_2.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_life.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_life.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Long-duration junction temperature of IGBT and diode.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Long-duration junction temperature of IGBT and diode.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_conference.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_conference.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_final_results.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_final_results.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_heat_sink.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_heat_sink.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/trial.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/trial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking.plecs" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Benchmarking.plecs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_100_0.5_lags.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_100_0.5_lags.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_100_0.5_leads.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_100_0.5_leads.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_100_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_100_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_25_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_25_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_50_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_50_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_75_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vg_75_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_100_0.5_lags.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_100_0.5_lags.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_100_0.5_leads.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_100_0.5_leads.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_100_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_100_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_25_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_25_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_50_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_50_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_75_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/CSV_inputs/Vs_75_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Paper/Inverter_PLECS_modified.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Paper/Inverter_PLECS_modified.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Paper/LCL_filter_PLECS.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Paper/LCL_filter_PLECS.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/IL2_comparison.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/IL2_comparison.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.5_lags/IL2_waveform.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.5_lags/IL2_waveform.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.5_lags/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.5_lags/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.5_leads/IL2_waveform.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.5_leads/IL2_waveform.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.5_leads/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.5_leads/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.866025_lags/IL2_waveform.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.866025_lags/IL2_waveform.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.866025_lags/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.866025_lags/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.866025_leads/IL2_waveform.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.866025_leads/IL2_waveform.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.866025_leads/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_0.866025_leads/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_1/IL2_waveform.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_1/IL2_waveform.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_1/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/100_1/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/25_1/IL2_waveform.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/25_1/IL2_waveform.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/25_1/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/25_1/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/50_1/IL2_waveform.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/50_1/IL2_waveform.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/50_1/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/50_1/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/75_1/IL2_waveform.csv" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/75_1/IL2_waveform.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/75_1/benchmark_values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/Results/Python/75_1/benchmark_values.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Benchmarking/mother_function_benchmarking.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Benchmarking/mother_function_benchmarking.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Figures/Current_comparing_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Plotting_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Plotting_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/A practical core loss calculation method of filter inductors in PWM inverters based on the modified Steinmetz equation.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/Ageing and reliability of electrical insulationthe risk of hybrid ACDC grids.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/Core losses analysis of the LCL filter inductor for SiC-based inverter.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/Design and loss analysis of LCL filter inductors for two-level and three-level inverters.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Inductor Losses/Note for inductor lifetime.docx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/0 A General Analytical Formulation for LCL Filter Design for Grid-Connected PWM-Driven Cascaded H-Bridge Inverters.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/1 Modeling and Stability Analysis of LCL-Type Grid-Connected Inverters A Comprehensive Overview.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/16 Design and Comparison of LCL Filters in STATCOM.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/2 An LCL-Filter Design With Optimum Total Inductance and Capacitance.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/6 Reactive Power Impacts on LCL Filter Capacitor Lifetime in Grid-Connected Inverter.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/LCL design and modelling/8 Analysis of Resonant Current Influence on Capacitor Lifetime Variation in LCL-Type Photovoltaic Systems.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/12 Advanced Condition Monitoring for Active Front-End Converter LCL Filter AC Capacitors.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/13 LCL Filter Design for Three Phase AC-DC Converters Considering Semiconductor Modules and Magnetics Components Performance.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/15 Analysis of Capacitor and Reactor Damage Rates on LCL Filters.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/3 A New Design Method of LCL Filter for Single Phase Grid Connected Power Converter.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/4 L vs. LCL Filter for Photovoltaic Grid-Connected Inverter, A Reliability Study.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/5 Reactive Power Impacts on LCL Filter Capacitor Lifetime and Reliability in DFIG Grid-Connected Inverter.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/LCL/z/7 Reliability analysis of grid-interfaced filter capacitors.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Optimal LCL-filter design for a single-phase grid-connected inverter using metaheuristic algorithms.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Optimal Time-Domain Sinusoidal Pulse Width Modulation Technique.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Optimal time-domain pulse width modulation for three-phase inverters Editor’s Pick Open Access.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Optimal time-domain technique for pulse width modulation in power electronics Open Access.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Time-Domain Analysis of PWM Inverters.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/Read new/Tutorial Grid-Following Inverter for Electrical Power Grid.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_12_C_VI.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_13_L1_VI.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_14_L2_VI.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_15_P_total.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_16_core_winding.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_17_T.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_18_lifetime.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_20_average_temperature.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_3_pf.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_4_pf_phi.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_5_Igref_Vsref.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_6_Vs.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_7_L1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_8_C.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Fig_9_L2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Results/Simulation_1/Figures/Switching_waveforms.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Research Papers/z/L vs. LCL Filter for Photovoltaic Grid-Connected Inverter, A Reliability Study.pdf" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/mother_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/mother_function.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Images/Plecs_benchmarking_image.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Inductor_L1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Plotting_pf_sweep.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/Figures/Fig_cities_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Bahir_Dar_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Bandung_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Juja_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Kampala_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Koudougou_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Kumasi_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Lima_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Mumbai_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Munich_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Stellenbosch_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/TEMP_profiles_nc/Windhoek_2025.nc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature cities/Temperature_cities.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Figures/Fig_lifetime_vs_Tamb_with_min.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Figures/Fig_lifetime_vs_Tamb_with_min.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/PEARL_LCL_temperature_simulation_plan.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_1/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_10/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_11/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_12/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_13/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_14/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_15/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_16/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_17/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_18/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_19/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_2/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_20/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_21/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_3/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_4/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_5/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_6/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_7/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_8/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_3a_T_amb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/Temperature_sweep_results/Simulation_9/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Figures/Fig_irms_vs_pf.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Figures/Fig_lifetime_vs_pf_with_min.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Figures/Fig_loss_vs_pf.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Figures/Fig_temp_vs_pf.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/PEARL_LCL_pf_simulation_plan.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_1/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_10/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_11/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_12/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_13/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_14/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_15/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_16/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_17/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_18/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_19/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_2/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_20/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_21/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_3/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_4/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_5/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_6/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_7/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_8/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_10_THD_I_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_11_I_L2_vs_Ig_ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_12_C_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_13_L1_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_14_L2_VI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_15_P_total.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_16_core_winding.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_17_T.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_18_lifetime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_19_lifetime_consumed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_1_power_SPQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_20_average_temperature.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_2_Vg_Ig.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_3_pf.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_4_pf_phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_5_Igref_Vg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_6_Vs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_7_L1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_8_C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/Paper_related/pf_sweep_results/Simulation_9/Figures/Fig_9_L2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/mother_function.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/trial.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,6 +1001,7 @@
     "Python.Inductor_L1.executor": "Run",
     "Python.Inductor_L2.executor": "Run",
     "Python.Input_parameters.executor": "Run",
+    "Python.Input_parameters_mini_grid.executor": "Run",
     "Python.Inverter_calculations.executor": "Run",
     "Python.Inverter_model.executor": "Run",
     "Python.Inverter_model_1.executor": "Run",
@@ -118,12 +1011,16 @@
     "Python.Inverter_model_5.executor": "Run",
     "Python.LCL_filter_ODE.executor": "Run",
     "Python.LCL_filter_design.executor": "Run",
+    "Python.Load_data.executor": "Run",
+    "Python.Mother_function_trial_temp_sweep.executor": "Run",
+    "Python.Plotting_THD_sweep.executor": "Run",
     "Python.Plotting_conference.executor": "Run",
     "Python.Plotting_final_results.executor": "Run",
     "Python.Plotting_function.executor": "Run",
     "Python.Plotting_heat_sink.executor": "Run",
     "Python.Plotting_pf_sweep.executor": "Run",
     "Python.Plotting_results.executor": "Run",
+    "Python.Python_building.executor": "Run",
     "Python.Temperature_cities.executor": "Run",
     "Python.Temperature_sweep.executor": "Run",
     "Python.Thermal_model_idea_2.executor": "Run",
@@ -133,6 +1030,9 @@
     "Python.mother_function.executor": "Run",
     "Python.mother_function_benchmarking.executor": "Run",
     "Python.mother_function_trial.executor": "Run",
+    "Python.mother_function_trial_THD_sweep.executor": "Run",
+    "Python.mother_function_trial_pf_sweep.executor": "Run",
+    "Python.pf_sweep_results_new.executor": "Run",
     "Python.runner.executor": "Run",
     "Python.runner_0.1.executor": "Run",
     "Python.runner_0.executor": "Run",
@@ -149,35 +1049,6 @@
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager">
-    <configuration name="Plotting_pf_sweep" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="PEARL" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/LCL Filter/z/Paper_related" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LCL Filter/z/Paper_related/Plotting_pf_sweep.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.Plotting_pf_sweep" />
-      </list>
-    </recent_temporary>
-  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

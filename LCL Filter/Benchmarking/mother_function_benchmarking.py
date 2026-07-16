@@ -53,7 +53,8 @@ Calculation_functions.check_within_tolerance({"L1": (L1_specs["L1"], L1_optimum)
 # ----------------------------------------#
 
 if C_specs["Thermal_resistance_C"] == None:
-    C_specs["Thermal_resistance_C"] = Calculation_functions.calculate_capacitor_thermal_resistance(method="surface_area", D_case=C_specs["D_case"], H_case=C_specs["H_case"], heat_transfer_coefficient=heat_transfer_coefficient)  # [W/m²K] natural convection
+    C_specs["Thermal_resistance_C"] = Calculation_functions.calculate_capacitor_thermal_resistance(method="surface_area", case_shape="cylinder", D_case=C_specs["D_case"], H_case=C_specs["H_case"],heat_transfer_coefficient=heat_transfer_coefficient)
+    # C_specs["Thermal_resistance_C"] = Calculation_functions.calculate_capacitor_thermal_resistance(method="surface_area", case_shape="box", W_case=C_specs["W_case"], H_case=C_specs["H_case"], L_case=C_specs["L_case"],heat_transfer_coefficient=heat_transfer_coefficient)
 if C_specs["tan_delta_0"] == None:
     C_specs["tan_delta_0"] = Calculation_functions.calculate_tan_delta_0(tan_delta_measured = C_specs["tan_delta_measured"],  Rs = C_specs["Rs"],C = C_specs["C"], f_measured = C_specs["f_measured_for_tan_delta"])
 
