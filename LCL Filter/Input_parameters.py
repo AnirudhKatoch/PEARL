@@ -73,7 +73,7 @@ class Input_parameters_class:
         # Time Discretization and simulation Resolution
         # ----------------------------------------#
 
-        self.resolution_per_cycle = 5000                       # [-] Number of discrete simulation samples used to represent one fundamental AC cycle; higher values improve waveform fidelity but increase computational cost, This value is also very important for calculation actual value of Vs_ref
+        self.resolution_per_cycle = 2000                       # [-] Number of discrete simulation samples used to represent one fundamental AC cycle; higher values improve waveform fidelity but increase computational cost, This value is also very important for calculation actual value of Vs_ref
         self.dt = self.T / self.resolution_per_cycle            # [s] Simulation time-step size derived from resolution_per_cycle
         self.samples_per_switching_period = self.Tsw / self.dt  # [-] Number of simulation samples contained within one PWM switching period; determines PWM waveform resolution accuracy
         self.Minimum_required_samples_per_switching_period = 5  # [-] Minimum acceptable PWM numerical resolution required to accurately capture switching events and carrier intersections
@@ -87,7 +87,7 @@ class Input_parameters_class:
         self.S_rated = 1e6                                              # [VA] Rated apparent Inverter  power
         self.I_rated_RMS = self.S_rated / (np.sqrt(3) * self.Vg_ll_RMS) # [A] Rated Inverter  current
         self.I_rated_peak = np.sqrt(2) * self.I_rated_RMS               # [A] Peak current
-        self.current_ripple_limit = 0.30                                # [-] Current ripple is usually limited to 20%–30% of rated current.Here 30% is used.
+        self.current_ripple_limit = 0.30                               # [-] Current ripple is usually limited to 20%–30% of rated current.Here 30% is used.
         self.delta = 0.19                                               # [-] 20% initial harmonic attenuation ratio recommended for LCL filter design
         self.omega_sw = 2 * np.pi * self.fsw                            # [rad/s] Switching angular frequency
 
@@ -172,12 +172,12 @@ class Input_parameters_class:
             'mu_r': 3000,                    # [-]     relative permeability at 10 kHz. From [A] Fig 12a at 10kHz # Assumed constant for simplicity
 
             # ── Core geometry (scaled 4216L1R-B × 1.55) ──────────────────────────
-            'A_core': 180e-3  *  0.7165,  # [m]  Overall width;         outer horizontal dimension;                    from [A] Table 1
-            'B_core': 240e-3 *  0.7165,   # [m]  Overall height;        outer vertical dimension;                      from [A] Table 1
-            'D_core': 30e-3  *  0.7165,   # [m]  Depth (cast width);    dimension going into the page;                 from [A] Table 1
-            'E_core': 50e-3  *  0.7165,   # [m]  Thickness (build);                                                    from [A] Table 1
-            'F_core': 80e-3  *  0.7165,   # [m]  Window width;          inner horizontal opening for winding;          from [A] Table 1
-            'G_core': 140e-3  *  0.7165,  # [m]  Window height;         inner vertical opening for winding;            from [A] Table 1
+            'A_core': 180e-3  *  0.705,  # [m]  Overall width;         outer horizontal dimension;                    from [A] Table 1
+            'B_core': 240e-3 *  0.705,   # [m]  Overall height;        outer vertical dimension;                      from [A] Table 1
+            'D_core': 30e-3  *  0.705,   # [m]  Depth (cast width);    dimension going into the page;                 from [A] Table 1
+            'E_core': 50e-3  *  0.705,   # [m]  Thickness (build);                                                    from [A] Table 1
+            'F_core': 80e-3  *  0.705,   # [m]  Window width;          inner horizontal opening for winding;          from [A] Table 1
+            'G_core': 140e-3  *  0.705,  # [m]  Window height;         inner vertical opening for winding;            from [A] Table 1
             'kf'    : 0.82,             # [-]  Stacking factor;                                                      from [A] Table 2
 
             # ── Winding (Elektrisola Amidester 200 A200 — IEC 60317-8 / NEMA MW 74) ──────
@@ -216,7 +216,7 @@ class Input_parameters_class:
             # Product code - B32362A3157J030 # FilterCap MKD AC – Single phase # TDK Electronics
 
             # Capacitance
-            'C': 150e-6,  # [F]    Capacitance
+            'C': 167e-6*0.8,  # [F]    Capacitance# Keep C what it is just retune the L1 and L2
 
             # Dimensions
             'D_case': 75e-3,
@@ -225,15 +225,15 @@ class Input_parameters_class:
             'W_case': None,
 
             # Ratings
-            'I_C_RMS_rated': 30,              # [A]     Rated RMS current
+            'I_C_RMS_rated': 30,              # [A]     Rated RMS current # 330
             'V_C_RMS_Rated': 330,             # [V]     Rated RMS voltage
             'V_C_Peak_Rated': 460,            # [V]     Rated peak voltage
             'Temperature_Rated': 273.15 + 70, # [K]     Rated temperature
             'Lifetime_Rated': 1e5,            # [hours] Rated lifetime
 
             # Constants
-            'A': 8.5,
-            'n': 9.4,
+            'A': 8.5,    # 8.5
+            'n': 9.4,    # 9.4
 
             # Thermal
             'T_C_Rated': 273 + 85,  # [K]    Maximum hotspot temperature
@@ -265,13 +265,11 @@ class Input_parameters_class:
                                 0.8: {"T": np.array([273 + 85, 273 + 80]),
                                       "L": np.array([4.5 * 1e5, 6 * 1e5])}, },
 
-            'Lifetime_calculations':'Analytical', # [-] 'Graphical' or 'Analytical' # 'Graphical' option finds the lifetime graphically and 'Analytical' finds the lifetime of capacitor analytically
+            'Lifetime_calculations':'Graphical', # [-] 'Graphical' or 'Analytical' # 'Graphical' option finds the lifetime graphically and 'Analytical' finds the lifetime of capacitor analytically
 
             # Damping resistor
-            'R3': 0.010579 # [Ohm]  Series resistance placed in parallel with capacitor for passive damping of LCL resonance (PD-3 method)
+            'R3': 0.0011754 # [Ohm]  Series resistance placed in parallel with capacitor for passive damping of LCL resonance (PD-3 method)
         }
-
-
 
 
 

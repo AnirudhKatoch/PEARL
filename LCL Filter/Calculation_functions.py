@@ -2658,7 +2658,7 @@ class Calculation_functions_class:
                 "or relax `tol` if the deviation is intentional."
             )
             raise ValueError("\n".join(lines))
-
+    '''
     @staticmethod
     def Three_phase_switching_output(t, Vs_ref, Vo, Tsw, f, Profile_size, sample="center"):
         """
@@ -2809,6 +2809,123 @@ class Calculation_functions_class:
             frac_on = on_time / dt
 
             # Pole voltage averaged over each cell: +Vo when on, -Vo when off
+            return Vo_t * (2.0 * frac_on - 1.0)
+
+        Vao = render_leg(m_a)
+        Vbo = render_leg(m_b)
+        Vco = render_leg(m_c)
+
+        # ------------------------------------------------------------------ #
+        # 5) Common-mode removal -> phase-A voltage seen by the LCL
+        # ------------------------------------------------------------------ #
+        V_cm = (Vao + Vbo + Vco) / 3.0
+        Vs = Vao - V_cm
+        return Vs
+    '''
+
+    @staticmethod
+    def Three_phase_switching_output(t, Vs_ref, Vo, Tsw, f, Profile_size, modulation, sample="center" ):
+        """
+        Produce the switched phase-A inverter voltage Vs from its reference Vs_ref,
+        for a three-phase, three-wire inverter, using exact switching instants rendered
+        onto the existing (coarse) time grid by volt-second-preserving averaging.
+
+        modulation : {"spwm", "svm"}
+            "spwm" -> sinusoidal PWM, no zero-sequence injection
+            "svm"  -> min-max zero-sequence injection (space vector modulation)
+        """
+
+        t = np.asarray(t, dtype=float)
+        Vs_ref = np.asarray(Vs_ref, dtype=float)
+        if t.shape != Vs_ref.shape:
+            raise ValueError("t and Vs_ref must have the same shape.")
+
+        n = t.size
+        dt = float(t[1] - t[0])
+        samples_per_second = n // int(Profile_size)
+        if samples_per_second * int(Profile_size) != n:
+            raise ValueError("len(t) must be Profile_size * samples_per_second.")
+
+        # Per-sample pole amplitude Vo(t)
+        Vo_arr = np.atleast_1d(np.asarray(Vo, dtype=float))
+        if Vo_arr.size == 1:
+            Vo_t = np.full(n, Vo_arr[0])
+        elif Vo_arr.size == int(Profile_size):
+            Vo_t = np.repeat(Vo_arr, samples_per_second)
+        else:
+            raise ValueError("Vo must be scalar or length Profile_size.")
+        if np.any(Vo_t <= 0):
+            raise ValueError("Vo must be positive everywhere.")
+
+        # ------------------------------------------------------------------ #
+        # 1) Three references at 0, -120, +120 deg via per-second time shift
+        # ------------------------------------------------------------------ #
+        period_samples = int(round((1.0 / f) / dt))
+        shift = period_samples // 3
+
+        block = Vs_ref.reshape(int(Profile_size), samples_per_second)
+        ref_a = Vs_ref
+        ref_b = np.roll(block, +shift, axis=1).reshape(n)
+        ref_c = np.roll(block, +2 * shift, axis=1).reshape(n)
+
+        m_a = ref_a / Vo_t
+        m_b = ref_b / Vo_t
+        m_c = ref_c / Vo_t
+
+        # ------------------------------------------------------------------ #
+        # 2) Zero-sequence injection, only for SVM
+        # ------------------------------------------------------------------ #
+        if modulation == "svm":
+            m_stack = np.vstack([m_a, m_b, m_c])
+            v_zs = -0.5 * (m_stack.max(axis=0) + m_stack.min(axis=0))
+            m_a = m_a + v_zs
+            m_b = m_b + v_zs
+            m_c = m_c + v_zs
+        elif modulation != "spwm":
+            raise ValueError("modulation must be 'spwm' or 'svm'.")
+
+        m_a = np.clip(m_a, -1.0, 1.0)
+        m_b = np.clip(m_b, -1.0, 1.0)
+        m_c = np.clip(m_c, -1.0, 1.0)
+
+        # ------------------------------------------------------------------ #
+        # 3+4) Exact edges + volt-second rendering, per leg
+        # ------------------------------------------------------------------ #
+        t_end = t[-1] + dt
+        n_periods = int(np.ceil(t_end / Tsw))
+        k = np.arange(n_periods)
+        t_k0 = k * Tsw
+        t_kc = (k + 0.5) * Tsw
+
+        bounds = np.empty(n + 1)
+        bounds[:n] = t
+        bounds[n] = t_end
+
+        def render_leg(m_leg):
+            if sample not in ("center", "natural"):
+                raise ValueError("sample must be 'center' or 'natural'.")
+            m_k = np.interp(t_kc, t, m_leg)
+            m_k = np.clip(m_k, -1.0, 1.0)
+
+            tau1 = (1.0 - m_k) / 4.0
+            tau2 = (m_k + 3.0) / 4.0
+            R = t_k0 + tau1 * Tsw
+            F = t_k0 + tau2 * Tsw
+            dur = F - R
+
+            cum_before = np.concatenate(([0.0], np.cumsum(dur)[:-1]))
+            knot_t = np.empty(2 * n_periods)
+            knot_A = np.empty(2 * n_periods)
+            knot_t[0::2] = R
+            knot_t[1::2] = F
+            knot_A[0::2] = cum_before
+            knot_A[1::2] = cum_before + dur
+
+            A_bounds = np.interp(bounds, knot_t, knot_A,
+                                 left=knot_A[0], right=knot_A[-1])
+            on_time = np.diff(A_bounds)
+            frac_on = on_time / dt
+
             return Vo_t * (2.0 * frac_on - 1.0)
 
         Vao = render_leg(m_a)
@@ -3239,45 +3356,45 @@ class Calculation_functions_class:
         print(f"{'Quantity':<{LBL}}{'Unit':<{UNT}}{'L1':>{COL}}{'L2':>{COL}}{'L1/L2':>{RAT}}")
         print(line)
 
-        print("[ Core geometry ]")
-        row("Inductance", "[µH]", v(L1, "L"), v(L2, "L"), scale=1e6, nfmt="{:.3f}", ratio=True)
-        row("Turns N", "[-]", v(L1, "N"), v(L2, "N"), nfmt="{:.0f}", ratio=True)
-        row("Air gap", "[mm]", v(L1, "lg"), v(L2, "lg"), scale=1e3, nfmt="{:.3f}", ratio=True)
-        row("B_peak", "[T]", v(L1, "B_peak"), v(L2, "B_peak"), nfmt="{:.4f}", ratio=True)
+        #print("[ Core geometry ]")
+        #row("Inductance", "[µH]", v(L1, "L"), v(L2, "L"), scale=1e6, nfmt="{:.3f}", ratio=True)
+        #row("Turns N", "[-]", v(L1, "N"), v(L2, "N"), nfmt="{:.0f}", ratio=True)
+        #row("Air gap", "[mm]", v(L1, "lg"), v(L2, "lg"), scale=1e3, nfmt="{:.3f}", ratio=True)
+        #row("B_peak", "[T]", v(L1, "B_peak"), v(L2, "B_peak"), nfmt="{:.4f}", ratio=True)
         # B_peak / Bsat as a percentage
-        bp1 = v(L1, "B_peak");
-        bs1 = v(L1, "Bsat")
-        bp2 = v(L2, "B_peak");
-        bs2 = v(L2, "Bsat")
-        pct1 = (bp1 / bs1) if (bp1 is not None and bs1) else None
-        pct2 = (bp2 / bs2) if (bp2 is not None and bs2) else None
-        row("B_peak / Bsat", "[%]", pct1, pct2, scale=100.0, nfmt="{:.2f}")
-        row("Ae (eff. area)", "[mm²]", v(L1, "Ae"), v(L2, "Ae"), scale=1e6, nfmt="{:.2f}", ratio=True)
-        row("le (path len)", "[mm]", v(L1, "le"), v(L2, "le"), scale=1e3, nfmt="{:.2f}", ratio=True)
-        row("Ve (volume)", "[cm³]", v(L1, "Ve"), v(L2, "Ve"), scale=1e6, nfmt="{:.2f}", ratio=True)
-        row("A_surface", "[cm²]", v(L1, "A_surface"), v(L2, "A_surface"), scale=1e4, nfmt="{:.2f}", ratio=True)
+        #bp1 = v(L1, "B_peak");
+        #bs1 = v(L1, "Bsat")
+        #bp2 = v(L2, "B_peak");
+        #bs2 = v(L2, "Bsat")
+        #pct1 = (bp1 / bs1) if (bp1 is not None and bs1) else None
+        #pct2 = (bp2 / bs2) if (bp2 is not None and bs2) else None
+        #row("B_peak / Bsat", "[%]", pct1, pct2, scale=100.0, nfmt="{:.2f}")
+        #row("Ae (eff. area)", "[mm²]", v(L1, "Ae"), v(L2, "Ae"), scale=1e6, nfmt="{:.2f}", ratio=True)
+        #row("le (path len)", "[mm]", v(L1, "le"), v(L2, "le"), scale=1e3, nfmt="{:.2f}", ratio=True)
+        #row("Ve (volume)", "[cm³]", v(L1, "Ve"), v(L2, "Ve"), scale=1e6, nfmt="{:.2f}", ratio=True)
+        #row("A_surface", "[cm²]", v(L1, "A_surface"), v(L2, "A_surface"), scale=1e4, nfmt="{:.2f}", ratio=True)
 
-        print("[ Winding ]")
-        row("I_RMS", "[A]", v(L1, "I_RMS"), v(L2, "I_RMS"), nfmt="{:.2f}", ratio=True)
-        row("V_RMS", "[V]", v(L1, "V_RMS"), v(L2, "V_RMS"), nfmt="{:.4f}", ratio=True)
-        row("Rdc", "[mΩ]", v(L1, "Rdc"), v(L2, "Rdc"), scale=1e3, nfmt="{:.4f}", ratio=True)
-        row("Parallel strands", "[-]", v(L1, "N_parallel"), v(L2, "N_parallel"), nfmt="{:.0f}", ratio=True)
-        row("A_wire actual", "[mm²]", v(L1, "A_wire"), v(L2, "A_wire"), scale=1e6, nfmt="{:.2f}", ratio=True)
-        row("Mean turn len", "[mm]", v(L1, "l_turn"), v(L2, "l_turn"), scale=1e3, nfmt="{:.2f}", ratio=True)
+        #print("[ Winding ]")
+        #row("I_RMS", "[A]", v(L1, "I_RMS"), v(L2, "I_RMS"), nfmt="{:.2f}", ratio=True)
+        #row("V_RMS", "[V]", v(L1, "V_RMS"), v(L2, "V_RMS"), nfmt="{:.4f}", ratio=True)
+        #row("Rdc", "[mΩ]", v(L1, "Rdc"), v(L2, "Rdc"), scale=1e3, nfmt="{:.4f}", ratio=True)
+        #row("Parallel strands", "[-]", v(L1, "N_parallel"), v(L2, "N_parallel"), nfmt="{:.0f}", ratio=True)
+        #row("A_wire actual", "[mm²]", v(L1, "A_wire"), v(L2, "A_wire"), scale=1e6, nfmt="{:.2f}", ratio=True)
+        #row("Mean turn len", "[mm]", v(L1, "l_turn"), v(L2, "l_turn"), scale=1e3, nfmt="{:.2f}", ratio=True)
 
-        print("[ Power losses ]")
-        row("Core loss  P_c", "[W]", v(L1, "P_core"), v(L2, "P_core"), nfmt="{:.4f}", ratio=True)
-        row("Winding loss P_w", "[W]", v(L1, "P_winding"), v(L2, "P_winding"), nfmt="{:.4f}", ratio=True)
-        row("Total loss P_tot", "[W]", v(L1, "P_total"), v(L2, "P_total"), nfmt="{:.4f}", ratio=True)
+        #print("[ Power losses ]")
+        #row("Core loss  P_c", "[W]", v(L1, "P_core"), v(L2, "P_core"), nfmt="{:.4f}", ratio=True)
+        #row("Winding loss P_w", "[W]", v(L1, "P_winding"), v(L2, "P_winding"), nfmt="{:.4f}", ratio=True)
+        #row("Total loss P_tot", "[W]", v(L1, "P_total"), v(L2, "P_total"), nfmt="{:.4f}", ratio=True)
 
         print("[ Thermal ]")
-        row("Thermal R_th", "[K/W]", v(L1, "R_th"), v(L2, "R_th"), nfmt="{:.4f}", ratio=True)
+        #row("Thermal R_th", "[K/W]", v(L1, "R_th"), v(L2, "R_th"), nfmt="{:.4f}", ratio=True)
         row("Temperature", "[°C]", v(L1, "T"), v(L2, "T"), offset=-K_to_C, nfmt="{:.2f}")
-        row("Rated temp", "[°C]", v(L1, "T_rated"), v(L2, "T_rated"), offset=-K_to_C, nfmt="{:.2f}")
+        #row("Rated temp", "[°C]", v(L1, "T_rated"), v(L2, "T_rated"), offset=-K_to_C, nfmt="{:.2f}")
         # Margin = T_rated - T_operating
-        m1 = (v(L1, "T_rated") - v(L1, "T")) if (v(L1, "T_rated") is not None and v(L1, "T") is not None) else None
-        m2 = (v(L2, "T_rated") - v(L2, "T")) if (v(L2, "T_rated") is not None and v(L2, "T") is not None) else None
-        row("Margin below rated", "[K]", m1, m2, nfmt="{:.2f}")
+        #m1 = (v(L1, "T_rated") - v(L1, "T")) if (v(L1, "T_rated") is not None and v(L1, "T") is not None) else None
+        #m2 = (v(L2, "T_rated") - v(L2, "T")) if (v(L2, "T_rated") is not None and v(L2, "T") is not None) else None
+        #row("Margin below rated", "[K]", m1, m2, nfmt="{:.2f}")
 
         print("[ Lifetime ]")
         row("Lifetime", "[yr]", v(L1, "Lifetime"), v(L2, "Lifetime"), nfmt="{:.4f}", ratio=True)
@@ -3485,3 +3602,148 @@ class Calculation_functions_class:
             "THD_IL2_self": 100.0 * IL2_hrm / IL2_fund,
             "THD_IL2_ref": 100.0 * IL2_hrm / Ig_fund,
         }
+
+    @staticmethod
+    def compute_I_L2_RMS_per_harmonic(I_L2, f, fsw,resolution_per_cycle, Profile_size):
+
+        """
+        Decompose the grid-side current I_L2 into RMS values per harmonic order
+        for each second of the mission profile, for use in the transformer
+        harmonic loss factor calculation of IEEE C57.110.
+
+        Harmonic orders are the physically significant harmonics of a
+        three-phase grid-connected inverter:
+        - Low-order characteristic harmonics: 1, 5, 7, 11, 13, 17, 19
+        - First switching band:               mf-2 ... mf+2
+        - Second switching band:              2*mf-2 ... 2*mf+2
+
+        Parameters
+        ----------
+        I_L2 : np.ndarray
+            Time-domain grid-side current signal,
+            length = Profile_size * resolution_per_cycle * f
+        f : float
+            Fundamental frequency [Hz]
+        fsw : float
+            Inverter switching frequency [Hz]
+        resolution_per_cycle : int
+            Number of samples per fundamental cycle
+        Profile_size : int
+            Number of seconds in the mission profile
+
+        Returns
+        -------
+        I_L2_RMS_harmonics : np.ndarray
+            Shape: (Profile_size, n_harmonics)
+            I_L2_RMS_harmonics[i, n] = RMS current at harmonic order n during second i
+        harmonic_orders : np.ndarray
+            Shape: (n_harmonics,)
+            The harmonic order h corresponding to each column. Required by the
+            harmonic loss factor, since the orders are not contiguous.
+        """
+
+        # ----------------------------------------#
+        # Harmonic orders
+        # ----------------------------------------#
+        mf = int(round(fsw / f))  # frequency modulation ratio
+
+        low_order_harmonics = [1, 5, 7, 11, 13, 17, 19]
+        switching_band_1 = list(range(mf - 2, mf + 3))
+        switching_band_2 = list(range(2 * mf - 2, 2 * mf + 3))
+
+        harmonic_orders = np.array(low_order_harmonics
+                                   + switching_band_1
+                                   + switching_band_2)
+
+        # ----------------------------------------#
+        # FFT, all seconds at once
+        # ----------------------------------------#
+        samples_per_second = int(resolution_per_cycle * f)
+        N = samples_per_second
+
+        I_matrix = np.asarray(I_L2, dtype=float).reshape(Profile_size, N)
+
+        fft_vals = np.fft.rfft(I_matrix, axis=1)
+        fft_freq = np.fft.rfftfreq(N, d=1.0 / samples_per_second)
+
+        target_freqs = harmonic_orders * f
+
+        bin_indices = np.argmin(
+            np.abs(fft_freq[:, np.newaxis] - target_freqs[np.newaxis, :]), axis=0)
+
+        amplitudes_peak = (2 * np.abs(fft_vals[:, bin_indices])) / N
+        I_L2_RMS_harmonics = amplitudes_peak / np.sqrt(2)
+
+        return I_L2_RMS_harmonics, harmonic_orders
+
+    @staticmethod
+    def compute_I_C_RMS_per_harmonic(I_C, f, fsw, resolution_per_cycle, Profile_size):
+        """
+        Decompose the grid-side current I_C into RMS values per harmonic order
+        for each second of the mission profile, for use in the transformer
+        harmonic loss factor calculation of IEEE C57.110.
+
+        Harmonic orders are the physically significant harmonics of a
+        three-phase grid-connected inverter:
+        - Low-order characteristic harmonics: 1, 5, 7, 11, 13, 17, 19
+        - First switching band:               mf-2 ... mf+2
+        - Second switching band:              2*mf-2 ... 2*mf+2
+
+        Parameters
+        ----------
+        I_C : np.ndarray
+            Time-domain grid-side current signal,
+            length = Profile_size * resolution_per_cycle * f
+        f : float
+            Fundamental frequency [Hz]
+        fsw : float
+            Inverter switching frequency [Hz]
+        resolution_per_cycle : int
+            Number of samples per fundamental cycle
+        Profile_size : int
+            Number of seconds in the mission profile
+
+        Returns
+        -------
+        I_C_RMS_harmonics : np.ndarray
+            Shape: (Profile_size, n_harmonics)
+            I_C_RMS_harmonics[i, n] = RMS current at harmonic order n during second i
+        harmonic_orders : np.ndarray
+            Shape: (n_harmonics,)
+            The harmonic order h corresponding to each column. Required by the
+            harmonic loss factor, since the orders are not contiguous.
+        """
+
+        # ----------------------------------------#
+        # Harmonic orders
+        # ----------------------------------------#
+        mf = int(round(fsw / f))  # frequency modulation ratio
+
+        low_order_harmonics = [1, 5, 7, 11, 13, 17, 19]
+        switching_band_1 = list(range(mf - 2, mf + 3))
+        switching_band_2 = list(range(2 * mf - 2, 2 * mf + 3))
+
+        harmonic_orders = np.array(low_order_harmonics
+                                   + switching_band_1
+                                   + switching_band_2)
+
+        # ----------------------------------------#
+        # FFT, all seconds at once
+        # ----------------------------------------#
+        samples_per_second = int(resolution_per_cycle * f)
+        N = samples_per_second
+
+        I_matrix = np.asarray(I_C, dtype=float).reshape(Profile_size, N)
+
+        fft_vals = np.fft.rfft(I_matrix, axis=1)
+        fft_freq = np.fft.rfftfreq(N, d=1.0 / samples_per_second)
+
+        target_freqs = harmonic_orders * f
+
+        bin_indices = np.argmin(
+            np.abs(fft_freq[:, np.newaxis] - target_freqs[np.newaxis, :]), axis=0)
+
+        amplitudes_peak = (2 * np.abs(fft_vals[:, bin_indices])) / N
+        I_C_RMS_harmonics = amplitudes_peak / np.sqrt(2)
+
+        return I_C_RMS_harmonics, harmonic_orders

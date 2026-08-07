@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.lines as mlines
 import matplotlib.font_manager as fm
+from pathlib import Path
 
 
 # register the TUM font from the ttf file
@@ -269,4 +270,141 @@ df_pf0_loss = pd.read_parquet("Simulation_results/Simulation_2_0.0002/df_electri
 df_pf0_thermal = pd.read_parquet("Simulation_results/Simulation_2_0.0002/df_thermal/df_1.parquet",engine="pyarrow")
 
 N = 101  # 0.201 s at dt=0.001 (if time is per ms); adjust as needed
-plotting_electro_thermal_chain_pf1_pf0(df_pf1_loss[:N], df_pf1_thermal[:N],df_pf0_loss[:N], df_pf0_thermal[:N],outpath="Paper_figures/Electro_thermal_chain_pf1_pf0.pdf",t_end=0.020)  # set 0.040 to show exactly 2 cycles at 50 Hz)
+#plotting_electro_thermal_chain_pf1_pf0(df_pf1_loss[:N], df_pf1_thermal[:N],df_pf0_loss[:N], df_pf0_thermal[:N],outpath="Paper_figures/Electro_thermal_chain_pf1_pf0.pdf",t_end=0.020)  # set 0.040 to show exactly 2 cycles at 50 Hz)
+
+
+
+
+
+
+def plotting_electro_thermal_chain_pf1_pf0_individual(df_pf1_loss, df_pf1_thermal,df_pf0_loss, df_pf0_thermal,outdir="Paper_figures", t_end=0.020):
+
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    # Time vectors (start at 0)
+    t1 = df_pf1_loss["time"] - df_pf1_loss["time"].iloc[0]
+    t0 = df_pf0_loss["time"] - df_pf0_loss["time"].iloc[0]
+    t1_th = df_pf1_thermal["time"] - df_pf1_thermal["time"].iloc[0]
+    t0_th = df_pf0_thermal["time"] - df_pf0_thermal["time"].iloc[0]
+
+    lw = 2.5 * 1.25
+
+    def make_fig(x1, y1_I, y1_D, x0, y0_I, y0_D, ylabel, title, ylim, fname):
+        fig, ax = plt.subplots(figsize=(6.4, 4.8 ), layout="constrained")
+        fig.get_layout_engine().set(h_pad=0.075)
+
+        ax.plot(x1, y1_I, linestyle="-",  color="blue", linewidth=lw)
+        ax.plot(x1, y1_D, linestyle="-",  color="red",  linewidth=lw)
+        ax.plot(x0, y0_I, linestyle="--", color="blue", linewidth=lw)
+        ax.plot(x0, y0_D, linestyle="--", color="red",  linewidth=lw)
+
+        ax.set_ylabel(ylabel)
+        ax.set_xlabel("Time [s]")
+        ax.set_title(title)
+        ax.set_ylim(*ylim)
+        ax.set_xlim(0, t_end)
+        ax.set_xticks(np.arange(0, t_end + 1e-12, 0.005))
+
+        igbt_line  = mlines.Line2D([], [], color="blue",  linestyle="-",  linewidth=lw)
+        diode_line = mlines.Line2D([], [], color="red",   linestyle="-",  linewidth=lw)
+        pf1_line   = mlines.Line2D([], [], color="black", linestyle="-",  linewidth=lw)
+        pf0_line   = mlines.Line2D([], [], color="black", linestyle="--", linewidth=lw)
+
+        fig.legend(handles=[igbt_line, diode_line, pf1_line, pf0_line],
+                   labels=["IGBT", "Diode", "pf = 1", "pf = 0"],
+                   loc="outside upper center", ncol=4, frameon=True,
+                   columnspacing=1.25, handlelength=1.5)
+
+        fig.savefig(outdir / fname, dpi=300)
+        plt.close(fig)
+
+    # ---- (1) Instantaneous current ----
+    make_fig(t1, df_pf1_loss["is_I"], df_pf1_loss["is_D"],
+             t0, df_pf0_loss["is_I"], df_pf0_loss["is_D"],
+             "Current [A]", "Instantaneous IGBT and diode currents",
+             (0, 140), "Chain_current.pdf")
+
+    # ---- (2) Power losses ----
+    make_fig(t1, df_pf1_loss["P_sw_I"], df_pf1_loss["P_sw_D"],
+             t0, df_pf0_loss["P_sw_I"], df_pf0_loss["P_sw_D"],
+             "Power loss [W]", "Total IGBT and diode power losses",
+             (0,55), "Chain_losses.pdf")
+
+    # ---- (3) Junction temperature ----
+    make_fig(t1_th, df_pf1_thermal["Tj_igbt"] - 273.15, df_pf1_thermal["Tj_diode"] - 273.15,
+             t0_th, df_pf0_thermal["Tj_igbt"] - 273.15, df_pf0_thermal["Tj_diode"] - 273.15,
+             "Temperature [°C]", "IGBT and diode junction temperature",
+             (25, 55), "Chain_temperature.pdf")
+
+
+df_pf1_loss    = pd.read_parquet("Simulation_results/Simulation_1_0.0002/df_electrical_loss/df_1.parquet", engine="pyarrow")
+df_pf1_thermal = pd.read_parquet("Simulation_results/Simulation_1_0.0002/df_thermal/df_1.parquet", engine="pyarrow")
+df_pf0_loss    = pd.read_parquet("Simulation_results/Simulation_2_0.0002/df_electrical_loss/df_1.parquet", engine="pyarrow")
+df_pf0_thermal = pd.read_parquet("Simulation_results/Simulation_2_0.0002/df_thermal/df_1.parquet", engine="pyarrow")
+
+N = 101
+plotting_electro_thermal_chain_pf1_pf0_individual(df_pf1_loss[:N], df_pf1_thermal[:N],df_pf0_loss[:N], df_pf0_thermal[:N])
+
+'''
+
+
+def plotting_electro_thermal_chain_pf1_individual(df_pf1_loss, df_pf1_thermal,
+                                                  outdir="Paper_figures", t_end=0.020):
+
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    # Time vectors (start at 0)
+    t1 = df_pf1_loss["time"] - df_pf1_loss["time"].iloc[0]
+    t1_th = df_pf1_thermal["time"] - df_pf1_thermal["time"].iloc[0]
+
+    lw = 2.5 * 1.25
+
+    def make_fig(x1, y1_I, y1_D, ylabel, title, ylim, fname):
+        fig, ax = plt.subplots(figsize=(6.4, 4.8), layout="constrained")
+        fig.get_layout_engine().set(h_pad=0.075)
+
+        ax.plot(x1, y1_I, linestyle="-", color="blue", linewidth=lw)
+        ax.plot(x1, y1_D, linestyle="-", color="red",  linewidth=lw)
+
+        ax.set_ylabel(ylabel)
+        ax.set_xlabel("Time [s]")
+        ax.set_title(title)
+        ax.set_ylim(*ylim)
+        ax.set_xlim(0, t_end)
+        ax.set_xticks(np.arange(0, t_end + 1e-12, 0.005))
+
+        igbt_line  = mlines.Line2D([], [], color="blue", linestyle="-", linewidth=lw)
+        diode_line = mlines.Line2D([], [], color="red",  linestyle="-", linewidth=lw)
+
+        fig.legend(handles=[igbt_line, diode_line],
+                   labels=["IGBT", "Diode"],
+                   loc="outside upper center", ncol=2, frameon=True,
+                   columnspacing=1.25, handlelength=1.5)
+
+        fig.savefig(outdir / fname, dpi=300)
+        plt.close(fig)
+
+    # ---- (1) Instantaneous current ----
+    make_fig(t1, df_pf1_loss["is_I"], df_pf1_loss["is_D"],
+             "Current [A]", "Instantaneous IGBT and diode currents",
+             (0, 140), "Chain_current.pdf")
+
+    # ---- (2) Power losses ----
+    make_fig(t1, df_pf1_loss["P_sw_I"], df_pf1_loss["P_sw_D"],
+             "Power loss [W]", "Total IGBT and diode power losses",
+             (0, 55), "Chain_losses.pdf")
+
+    # ---- (3) Junction temperature ----
+    make_fig(t1_th, df_pf1_thermal["Tj_igbt"] - 273.15, df_pf1_thermal["Tj_diode"] - 273.15,
+             "Temperature [°C]", "IGBT and diode junction temperature",
+             (25, 55), "Chain_temperature.pdf")
+
+
+df_pf1_loss    = pd.read_parquet("Simulation_results/Simulation_1_0.0002/df_electrical_loss/df_1.parquet", engine="pyarrow")
+df_pf1_thermal = pd.read_parquet("Simulation_results/Simulation_1_0.0002/df_thermal/df_1.parquet", engine="pyarrow")
+
+N = 101
+plotting_electro_thermal_chain_pf1_individual(df_pf1_loss[:N], df_pf1_thermal[:N])
+'''

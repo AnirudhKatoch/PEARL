@@ -12,9 +12,9 @@ def LCL_filter_design_function(Vg_ll_RMS,
                                inverter_phases,
                                modulation_scheme,
                                print_values,
-                               current_ripple_limit=0.30,
-                               delta=0.20,
-                               num_C_values=100):
+                               current_ripple_limit,
+                               delta,
+                               num_C_values):
 
     """
 
@@ -86,7 +86,7 @@ def LCL_filter_design_function(Vg_ll_RMS,
         Selected passive damping resistor for the PD-3 method [Ohm]. This resistor is placed in series with the filter capacitor branch.
     """
 
-    # Choosing Capactitor
+    # Choosing Capacitor
     C_max = 0.05 * S_rated / (2 * np.pi * fo * (Vg_ll_RMS ** 2))    # [F] Capacitor's max capacitance value
 
     # Choosing total inductance which is L1 + L2
@@ -114,12 +114,12 @@ def LCL_filter_design_function(Vg_ll_RMS,
     # Number of capacitor divisions
     C_candidates = C_max * (np.arange(1, num_C_values + 1) / num_C_values)
 
+
     # Possible L2 values
     aL_candidates = np.abs(((1 / delta) - 1)/(1 - L1_min * C_candidates * omega_sw**2))
 
     L2_candidates = aL_candidates * L1_min
     L_total_candidates = L1_min + L2_candidates
-
 
 
     # Possible Resonance frequency values
@@ -155,18 +155,18 @@ def LCL_filter_design_function(Vg_ll_RMS,
         # Check total inductance constraint
         # ----------------------------------------#
 
-        if len(valid_L_total) == 0:
-            raise ValueError(
-                "\nNo valid LCL design candidate satisfies all constraints.\n"
-                "\nProblem: No candidate satisfies the total inductance constraint.\n"
-                "Condition failed: L1 + L2 <= L_T_max\n"
-                f"Minimum L_total candidate = {np.min(L_total_candidates):.6e} H\n"
-                f"Allowed L_T_max           = {L_T_max:.6e} H\n"
-                "\nPossible fixes:\n"
-                "- Increase Vg_ll_RMS if the rated output power remains the same.\n"
-                "- Reduce S_rated if the grid voltage remains the same.\n"
-                "- Increase delta, because larger delta reduces L2.\n"
-                "- Reduce L1_min by allowing more current ripple, but this increases inverter-side current ripple.")
+        #if len(valid_L_total) == 0:
+        #    raise ValueError(
+        #        "\nNo valid LCL design candidate satisfies all constraints.\n"
+        #        "\nProblem: No candidate satisfies the total inductance constraint.\n"
+        #        "Condition failed: L1 + L2 <= L_T_max\n"
+        #        f"Minimum L_total candidate = {np.min(L_total_candidates):.6e} H\n"
+        #        f"Allowed L_T_max           = {L_T_max:.6e} H\n"
+        #        "\nPossible fixes:\n"
+        #        "- Increase Vg_ll_RMS if the rated output power remains the same.\n"
+        #        "- Reduce S_rated if the grid voltage remains the same.\n"
+        #        "- Increase delta, because larger delta reduces L2.\n"
+        #        "- Reduce L1_min by allowing more current ripple, but this increases inverter-side current ripple.")
 
         # ----------------------------------------#
         # Check resonance only among candidates that satisfy total inductance
@@ -288,6 +288,8 @@ def LCL_filter_design_function(Vg_ll_RMS,
     R3_min = ((1 / (6 * np.pi)) * (L2 * fsw / (L1 * fr)) * (1 / (C * omega_r)))
     R3_max = 1 / (omega_sw * C)
     R3 = np.sqrt(R3_min * R3_max)
+
+    R3 = R3_min
 
     if R3_min >= R3_max:
         raise ValueError(

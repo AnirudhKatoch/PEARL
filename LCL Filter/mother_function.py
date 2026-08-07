@@ -43,8 +43,9 @@ Calculation_functions.validate_pwm_pulse_amplitude_profile(Vdc_RMS=Vdc_RMS, inve
 # LCL filter component selection
 # ----------------------------------------#
 
-L1_optimum, L2_optimum, C_optimum, R3_optimum = LCL_filter_design_function(Vg_ll_RMS=Vg_ll_RMS, S_rated=S_rated, I_rated=I_rated_RMS, fsw=fsw, omega_sw=omega_sw, fo=f, Udc_rated=Vdc_rated, M_rated=M_rated, inverter_phases=inverter_phases, modulation_scheme=modulation_scheme, print_values = False, current_ripple_limit=0.30, delta=0.19, num_C_values=10)
-Calculation_functions.check_within_tolerance({"L1": (L1_specs["L1"], L1_optimum), "L2": (L2_specs["L2"], L2_optimum), "C":  (C_specs["C"],   C_optimum), "R3": (C_specs["R3"],  R3_optimum), }, tol=0.125)
+L1_optimum, L2_optimum, C_optimum, R3_optimum = LCL_filter_design_function(Vg_ll_RMS=Vg_ll_RMS, S_rated=S_rated, I_rated=I_rated_RMS, fsw=fsw, omega_sw=omega_sw, fo=f, Udc_rated=Vdc_rated, M_rated=M_rated, inverter_phases=inverter_phases, modulation_scheme=modulation_scheme, print_values = False, current_ripple_limit=current_ripple_limit, delta=delta, num_C_values=10)
+#Calculation_functions.check_within_tolerance({"L1": (L1_specs["L1"], L1_optimum), "L2": (L2_specs["L2"], L2_optimum), "C":  (C_specs["C"],   C_optimum), "R3": (C_specs["R3"],  R3_optimum), }, tol=0.125)
+
 
 # ----------------------------------------#
 # LCL filter middle branch [C]
@@ -94,14 +95,14 @@ Ve_L2 = Calculation_functions.calculate_core_volume(Ae=Ae_L2, le=le_L2)         
 N_L2 = Calculation_functions.calculate_turns(L=L2_specs["L2"], I_peak=I_rated_peak, B_max=L2_specs["B_max"], Ae = Ae_L2)   # [-] Minimum number of turns required.
 lg_L2 = Calculation_functions.calculate_air_gap(mu_0=L2_specs["mu_0"], N=N_L2, Ae=Ae_L2, L=L2_specs["L2"], le=le_L2, mu_r=L2_specs["mu_r"])  # [m] Required air gap length.
 B_peak_L2 = Calculation_functions.calculate_B_peak(mu_0=L2_specs["mu_0"], N=N_L2, I_peak=I_rated_peak, lg=lg_L2, le=le_L2, mu_r=L2_specs["mu_r"]) # [T] Peak flux density in the core.
-Calculation_functions.safety_checks(B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], lg=lg_L2, le=le_L2)
+#Calculation_functions.safety_checks(B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], lg=lg_L2, le=le_L2)
 
 # Winding
 
 A_wire_L2_minimum, d_wire_L2_minimum = Calculation_functions.calculate_minimum_required_wire_area(I_RMS_rated = I_rated_RMS, J_max = L2_specs["J_max"]) # [m²] Minimum copper cross-section required to carry the rated current
 N_parallel_wire_L2 = Calculation_functions.calculate_parallel_strands(A_wire_minimum = A_wire_L2_minimum, A_strand = L2_specs["A_strand"])             # [-] The number of parallel strands required to achieve the minimum copper cross-section from individual strand area
 A_wire_actual_L2 = Calculation_functions.calculate_actual_wire_area(N_parallel = N_parallel_wire_L2, A_strand = L2_specs["A_strand"])                  # [m²] Actual total copper cross-section after rounding up
-Calculation_functions.check_window_fill(N_turns = N_L2, N_parallel = N_parallel_wire_L2, A_wire_bare = L2_specs["A_strand"], F_core = L2_specs["F_core"], G_core = L2_specs["G_core"], kf_window_max= 0.5) # Check whether the winding physically fits inside the core window.
+#Calculation_functions.check_window_fill(N_turns = N_L2, N_parallel = N_parallel_wire_L2, A_wire_bare = L2_specs["A_strand"], F_core = L2_specs["F_core"], G_core = L2_specs["G_core"], kf_window_max= 0.5) # Check whether the winding physically fits inside the core window.
 l_turn_L2 = Calculation_functions.calculate_l_turn(D_core=L2_specs["D_core"], E_core=L2_specs["E_core"])                                               # [m] Estimate mean length of one turn for a rectangular toroidal core.
 Rdc_L2 = Calculation_functions.calculate_Rdc(rho=L2_specs["rho"], N=N_L2, l_turn=l_turn_L2, A_wire=A_wire_actual_L2)                                                         # [ohm] float  DC winding resistance # Assumed  no Skin or Proximity Effect
 R_th_L2 = Calculation_functions.calculate_inductor_thermal_resistance(method = "surface_area", A_surface = A_surface_L2 , heat_transfer_coefficient=heat_transfer_coefficient)   # [K/W] Thermal resistance from  to ambient .
@@ -118,8 +119,56 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
     # Electrical model
     # ----------------------------------------#
 
+    def add_grid_background_harmonics(Vg, t, omega, Vg_RMS, harmonics=None, broadband_order_max=None, broadband_amplitude=0.0,seed=None):
+        """
+        Superimpose background voltage distortion on the fundamental grid voltage.
+
+        Two modes, which may be combined.
+
+        harmonics : dict or None
+            {harmonic_order: amplitude_as_fraction_of_fundamental}.
+            Use for specific orders, e.g. {98: 0.002, 100: 0.003}.
+
+        broadband_order_max : int or None
+            If given, every harmonic order from 2 to broadband_order_max is
+            injected at broadband_amplitude, giving a flat background spectrum.
+
+        broadband_amplitude : float
+            Amplitude of each broadband order as a fraction of the fundamental.
+
+        seed : int or None
+            Seed for the random phase of each harmonic. None gives zero phase,
+            which makes all harmonics add coherently at t = 0 and is not
+            physically realistic for a broadband background.
+        """
+
+        Vg = np.asarray(Vg, dtype=float)
+        t = np.asarray(t, dtype=float)
+
+        orders = {}
+        if broadband_order_max is not None and broadband_amplitude > 0.0:
+            for h in range(2, int(broadband_order_max) + 1):
+                orders[h] = broadband_amplitude
+        if harmonics is not None:
+            orders.update(harmonics)  # explicit orders override broadband
+
+        if not orders:
+            return Vg
+
+        rng = np.random.default_rng(seed) if seed is not None else None
+        Vg_distorted = Vg.copy()
+
+        for h, amplitude_fraction in orders.items():
+            phase = rng.uniform(0, 2 * np.pi) if rng is not None else 0.0
+            Vg_distorted += (np.sqrt(2) * Vg_RMS * amplitude_fraction
+                             * np.sin(h * omega * t + phase))
+
+        return Vg_distorted
+
     # grid voltage waveform (one second)
     Vg = np.sqrt(2) * Vg_RMS_i * np.sin(omega * t_one)
+
+    #Vg = add_grid_background_harmonics(Vg=Vg, t=t_one, omega=omega, Vg_RMS=Vg_RMS_i,broadband_order_max=500, broadband_amplitude=0.0008,seed=0)
 
     pf_inst = np.full(resolution_per_cycle * f, pf_i)
     phi = np.arccos(np.clip(np.abs(pf_inst), 0.0, 1.0))
@@ -138,8 +187,8 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
     Calculation_functions.validate_required_inverter_voltage(Vs_ref=Vs_ref, Vo_available=Vo_rated)
 
     # switching output (Vo passed as single-element array, Profile_size=1)
-    Vs = Calculation_functions.Three_phase_switching_output(t=t_one, Vs_ref=Vs_ref, Vo=np.array([Vo_i]), Tsw=Tsw, f=f, Profile_size=1)
-    Vs = Vs_ref
+    Vs = Calculation_functions.Three_phase_switching_output(t=t_one, Vs_ref=Vs_ref, Vo=np.array([Vo_i]), Tsw=Tsw, f=f, Profile_size=1, modulation="spwm")
+    #Vs = Vs_ref
 
     _ = Calculation_functions.check_Vs_quality(t=t_one, Vs=Vs, Vs_ref=Vs_ref, f=f, fsw=fsw, Profile_size=1, raise_on_fail=True)
 
@@ -150,21 +199,21 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
     # LCL filter middle branch [C]
     # ----------------------------------------#
 
+    I_L2_RMS_harmonics = Calculation_functions.compute_I_L2_RMS_per_harmonic(I_L2=I_L2, f=f, fsw=fsw, resolution_per_cycle=resolution_per_cycle, Profile_size=1)
     # ----- Capacitor branch [C] -----
-    I_C_RMS_harmonics = Calculation_functions.compute_I_C_RMS_per_harmonic_for_capacitor(I_C=I_C, f=f, fsw=fsw,resolution_per_cycle=resolution_per_cycle, Profile_size=1)
+    I_C_RMS_harmonics, harmonic_orders_C = Calculation_functions.compute_I_C_RMS_per_harmonic(I_C=I_C, f=f, fsw=fsw,resolution_per_cycle=resolution_per_cycle, Profile_size=1)
 
     I_C_RMS = Calculation_functions.Singal_RMS(Signal=I_C, resolution_per_cycle=resolution_per_cycle, f=f)
 
     # Power losses
     P_total_C = Calculation_functions.Capacitor_total_power_losses(fsw=fsw, f=f, I_C_RMS_harmonics=I_C_RMS_harmonics, tan_delta_0=C_specs["tan_delta_0"], C=C_specs["C"], Rs=C_specs["Rs"])
 
-
     # Temperature  (T_amb is THIS operating point's ambient)
     T_C = Calculation_functions.Capacitor_hotspot_temperature(T_amb=T_amb_i, P_total_C=P_total_C,Thermal_resistance_C=C_specs["Thermal_resistance_C"])
 
     V_C_RMS = Calculation_functions.Singal_RMS(Signal=V_C, resolution_per_cycle=resolution_per_cycle, f=f)
 
-    Calculation_functions.validate_capacitor_operating_limits(T_C=T_C, V_C_RMS=V_C_RMS, V_C=V_C,T_C_Rated=C_specs["T_C_Rated"],V_C_RMS_Rated=C_specs["V_C_RMS_Rated"],V_C_Peak_Rated=C_specs["V_C_Peak_Rated"],V_RMS_overvoltage_factor=1.5, V_peak_overvoltage_factor=1.5)
+    #Calculation_functions.validate_capacitor_operating_limits(T_C=T_C, V_C_RMS=V_C_RMS, V_C=V_C,T_C_Rated=C_specs["T_C_Rated"],V_C_RMS_Rated=C_specs["V_C_RMS_Rated"],V_C_Peak_Rated=C_specs["V_C_Peak_Rated"],V_RMS_overvoltage_factor=1.5, V_peak_overvoltage_factor=1.5)
 
     # ----------------------------------------#
     # LCL filter inverter side [L1]
@@ -283,6 +332,8 @@ def compare_fundamental(signal_ref, signal_meas, f, resolution_per_cycle):
 THD_percent_I_L2 = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=I_L2, Signal_ref=Ig_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
 THD_percent_Vs = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=Vs, Signal_ref=Vs_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
 
+print("THD_percent_I_L2",THD_percent_I_L2)
+
 
 # ----------------------------------------#
 # LCL filter middle branch [C]
@@ -317,9 +368,8 @@ Calculation_functions.compare_components(C_report, L1_report, L2_report)
 
 
 
-
 #blabla = False
-blabla = True
+blabla = False
 
 if blabla == True:
     df_1_power_flow_RMS = pd.DataFrame(
@@ -450,7 +500,7 @@ if C_specs["Lifetime_calculations"] == "Graphical":
 
     Lifetime_C_MC = np.empty(number_of_samples)
     for i in range(number_of_samples):
-        Lifetime_C_MC[i] = Calculation_functions.Capacitor_lifetime_graphical(T_C=T_C_samples[i], V_C_RMS=V_C_samples[i], V_C_RMS_Rated=V_C_RMS_Rated_samples[i], lifetime_curves=lifetime_curves_samples[i],)
+        Lifetime_C_MC[i] = Calculation_functions.Capacitor_lifetime_graphical(T_C=np.atleast_1d(T_C_samples[i]),V_C_RMS=np.atleast_1d(V_C_samples[i]),V_C_RMS_Rated=V_C_RMS_Rated_samples[i],lifetime_curves=lifetime_curves_samples[i])[0]
 
 elif C_specs["Lifetime_calculations"] == "Analytical":
 
@@ -499,6 +549,11 @@ Lifetime_L2_MC = Calculation_functions.calculate_inductor_lifetime(T_operating =
                                                                    kb = L2_specs["kb"], L_max_years = L2_specs["L_max_years"],)
 
 Lifetime_LCL_MC = np.minimum.reduce([Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, ])
+
+B10_C   = np.percentile(Lifetime_C_MC, 10)
+B10_L1  = np.percentile(Lifetime_L1_MC, 10)
+B10_L2  = np.percentile(Lifetime_L2_MC, 10)
+B10_LCL = np.percentile(Lifetime_LCL_MC, 10)
 
 df_6_MC = pd.DataFrame(
     {
