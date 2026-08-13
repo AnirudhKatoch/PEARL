@@ -48,7 +48,7 @@ class Input_parameters_class:
         # Mission profiles
         # -------------------------#
 
-        self.Profile_size = 2                                               # [s] Total duration of the mission profile; each array entry represents one operating point with 1-second resolution
+        self.Profile_size = 365                                               # [s] Total duration of the mission profile; each array entry represents one operating point with 1-second resolution
         self.Vdc_RMS = np.full(self.Profile_size,self.Vdc_rated)               # [V] Mission profile of DC bus voltage sampled at 1-second intervals
         self.M = np.full(self.Profile_size, 1)                         # [-] Mission profile of modulation index sampled at 1-second intervals
         self.Vo = np.full(self.Profile_size, self.Vo_rated)                    # [V] Mission profile of PWM pulse amplitude (instantaneous switched voltage level)
@@ -78,7 +78,7 @@ class Input_parameters_class:
         self.samples_per_switching_period = self.Tsw / self.dt  # [-] Number of simulation samples contained within one PWM switching period; determines PWM waveform resolution accuracy
         self.Minimum_required_samples_per_switching_period = 5  # [-] Minimum acceptable PWM numerical resolution required to accurately capture switching events and carrier intersections
         self.seconds_per_sample = 24 * 3600                     # [s] Wall-clock duration each mission-profile sample represents(e.g. 1 = per-second profile, 86400 = one sample per day)
-
+        self.h_max = 500                                        # [-] The harmonic order until which one wants the simulation to be done
         # ----------------------------------------#
         # LCL filter design parameters
         # ----------------------------------------#
@@ -216,7 +216,9 @@ class Input_parameters_class:
             # Product code - B32362A3157J030 # FilterCap MKD AC – Single phase # TDK Electronics
 
             # Capacitance
-            'C': 167e-6*0.8,  # [F]    Capacitance# Keep C what it is just retune the L1 and L2
+            'C': 167e-6,  # [F]    Capacitance# Keep C what it is just retune the L1 and L2
+
+            #'C': 167e-6,  # [F]    Capacitance# Keep C what it is just retune the L1 and L2
 
             # Dimensions
             'D_case': 75e-3,

@@ -5,51 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef770173-ff58-43e2-9746-4ea07cca118c" name="Changes" comment="Latest">
-      <change afterPath="$PROJECT_DIR$/LCL Filter/trial.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LCL Filter/trial_1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/OAPE_results/Plotting.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/OAPE_results/trial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LCL Filter/mother_trial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Cauer_network.drawio" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Cauer_network.drawio" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Cauer_network.drawio.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Cauer_network.drawio.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Air_speed_unreliability.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Case study 1 framework.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/CaseStudy1_summary_2x2.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/CaseStudy1_summary_4x1.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/CaseStudy1_summary_4x1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/CaseStudy1_summary_5plots.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/CaseStudy1_summary_5plots_column.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/CaseStudy1_summary_5plots_column.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Electro_thermal_chain_pf1_pf0.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Electro_thermal_chain_pf1_pf0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_B10.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_case_study_2.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_combined.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_life.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_life.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Heat_sink_unreliability.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/IGBT_and_Diode_current.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Junction_temperature_vs_pf.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Lifetime_IGBT_Diode_vs_pf.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Lifetime_Switch_vs_pf.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Long-duration junction temperature of IGBT and diode.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/New folder/Case study 1 framework.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/New folder/Electro_thermal_chain_pf1_pf0.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/New folder/Electro_thermal_chain_pf1_pf0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/New folder/IGBT and diode instantaneous current.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/New folder/IGBT and diode power losses.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/New folder/Long-duration junction temperature of IGBT and diode.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/New folder/Short-time junction temperature of IGBT and diode.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Total_power_losses.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/df.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/pearl_qr.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/pearl_qr.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_conference.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_conference.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_final_results.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_final_results.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Chain_current.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Chain_losses.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Paper_figures/Chain_temperature.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_heat_sink.py" beforeDir="false" afterPath="$PROJECT_DIR$/IGBT and Diode/z/Final_results_conference/Plotting_heat_sink.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Calculation_functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Input_parameters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/Input_parameters_mini_grid.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LCL Filter/LCL_filter_design.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/LCL_filter_design.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/Plotting_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/Plotting_function.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LCL Filter/mother_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/mother_function.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/trial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/trial_1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/1_Fig_lifetime_vs_pf_with_min.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/1_Fig_lifetime_vs_pf_with_min.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/2_Fig_inductor_irms_vs_pf.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/2_Fig_inductor_irms_vs_pf.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/3_Fig_capacitor_vrms_irms_vs_pf.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/3_Fig_capacitor_vrms_irms_vs_pf.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/Fig_B10_vs_pf.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/Fig_B10_vs_pf.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/Fig_irms_vs_pf.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/Fig_irms_vs_pf.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/Fig_loss_vs_pf.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/Fig_loss_vs_pf.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/Fig_temp_vs_pf.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/Fig_temp_vs_pf.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/Fig_vrms_vs_pf.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/LCL Filter/z/z/Paper_related/pf_sweep_results/Figures/Fig_vrms_vs_pf.pdf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,6 +90,8 @@
     &quot;Python.LCL_filter_design.executor&quot;: &quot;Run&quot;,
     &quot;Python.Load_data.executor&quot;: &quot;Run&quot;,
     &quot;Python.Mother_function_trial_temp_sweep.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Plots.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Plotting.executor&quot;: &quot;Run&quot;,
     &quot;Python.Plotting_THD_sweep.executor&quot;: &quot;Run&quot;,
     &quot;Python.Plotting_conference.executor&quot;: &quot;Run&quot;,
     &quot;Python.Plotting_final_results.executor&quot;: &quot;Run&quot;,
@@ -132,6 +111,7 @@
     &quot;Python.mother_function_trial.executor&quot;: &quot;Run&quot;,
     &quot;Python.mother_function_trial_THD_sweep.executor&quot;: &quot;Run&quot;,
     &quot;Python.mother_function_trial_pf_sweep.executor&quot;: &quot;Run&quot;,
+    &quot;Python.mother_trial.executor&quot;: &quot;Run&quot;,
     &quot;Python.pf_sweep_results_new.executor&quot;: &quot;Run&quot;,
     &quot;Python.runner.executor&quot;: &quot;Run&quot;,
     &quot;Python.runner_0.1.executor&quot;: &quot;Run&quot;,

@@ -963,19 +963,22 @@ class Calculation_functions_class:
         return I_C_RMS_harmonics
 
     @staticmethod
-    def Capacitor_total_power_losses(fsw, f, I_C_RMS_harmonics, tan_delta_0, C, Rs):
+    def Capacitor_total_power_losses(f, I_C_RMS_harmonics, harmonic_orders, tan_delta_0, C, Rs):
 
         '''
-        Compute the total power dissipation in the LCL filter capacitor across all relevant harmonics.
+        Compute the total power dissipation in the LCL filter capacitor,
+        summed over every harmonic present in the supplied spectrum.
 
         Parameters
         ----------
-        fsw : float
-            Inverter switching frequency [Hz].
         f : float
             Fundamental grid frequency [Hz].
         I_C_RMS_harmonics : ndarray, shape (Profile_size, num_harmonics)
-            RMS current through the capacitor at each harmonic frequency, for each second of the mission profile. Rows = mission-profile seconds, columns = harmonic orders.
+            RMS current through the capacitor at each harmonic order, for each
+            second of the mission profile. Rows = mission-profile seconds,
+            columns = harmonic orders.
+        harmonic_orders : ndarray, shape (num_harmonics,)
+            Harmonic order corresponding to each column of I_C_RMS_harmonics.
         tan_delta_0 : float
             Dielectric dissipation factor of the polypropylene film [-].
         C : float
@@ -986,35 +989,20 @@ class Calculation_functions_class:
         Returns
         -------
         P_total_C : ndarray, shape (Profile_size,)
-            Total power dissipation in the capacitor [W] for each second of the mission profile.
-
-
+            Total power dissipation in the capacitor [W] for each second of
+            the mission profile.
         '''
 
-        mf = int(round(fsw / f))  # Frequency modulation ratio: e.g. 200 for fsw=10kHz, f=50Hz
+        harmonic_orders = np.asarray(harmonic_orders, dtype=float)
+        f_i = harmonic_orders * f  # absolute frequency of each harmonic [Hz]
 
-        # Define the harmonic orders to include in the loss calculation
-        low_order_harmonics = [1, 5, 7, 11, 13, 17, 19]  # Dominant low-order grid harmonics
-        switching_band_1 = list(range(mf - 2, mf + 3))  # First switching-frequency sideband, e.g. [198,199,200,201,202]
-        switching_band_2 = list(
-            range(2 * mf - 2, 2 * mf + 3))  # Second switching-frequency sideband, e.g. [398,399,400,401,402]
-        harmonic_orders = np.array(low_order_harmonics + switching_band_1 + switching_band_2)
-
-        f_i = harmonic_orders * f  # Absolute frequency of each harmonic [Hz]
-
-        # ----------------------------------------#
-        # Rs temperature correction
-        # ----------------------------------------#
-        # Datasheet page 18: Rs_85 = 1.25 * Rs_20
-        # Linear interpolation between 20°C and 85°C
-
-        # Dielectric losses at each harmonic: PD(fi) = I(fi)^2 * tan_delta_0 / (2*pi*fi*C)
+        # Dielectric losses at each harmonic: P_D(f_i) = I(f_i)^2 * tan_delta_0 / (2*pi*f_i*C)
         P_D = I_C_RMS_harmonics ** 2 * tan_delta_0 / (2 * np.pi * f_i * C)
 
-        # Resistive losses at each harmonic: PR(fi) = I(fi)^2 * Rs
+        # Resistive losses at each harmonic: P_R(f_i) = I(f_i)^2 * Rs
         P_R = I_C_RMS_harmonics ** 2 * Rs
 
-        P_total_per_harmonic = P_D + P_R  # Total loss contribution per harmonic [W], shape (Profile_size, num_harmonics)
+        P_total_per_harmonic = P_D + P_R
         P_total_C = np.sum(P_total_per_harmonic, axis=1)
 
         return P_total_C
@@ -2312,7 +2300,7 @@ class Calculation_functions_class:
         return L
 
     @staticmethod
-    def miners_rule_modified(L_per_second, seconds_per_sample=1.0):
+    def miners_rule_modified(L_per_second, seconds_per_sample):
         """
         Apply Miner's cumulative damage rule to compute expected total lifetime
         and the fraction of life consumed by one mission profile cycle.
@@ -2368,7 +2356,102 @@ class Calculation_functions_class:
         life_consumed_percent = D_cycle * 100
         if life_consumed_percent > 100:
             life_consumed_percent = 100.0
-        return L_total, life_consumed_percent
+        return L_total, life_consumed_percent, D_cycle
+
+    @staticmethod
+    def miners_rule_modified_capacitor(L_per_second, seconds_per_sample, C_0 , D_cum_previous, k_capacitance):
+        """
+        Apply Miner's cumulative damage rule to compute expected total lifetime,
+        the fraction of life consumed by one mission profile cycle, and
+        optionally the degraded capacitance at the end of that cycle.
+
+        Miner's rule states that failure occurs when cumulative damage D = 1:
+            D = sum( dt_i / L_i )
+        where dt_i is the time spent at condition i and L_i is the lifetime
+        at that condition. The expected total lifetime is then:
+            L_total = Profile_duration / D_cycle
+
+        For a film capacitor the accumulated damage is additionally mapped to a
+        loss of capacitance by the linear convention
+
+            C_new = C_0 * (1 - k_capacitance * D_cumulative)
+
+        so that a cumulative damage of unity corresponds to a capacitance loss of
+        k_capacitance. The default k_capacitance = 0.20 follows MIL-C-62F, under
+        which a capacitor is considered unhealthy once its capacitance has fallen
+        20% below its pristine value. The mapping is applied to the pristine C_0
+        rather than to the previous value, so that the result depends only on the
+        cumulative damage and not on how the mission profile is divided in time.
+
+        Reference
+        ---------
+        Miner, M.A., "Cumulative damage in fatigue",
+        Journal of Applied Mechanics, 1945.
+        IEC 60216-1: Electrical insulating materials — Thermal endurance properties.
+        MIL-PRF-19978 / MIL-C-62F, U.S. Department of Defense, 2008.
+
+        Parameters
+        ----------
+        L_per_second : np.ndarray, shape (Profile_size,)
+            Predicted insulation lifetime [years] at each sample of the mission
+            profile, computed from the Arrhenius thermal aging model.
+            L_per_second[i] = lifetime [years] if the component operated forever
+            at the condition of sample i.
+
+        seconds_per_sample : float or np.ndarray, optional
+            Duration [s] that each entry of L_per_second represents.
+            Default 1.0 (one entry = one second, original behaviour).
+            Pass a scalar (e.g. 86400 for daily points) or an array of
+            per-sample durations for an irregular profile.
+
+        C_0 : float or None, optional
+            Pristine (design) capacitance [F]. If None, no capacitance is
+            computed and C_new is returned as None. Use None for the inductors.
+
+        D_cum_previous : float, optional
+            Cumulative Miner damage accrued before this mission profile run [-].
+            Zero for the first year. Default 0.0.
+
+        k_capacitance : float, optional
+            Fractional capacitance loss corresponding to a cumulative damage of
+            unity [-]. Default 0.20 (MIL-C-62F).
+
+        Returns
+        -------
+        L_total : float
+            Total predicted lifetime [years], the time until cumulative damage
+            reaches 1.0, obtained by repeating the mission profile until failure:
+                L_total = Profile_duration / D_cycle
+
+        life_consumed_percent : float
+            Fraction of total life consumed by ONE complete run of the mission
+            profile [%], clipped to 100. Failure occurs at 100%.
+
+        C_new : float or None
+            Capacitance [F] at the end of this mission profile run, given the
+            cumulative damage D_cum_previous + D_cycle. Returned as None when
+            C_0 is None. Clamped to the range [(1 - k_capacitance) * C_0, C_0].
+        """
+        sec_per_year = 365 * 24 * 3600
+        dt_years = seconds_per_sample / sec_per_year  # scalar or array, [years] per sample
+        d_i = dt_years / L_per_second  # fractional damage per sample
+        D_cycle = np.sum(d_i)
+        Profile_duration = np.sum(np.broadcast_to(dt_years, np.shape(L_per_second)))
+        L_total = Profile_duration / D_cycle
+
+        life_consumed_percent = D_cycle * 100
+        if life_consumed_percent > 100:
+            life_consumed_percent = 100.0
+
+        if C_0 is None:
+            C_new = None
+            D_cum = D_cum_previous
+        else:
+            D_cum = min(D_cum_previous + D_cycle, 1.0)
+            C_new = C_0 * (1.0 - k_capacitance * D_cum)
+
+        return L_total, life_consumed_percent, C_new, D_cum, D_cycle
+
 
     @staticmethod
     def calculate_capacitor_thermal_resistance(method, case_shape=None,
@@ -3403,6 +3486,7 @@ class Calculation_functions_class:
         print("=" * len(line))
 
 
+
     @staticmethod
     def normal_distribution_function(value, frac_sigma, n_samples, rng):
         """Draw n_samples ~ N(value, (frac_sigma*|value|)^2)."""
@@ -3723,9 +3807,7 @@ class Calculation_functions_class:
         switching_band_1 = list(range(mf - 2, mf + 3))
         switching_band_2 = list(range(2 * mf - 2, 2 * mf + 3))
 
-        harmonic_orders = np.array(low_order_harmonics
-                                   + switching_band_1
-                                   + switching_band_2)
+        harmonic_orders = np.array(low_order_harmonics + switching_band_1 + switching_band_2)
 
         # ----------------------------------------#
         # FFT, all seconds at once
@@ -3747,3 +3829,65 @@ class Calculation_functions_class:
         I_C_RMS_harmonics = amplitudes_peak / np.sqrt(2)
 
         return I_C_RMS_harmonics, harmonic_orders
+
+    @staticmethod
+    def compute_RMS_per_harmonic(I, f, resolution_per_cycle, Profile_size, h_max):
+
+        """
+        Decompose a current signal into RMS values for every harmonic order
+        from 1 to h_max, for each second of the mission profile. Applicable to
+        any branch current of the LCL filter, namely I_L1, I_C and I_L2.
+
+        The full spectrum is retained rather than a selected set of orders, so
+        that quantities such as the harmonic loss factor of IEEE C57.110 can be
+        evaluated over any chosen upper limit without re-running the simulation.
+
+        Parameters
+        ----------
+        I : np.ndarray
+            Time-domain current signal,
+            length = Profile_size * resolution_per_cycle * f
+        f : float
+            Fundamental frequency [Hz]
+        resolution_per_cycle : int
+            Number of samples per fundamental cycle
+        Profile_size : int
+            Number of seconds in the mission profile
+        h_max : int
+            Highest harmonic order retained. Must satisfy
+            h_max <= resolution_per_cycle / 2 to respect Nyquist.
+
+        Returns
+        -------
+        I_RMS_harmonics : np.ndarray
+            Shape: (Profile_size, h_max)
+            I_RMS_harmonics[i, n] = RMS current at harmonic order n+1
+            during second i
+        harmonic_orders : np.ndarray
+            Shape: (h_max,), the harmonic orders 1 ... h_max
+        """
+
+        samples_per_second = int(resolution_per_cycle * f)
+        N = samples_per_second
+
+        if h_max > resolution_per_cycle // 2:
+            raise ValueError(
+                f"h_max = {h_max} exceeds the Nyquist limit of "
+                f"{resolution_per_cycle // 2} for the given resolution.")
+
+        # ----------------------------------------#
+        # FFT, all seconds at once
+        # ----------------------------------------#
+        I_matrix = np.asarray(I, dtype=float).reshape(Profile_size, N)
+
+        fft_vals = np.fft.rfft(I_matrix, axis=1)
+
+        # Over a one second window the signal completes f cycles, so harmonic
+        # order h lands in FFT bin h * f.
+        harmonic_orders = np.arange(1, h_max + 1)
+        bin_indices = harmonic_orders * int(f)
+
+        amplitudes_peak = (2 * np.abs(fft_vals[:, bin_indices])) / N
+        I_RMS_harmonics = amplitudes_peak / np.sqrt(2)
+
+        return I_RMS_harmonics, harmonic_orders

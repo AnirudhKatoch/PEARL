@@ -331,10 +331,39 @@ def plotting_heat_sink_temp_limit():
     ax.legend(handles=[b1, b2, b3, b4, limit_line])
 
     plt.tight_layout()
-    plt.savefig("Paper_figures/Heat_sink_case_study_2.pdf")
+    plt.savefig("Paper_figures/Heat_sink_case_study_2.png")
 
 
-plotting_heat_sink_temp_limit()
+#plotting_heat_sink_temp_limit()
+
+
+def plotting_heat_sink_temp_limit_new():
+
+    with open("Simulation_results_heat_sink/dict_heat_sink.txt", "r") as f:
+        dict_heat_sink = json.load(f)
+
+    keys = list(dict_heat_sink.keys())
+    x = np.arange(len(keys))
+    speeds = ["1", "2", "3", "4"]
+    colors = ["tab:red", "tab:green", "tab:orange", "tab:blue"]
+    width = 0.2
+
+    fig, ax = plt.subplots(figsize=(6.4, 4.8))
+
+    for i, (s, c) in enumerate(zip(speeds, colors)):
+        vals = [dict_heat_sink[k][s] for k in keys]
+        ax.bar(x + (i - 1.5) * width, vals, width,
+               label=f"{s} m/s", color=c)
+
+    ax.axhline(175, color="black", ls="--", lw=1.5, label="175 °C limit")
+    ax.set_xticks(x, keys)
+    ax.set_xlabel("Heat sink configurations")
+    ax.set_ylabel("Temperature [°C]")
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig("Paper_figures/Heat_sink_case_study_2.png", dpi=300)
+
+#plotting_heat_sink_temp_limit_new()
 
 
 def plotting_heat_sink_life():
@@ -374,8 +403,34 @@ def plotting_heat_sink_life():
     plt.tight_layout()
     plt.savefig("Paper_figures/Heat_sink_life.pdf")
 
-plotting_heat_sink_life()
+#plotting_heat_sink_life()
 
+def plotting_heat_sink_life_new():
+
+    with open("Simulation_results_heat_sink/dict_heat_sink_life.txt", "r") as f:
+        dict_heat_sink = json.load(f)
+
+    keys = list(dict_heat_sink.keys())
+    x = np.arange(len(keys))
+    speeds = ["1", "2", "3", "4"]
+    colors = ["tab:red", "tab:green", "tab:orange", "tab:blue"]
+    width = 0.2
+
+    fig, ax = plt.subplots(figsize=(6.4, 4.8))
+
+    for i, (s, c) in enumerate(zip(speeds, colors)):
+        vals = [dict_heat_sink[k][s] for k in keys]
+        ax.bar(x + (i - 1.5) * width, vals, width,
+               label=f"{s} m/s", color=c)
+
+    ax.set_xticks(x, keys)
+    ax.set_xlabel("Heat sink configurations")
+    ax.set_ylabel("Lifetime [years]")
+    ax.legend(title="Air speed")
+    fig.tight_layout()
+    fig.savefig("Paper_figures/Heat_sink_life.png")
+
+#plotting_heat_sink_life_new()
 
 def plotting_heat_sink_combined():
 
@@ -607,8 +662,6 @@ def plotting_heat_sink_unreliability():
 #plotting_heat_sink_unreliability()
 
 
-
-
 def plotting_heat_sink_unreliability_custom_colors():
 
     # ------------------------------------------------------------------
@@ -675,7 +728,7 @@ def plotting_heat_sink_unreliability_custom_colors():
     plt.tight_layout(rect=[0, 0, 1, 1.03])
     plt.savefig("Paper_figures/Heat_sink_unreliability.pdf")
 
-plotting_heat_sink_unreliability_custom_colors()
+#plotting_heat_sink_unreliability_custom_colors()
 
 
 def plotting_air_speed_unreliability_custom_colors():
@@ -740,6 +793,6 @@ def plotting_air_speed_unreliability_custom_colors():
               handletextpad=0.5, labelspacing=0.25, borderpad=0.25)
 
     plt.tight_layout(rect=[0, 0, 1, 1.03])
-    plt.savefig("Paper_figures/Air_speed_unreliability.pdf")
+    plt.savefig("Paper_figures/Air_speed_unreliability.png")
 
 plotting_air_speed_unreliability_custom_colors()

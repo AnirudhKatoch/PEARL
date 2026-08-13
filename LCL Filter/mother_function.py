@@ -13,10 +13,8 @@ Plotting_function = Plotting_functions_class()
 Vdc_rated = params.Vdc_rated; Vo_rated = params.Vo_rated; inverter_phases = params.inverter_phases; M_rated = params.M_rated; single_phase_inverter_topology = params.single_phase_inverter_topology; waveform_voltage_definition = params.waveform_voltage_definition; modulation_scheme = params.modulation_scheme; f = params.f; fsw = params.fsw; T = params.T; Tsw = params.Tsw; omega = params.omega
 Profile_size = params.Profile_size; Vdc_RMS = params.Vdc_RMS; M = params.M; Vo = params.Vo; Vg_RMS = params.Vg_RMS; S_RMS = params.S_RMS; pf = params.pf; P_RMS = params.P_RMS; Q_RMS = params.Q_RMS; Ig_RMS = params.Ig_RMS
 T_amb = params.T_amb; heat_transfer_coefficient = params.heat_transfer_coefficient
-resolution_per_cycle = params.resolution_per_cycle; dt = params.dt; samples_per_switching_period = params.samples_per_switching_period; Minimum_required_samples_per_switching_period = params.Minimum_required_samples_per_switching_period; seconds_per_sample = params.seconds_per_sample
-L1_specs = params.L1_specs
-C_specs = params.C_specs
-L2_specs = params.L2_specs
+resolution_per_cycle = params.resolution_per_cycle; dt = params.dt; samples_per_switching_period = params.samples_per_switching_period; Minimum_required_samples_per_switching_period = params.Minimum_required_samples_per_switching_period; seconds_per_sample = params.seconds_per_sample; h_max = params.h_max
+L1_specs = params.L1_specs; C_specs = params.C_specs; L2_specs = params.L2_specs
 Vg_ll_RMS = params.Vg_ll_RMS; S_rated = params.S_rated; I_rated_RMS = params.I_rated_RMS; I_rated_peak = params.I_rated_peak; current_ripple_limit = params.current_ripple_limit; delta = params.delta; omega_sw = params.omega_sw
 
 sim_dir, dataframes_dir, figures_dir = Calculation_functions.create_simulation_folders(base="Results")
@@ -45,7 +43,6 @@ Calculation_functions.validate_pwm_pulse_amplitude_profile(Vdc_RMS=Vdc_RMS, inve
 
 L1_optimum, L2_optimum, C_optimum, R3_optimum = LCL_filter_design_function(Vg_ll_RMS=Vg_ll_RMS, S_rated=S_rated, I_rated=I_rated_RMS, fsw=fsw, omega_sw=omega_sw, fo=f, Udc_rated=Vdc_rated, M_rated=M_rated, inverter_phases=inverter_phases, modulation_scheme=modulation_scheme, print_values = False, current_ripple_limit=current_ripple_limit, delta=delta, num_C_values=10)
 #Calculation_functions.check_within_tolerance({"L1": (L1_specs["L1"], L1_optimum), "L2": (L2_specs["L2"], L2_optimum), "C":  (C_specs["C"],   C_optimum), "R3": (C_specs["R3"],  R3_optimum), }, tol=0.125)
-
 
 # ----------------------------------------#
 # LCL filter middle branch [C]
@@ -95,7 +92,7 @@ Ve_L2 = Calculation_functions.calculate_core_volume(Ae=Ae_L2, le=le_L2)         
 N_L2 = Calculation_functions.calculate_turns(L=L2_specs["L2"], I_peak=I_rated_peak, B_max=L2_specs["B_max"], Ae = Ae_L2)   # [-] Minimum number of turns required.
 lg_L2 = Calculation_functions.calculate_air_gap(mu_0=L2_specs["mu_0"], N=N_L2, Ae=Ae_L2, L=L2_specs["L2"], le=le_L2, mu_r=L2_specs["mu_r"])  # [m] Required air gap length.
 B_peak_L2 = Calculation_functions.calculate_B_peak(mu_0=L2_specs["mu_0"], N=N_L2, I_peak=I_rated_peak, lg=lg_L2, le=le_L2, mu_r=L2_specs["mu_r"]) # [T] Peak flux density in the core.
-#Calculation_functions.safety_checks(B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], lg=lg_L2, le=le_L2)
+Calculation_functions.safety_checks(B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], lg=lg_L2, le=le_L2)
 
 # Winding
 
@@ -115,66 +112,18 @@ R_th_L2 = Calculation_functions.calculate_inductor_thermal_resistance(method = "
 def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS_i, Ig_RMS_i, T_amb_i):
 
     t_one = np.arange(0, 1, dt)  # time vector for a single second
+
     # ----------------------------------------#
     # Electrical model
     # ----------------------------------------#
 
-    def add_grid_background_harmonics(Vg, t, omega, Vg_RMS, harmonics=None, broadband_order_max=None, broadband_amplitude=0.0,seed=None):
-        """
-        Superimpose background voltage distortion on the fundamental grid voltage.
-
-        Two modes, which may be combined.
-
-        harmonics : dict or None
-            {harmonic_order: amplitude_as_fraction_of_fundamental}.
-            Use for specific orders, e.g. {98: 0.002, 100: 0.003}.
-
-        broadband_order_max : int or None
-            If given, every harmonic order from 2 to broadband_order_max is
-            injected at broadband_amplitude, giving a flat background spectrum.
-
-        broadband_amplitude : float
-            Amplitude of each broadband order as a fraction of the fundamental.
-
-        seed : int or None
-            Seed for the random phase of each harmonic. None gives zero phase,
-            which makes all harmonics add coherently at t = 0 and is not
-            physically realistic for a broadband background.
-        """
-
-        Vg = np.asarray(Vg, dtype=float)
-        t = np.asarray(t, dtype=float)
-
-        orders = {}
-        if broadband_order_max is not None and broadband_amplitude > 0.0:
-            for h in range(2, int(broadband_order_max) + 1):
-                orders[h] = broadband_amplitude
-        if harmonics is not None:
-            orders.update(harmonics)  # explicit orders override broadband
-
-        if not orders:
-            return Vg
-
-        rng = np.random.default_rng(seed) if seed is not None else None
-        Vg_distorted = Vg.copy()
-
-        for h, amplitude_fraction in orders.items():
-            phase = rng.uniform(0, 2 * np.pi) if rng is not None else 0.0
-            Vg_distorted += (np.sqrt(2) * Vg_RMS * amplitude_fraction
-                             * np.sin(h * omega * t + phase))
-
-        return Vg_distorted
-
     # grid voltage waveform (one second)
     Vg = np.sqrt(2) * Vg_RMS_i * np.sin(omega * t_one)
 
-    #Vg = add_grid_background_harmonics(Vg=Vg, t=t_one, omega=omega, Vg_RMS=Vg_RMS_i,broadband_order_max=500, broadband_amplitude=0.0008,seed=0)
-
     pf_inst = np.full(resolution_per_cycle * f, pf_i)
     phi = np.arccos(np.clip(np.abs(pf_inst), 0.0, 1.0))
-    sign = np.where(pf_inst >= 0, 1.0, -1.0)  # 0 -> +1, so the 90° shift survives
+    sign = np.where(pf_inst >= 0, 1.0, -1.0)
     phase_shift = sign * phi
-
 
     Ig_ref = np.sqrt(2) * Ig_RMS_i * np.sin(omega * t_one + phase_shift)
 
@@ -199,16 +148,18 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
     # LCL filter middle branch [C]
     # ----------------------------------------#
 
-    I_L2_RMS_harmonics = Calculation_functions.compute_I_L2_RMS_per_harmonic(I_L2=I_L2, f=f, fsw=fsw, resolution_per_cycle=resolution_per_cycle, Profile_size=1)
     # ----- Capacitor branch [C] -----
-    I_C_RMS_harmonics, harmonic_orders_C = Calculation_functions.compute_I_C_RMS_per_harmonic(I_C=I_C, f=f, fsw=fsw,resolution_per_cycle=resolution_per_cycle, Profile_size=1)
+
+    #I_C_RMS_harmonics, harmonic_orders_C = Calculation_functions.compute_I_C_RMS_per_harmonic(I_C=I_C, f=f, fsw=fsw,resolution_per_cycle=resolution_per_cycle, Profile_size=1)
+
+    I_C_RMS_harmonics, harmonic_orders = Calculation_functions.compute_RMS_per_harmonic(I=I_C, f=f,resolution_per_cycle=resolution_per_cycle,Profile_size=1, h_max=h_max)
 
     I_C_RMS = Calculation_functions.Singal_RMS(Signal=I_C, resolution_per_cycle=resolution_per_cycle, f=f)
 
     # Power losses
-    P_total_C = Calculation_functions.Capacitor_total_power_losses(fsw=fsw, f=f, I_C_RMS_harmonics=I_C_RMS_harmonics, tan_delta_0=C_specs["tan_delta_0"], C=C_specs["C"], Rs=C_specs["Rs"])
+    P_total_C = Calculation_functions.Capacitor_total_power_losses(f=f, I_C_RMS_harmonics=I_C_RMS_harmonics, harmonic_orders=harmonic_orders,tan_delta_0=C_specs["tan_delta_0"], C=C_specs["C"], Rs=C_specs["Rs"])
 
-    # Temperature  (T_amb is THIS operating point's ambient)
+    # Temperature  (T_amb is this operating point's ambient)
     T_C = Calculation_functions.Capacitor_hotspot_temperature(T_amb=T_amb_i, P_total_C=P_total_C,Thermal_resistance_C=C_specs["Thermal_resistance_C"])
 
     V_C_RMS = Calculation_functions.Singal_RMS(Signal=V_C, resolution_per_cycle=resolution_per_cycle, f=f)
@@ -219,15 +170,15 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
     # LCL filter inverter side [L1]
     # ----------------------------------------#
 
+    I_L1_RMS_harmonics, orders = Calculation_functions.compute_RMS_per_harmonic(I=I_L1, f=f,resolution_per_cycle=resolution_per_cycle,Profile_size=1, h_max=h_max)
+
     # ----- Inverter-side inductor [L1] (operating-point dependent) -----
     V_L1_RMS = Calculation_functions.Singal_RMS(Signal=V_L1, resolution_per_cycle=resolution_per_cycle, f=f)
     I_L1_RMS = Calculation_functions.Singal_RMS(Signal=I_L1, resolution_per_cycle=resolution_per_cycle, f=f)
 
     I_L1_peak_harmonics, harmonic_orders_L1, harmonic_freqs_L1 = Calculation_functions.compute_I_L_peak_per_harmonic_for_inductor(I_L=I_L1, f=f, resolution_per_cycle=resolution_per_cycle, Profile_size=1)
 
-    P_c_L1, _ = Calculation_functions.calculate_inductor_core_losses(I_peak_harmonics=I_L1_peak_harmonics, harmonic_freqs=harmonic_freqs_L1,
-                                                                     mu_0=L1_specs["mu_0"], N=N_L1, lg=lg_L1, le=le_L1, mu_r=L1_specs["mu_r"],
-                                                                     k=L1_specs["k"], a=L1_specs["a"], b=L1_specs["b"], Ve=Ve_L1)
+    P_c_L1, _ = Calculation_functions.calculate_inductor_core_losses(I_peak_harmonics=I_L1_peak_harmonics, harmonic_freqs=harmonic_freqs_L1, mu_0=L1_specs["mu_0"], N=N_L1, lg=lg_L1, le=le_L1, mu_r=L1_specs["mu_r"],k=L1_specs["k"], a=L1_specs["a"], b=L1_specs["b"], Ve=Ve_L1)
 
     P_w_L1, _ = Calculation_functions.calculate_winding_losses(I_L=I_L1, Rdc=Rdc_L1, resolution_per_cycle=resolution_per_cycle, f=f, Profile_size=1)
 
@@ -240,6 +191,8 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
     # ----------------------------------------#
     # LCL filter grid side [L2]
     # ----------------------------------------#
+
+    I_L2_RMS_harmonics, _ = Calculation_functions.compute_RMS_per_harmonic(I=I_L2, f=f,resolution_per_cycle=resolution_per_cycle,Profile_size=1, h_max=h_max)
 
     # ----- Grid-side inductor [L2] (operating-point dependent) -----
     V_L2_RMS = Calculation_functions.Singal_RMS(Signal=V_L2, resolution_per_cycle=resolution_per_cycle, f=f)
@@ -259,7 +212,7 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
 
     return (Vg, pf_inst, phi, phase_shift, Ig_ref, Vs_ref, Vs,
             V_L1, I_L1, V_C, I_C, V_L2, I_L2,
-            I_C_RMS_harmonics, I_C_RMS, P_total_C, T_C, V_C_RMS,
+            I_C_RMS_harmonics, I_L2_RMS_harmonics, I_L1_RMS_harmonics, I_C_RMS, P_total_C, T_C, V_C_RMS,
             V_L1_RMS, I_L1_RMS, P_c_L1, P_w_L1, P_total_L1, T_inductor_L1,
             V_L2_RMS, I_L2_RMS, P_c_L2, P_w_L2, P_total_L2, T_inductor_L2)
 
@@ -273,7 +226,7 @@ results = [solve_setpoint(round(float(Vdc_RMS[i]), 3), round(float(M[i]), 4), ro
 # transpose: turn a list-of-tuples into a tuple-of-lists, then concatenate each
 (Vg, pf_inst, phi, phase_shift, Ig_ref, Vs_ref, Vs,
 V_L1, I_L1, V_C, I_C, V_L2, I_L2,
-I_C_RMS_harmonics, I_C_RMS, P_total_C, T_C, V_C_RMS,
+I_C_RMS_harmonics, I_L2_RMS_harmonics, I_L1_RMS_harmonics,I_C_RMS, P_total_C, T_C, V_C_RMS,
 V_L1_RMS, I_L1_RMS, P_c_L1, P_w_L1, P_total_L1, T_inductor_L1,
 V_L2_RMS, I_L2_RMS, P_c_L2, P_w_L2, P_total_L2, T_inductor_L2) = (np.concatenate(col) for col in zip(*results))
 
@@ -329,11 +282,8 @@ def compare_fundamental(signal_ref, signal_meas, f, resolution_per_cycle):
 
     return rms_error_percent, phase_error_deg
 
-THD_percent_I_L2 = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=I_L2, Signal_ref=Ig_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
-THD_percent_Vs = Calculation_functions.compute_THD(t=np.arange(0, 1, dt) , Signal=Vs, Signal_ref=Vs_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
-
-print("THD_percent_I_L2",THD_percent_I_L2)
-
+THD_percent_I_L2 = Calculation_functions.compute_THD(t=np.arange(0, 1, dt), Signal=I_L2, Signal_ref=Ig_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
+THD_percent_Vs = Calculation_functions.compute_THD(t=np.arange(0, 1, dt), Signal=Vs, Signal_ref=Vs_ref, f=f, dt=dt, resolution_per_cycle=resolution_per_cycle,save_path=f"Figures/Current_comparing_{pf[-1]}.png", plot = False,printing=False)
 
 # ----------------------------------------#
 # LCL filter middle branch [C]
@@ -344,32 +294,30 @@ if C_specs["Lifetime_calculations"] == "Graphical":
     Lifetime_C_series = Calculation_functions.Capacitor_lifetime_graphical(T_C= T_C, V_C_RMS=V_C_RMS, V_C_RMS_Rated=C_specs["V_C_RMS_Rated"], lifetime_curves=C_specs["lifetime_curves"])
 elif C_specs["Lifetime_calculations"] == "Analytical":
     Lifetime_C_series = Calculation_functions.calculate_capacitor_lifetime_analytical(T_operating = T_C, V_C_RMS = V_C_RMS, V_C_RMS_Rated = C_specs["V_C_RMS_Rated"], t1 = C_specs["Lifetime_Rated"], T1 = C_specs["Temperature_Rated"], A = C_specs["A"], n = C_specs["n"])
-Lifetime_C,  Lifetime_consumed_C  = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_C_series,  seconds_per_sample=seconds_per_sample)
+
+Lifetime_C, Lifetime_consumed_C, C_new, D_cum_previous,D_cycle = Calculation_functions.miners_rule_modified_capacitor(L_per_second=Lifetime_C_series, seconds_per_sample=seconds_per_sample, C_0=C_specs["C"] , D_cum_previous=0, k_capacitance=0.2)
 
 # ----------------------------------------#
 # LCL filter inverter side [L1]
 # ----------------------------------------#
 
 Lifetime_L1_series = Calculation_functions.calculate_inductor_lifetime(T_operating = T_inductor_L1, T_rated = L1_specs["T_insulation_rated"], L_rated = L1_specs["L_insulation_rated"], Ea = L1_specs["Ea_insulation"], kb = L1_specs["kb"], L_max_years = L1_specs["L_max_years"])   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
-Lifetime_L1, Lifetime_consumed_L1 = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_L1_series, seconds_per_sample=seconds_per_sample)
+Lifetime_L1, Lifetime_consumed_L1,D_cycle_L1= Calculation_functions.miners_rule_modified(L_per_second=Lifetime_L1_series, seconds_per_sample=seconds_per_sample)
 
 # ----------------------------------------#
 # LCL filter grid side [L2]
 # ----------------------------------------#
 
 Lifetime_L2_series = Calculation_functions.calculate_inductor_lifetime(T_operating = T_inductor_L2, T_rated = L2_specs["T_insulation_rated"], L_rated = L2_specs["L_insulation_rated"], Ea = L2_specs["Ea_insulation"], kb = L2_specs["kb"], L_max_years = L2_specs["L_max_years"])   # [Years]  Predicted winding insulation lifetime at each second of the mission profile
-Lifetime_L2, Lifetime_consumed_L2 = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_L2_series, seconds_per_sample=seconds_per_sample)
-
+Lifetime_L2, Lifetime_consumed_L2,D_cycle_L2 = Calculation_functions.miners_rule_modified(L_per_second=Lifetime_L2_series, seconds_per_sample=seconds_per_sample)
 
 C_report = dict(C=C_specs["C"], R_th=C_specs["Thermal_resistance_C"], V_RMS=V_C_RMS, V_RMS_rated=C_specs["V_C_RMS_Rated"], I_RMS=I_C_RMS, P_total=P_total_C, T=T_C, T_rated=C_specs["T_C_Rated"], Lifetime=Lifetime_C,Lifetime_consumed_C=Lifetime_consumed_C)
 L1_report = dict(L=L1_specs["L1"], N=N_L1, lg=lg_L1, B_peak=B_peak_L1, B_max=L1_specs["B_max"], Bsat=L1_specs["Bsat"], Ae=Ae_L1, le=le_L1, Ve=Ve_L1, A_surface=A_surface_L1, I_RMS=I_L1_RMS, V_RMS=V_L1_RMS, Rdc=Rdc_L1, N_parallel=N_parallel_wire_L1, A_wire=A_wire_actual_L1, l_turn=l_turn_L1, P_core=P_c_L1, P_winding=P_w_L1, P_total=P_total_L1, R_th=R_th_L1, T=T_inductor_L1, T_rated=L1_specs["T_insulation_rated"], Lifetime=Lifetime_L1, Lifetime_consumed=Lifetime_consumed_L1,)
 L2_report = dict(L=L2_specs["L2"], N=N_L2, lg=lg_L2, B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], Ae=Ae_L2, le=le_L2, Ve=Ve_L2, A_surface=A_surface_L2, I_RMS=I_L2_RMS, V_RMS=V_L2_RMS, Rdc=Rdc_L2, N_parallel=N_parallel_wire_L2, A_wire=A_wire_actual_L2, l_turn=l_turn_L2, P_core=P_c_L2, P_winding=P_w_L2, P_total=P_total_L2, R_th=R_th_L2, T=T_inductor_L2, T_rated=L2_specs["T_insulation_rated"], Lifetime=Lifetime_L2, Lifetime_consumed=Lifetime_consumed_L2, )
-Calculation_functions.compare_components(C_report, L1_report, L2_report)
-
-
+#Calculation_functions.compare_components(C_report, L1_report, L2_report)
 
 #blabla = False
-blabla = False
+blabla = True
 
 if blabla == True:
     df_1_power_flow_RMS = pd.DataFrame(
@@ -413,14 +361,16 @@ if blabla == True:
 
     df_3_C = pd.DataFrame(
         {
-            "V_C_RMS" : np.atleast_1d(V_C_RMS),
-            "I_C_RMS" : np.atleast_1d(I_C_RMS),
-            "P_total_C" : np.atleast_1d(P_total_C),
-            "T_C" : np.atleast_1d(T_C),
-            "Lifetime_C" : Calculation_functions.last_of_column(Lifetime_C,Profile_size),
+            "V_C_RMS"            : np.atleast_1d(V_C_RMS),
+            "I_C_RMS"            : np.atleast_1d(I_C_RMS),
+            "P_total_C"          : np.atleast_1d(P_total_C),
+            "T_C"                : np.atleast_1d(T_C),
+            "Lifetime_C"         : Calculation_functions.last_of_column(Lifetime_C,Profile_size),
             "Lifetime_consumed_C": Calculation_functions.last_of_column(Lifetime_consumed_C,Profile_size),
-        })
-    df_3_C.to_parquet(f"{dataframes_dir}/df_3_C.parquet")
+            "C"                  : Calculation_functions.last_of_column(C_specs["C"], Profile_size),
+            "C_new"              : Calculation_functions.last_of_column(C_new, Profile_size),
+            "D_cycle_C"         : Calculation_functions.last_of_column(D_cycle_C, Profile_size),
+            })
 
     df_4_L1 = pd.DataFrame(
         {
@@ -446,7 +396,9 @@ if blabla == True:
             "R_th_L1":             Calculation_functions.last_of_column(R_th_L1,Profile_size),                # [K/W]
             "Lifetime_L1":         Calculation_functions.last_of_column(Lifetime_L1,Profile_size),            # [yr]
             "Lifetime_consumed_L1":Calculation_functions.last_of_column(Lifetime_consumed_L1,Profile_size),   # [%]
-        })
+            "L1"                  : Calculation_functions.last_of_column(L1_specs["L1"],Profile_size),  # [H]
+            "D_cycle_L1": Calculation_functions.last_of_column(D_cycle_L1, Profile_size),
+            })
     df_4_L1.to_parquet(f"{dataframes_dir}/df_4_L1.parquet")
 
     df_5_L2 = pd.DataFrame(
@@ -473,7 +425,9 @@ if blabla == True:
             "R_th_L2"             : Calculation_functions.last_of_column(R_th_L2,Profile_size),                # [K/W]
             "Lifetime_L2"         : Calculation_functions.last_of_column(Lifetime_L2,Profile_size),            # [yr]
             "Lifetime_consumed_L2": Calculation_functions.last_of_column(Lifetime_consumed_L2,Profile_size),   # [%]
-        })
+            "L2"                  : Calculation_functions.last_of_column(L2_specs["L2"], Profile_size),  # [H]
+            "D_cycle_L2": Calculation_functions.last_of_column(D_cycle_L2, Profile_size),
+            })
     df_5_L2.to_parquet(f"{dataframes_dir}/df_5_L2.parquet")
     Plotting_function.plot_df_components(df_3_C=df_3_C, df_4_L1=df_4_L1, df_5_L2=df_5_L2, figures_dir=figures_dir,xlabel = "Time [day]")
     del df_3_C, df_4_L1, df_5_L2
@@ -504,8 +458,7 @@ if C_specs["Lifetime_calculations"] == "Graphical":
 
 elif C_specs["Lifetime_calculations"] == "Analytical":
 
-    T_eq_C = Calculation_functions.equivalent_temperature_capacitor(L_eq_years=Lifetime_C,  V_C_RMS=np.mean(V_C_RMS), V_C_RMS_Rated=C_specs["V_C_RMS_Rated"],
-                                              t1=C_specs["Lifetime_Rated"], T1=C_specs["Temperature_Rated"], A=C_specs["A"], n=C_specs["n"])
+    T_eq_C = Calculation_functions.equivalent_temperature_capacitor(L_eq_years=Lifetime_C,  V_C_RMS=np.mean(V_C_RMS), V_C_RMS_Rated=C_specs["V_C_RMS_Rated"], t1=C_specs["Lifetime_Rated"], T1=C_specs["Temperature_Rated"], A=C_specs["A"], n=C_specs["n"])
 
     T_C_samples   = Calculation_functions.normal_distribution_function(T_eq_C, normal_distribution, number_of_samples, rng)
     V_C_samples   = Calculation_functions.normal_distribution_function(np.mean(V_C_RMS), normal_distribution, number_of_samples, rng)
@@ -519,25 +472,23 @@ elif C_specs["Lifetime_calculations"] == "Analytical":
                                                                                   V_C_RMS_Rated = V_C_RMS_Rated_samples,t1 = t1_samples,
                                                                                   T1 = T1_samples, A = A_samples,n = n_samples,)
 
-L_eq_L1_years = Lifetime_L1
-L_eq_L2_years = Lifetime_L2
-
-T_eq_L1 = Calculation_functions.equivalent_temperature(L_eq_L1_years, L1_specs["T_insulation_rated"],L1_specs["L_insulation_rated"], L1_specs["Ea_insulation"],L1_specs["kb"])
-T_eq_L2 = Calculation_functions.equivalent_temperature(L_eq_L2_years, L2_specs["T_insulation_rated"],L2_specs["L_insulation_rated"], L2_specs["Ea_insulation"],L2_specs["kb"])
-
 
 # Inductor L1
+L_eq_L1_years = Lifetime_L1
+
+T_eq_L1 = Calculation_functions.equivalent_temperature(L_eq_L1_years, L1_specs["T_insulation_rated"],L1_specs["L_insulation_rated"], L1_specs["Ea_insulation"],L1_specs["kb"])
 
 T_L1_samples      = Calculation_functions.normal_distribution_function(T_eq_L1,    normal_distribution, number_of_samples, rng)
 T_rated_L1_samples = Calculation_functions.normal_distribution_function(L1_specs["T_insulation_rated"], normal_distribution, number_of_samples, rng)
 L_rated_L1_samples = Calculation_functions.normal_distribution_function(L1_specs["L_insulation_rated"], normal_distribution, number_of_samples, rng)
 Ea_L1_samples     = Calculation_functions.normal_distribution_function(L1_specs["Ea_insulation"], normal_distribution, number_of_samples, rng)
 
-Lifetime_L1_MC = Calculation_functions.calculate_inductor_lifetime(T_operating = T_L1_samples,T_rated = T_rated_L1_samples,
-                                                                   L_rated = L_rated_L1_samples, Ea = Ea_L1_samples,
-                                                                   kb = L1_specs["kb"], L_max_years = L1_specs["L_max_years"],)
+Lifetime_L1_MC = Calculation_functions.calculate_inductor_lifetime(T_operating = T_L1_samples,T_rated = T_rated_L1_samples, L_rated = L_rated_L1_samples, Ea = Ea_L1_samples, kb = L1_specs["kb"], L_max_years = L1_specs["L_max_years"],)
 
 # Inductor 2
+
+L_eq_L2_years = Lifetime_L2
+T_eq_L2 = Calculation_functions.equivalent_temperature(L_eq_L2_years, L2_specs["T_insulation_rated"],L2_specs["L_insulation_rated"], L2_specs["Ea_insulation"],L2_specs["kb"])
 
 T_L2_samples      = Calculation_functions.normal_distribution_function(T_eq_L2, normal_distribution, number_of_samples, rng)
 T_rated_L2_samples = Calculation_functions.normal_distribution_function(L2_specs["T_insulation_rated"], normal_distribution, number_of_samples, rng)
@@ -570,4 +521,28 @@ df_6_MC.to_parquet(f"{dataframes_dir}/df_6_MC.parquet")
 Plotting_function.plot_lifetime_monte_carlo(Lifetime_C_MC=Lifetime_C_MC, Lifetime_L1_MC=Lifetime_L1_MC,
                                             Lifetime_L2_MC=Lifetime_L2_MC,Lifetime_LCL_MC=Lifetime_LCL_MC, figures_dir=figures_dir, B10_C=B10_C,
                                             B10_L1=B10_L1,B10_L2=B10_L2, B10_LCL=B10_LCL, plot_type="histogram", bins=50)
+del df_6_MC
+
+
+harmonic_orders = np.arange(1, h_max + 1)
+
+
+frames = []
+for name, arr in [("L1", I_L1_RMS_harmonics),
+                  ("C",  I_C_RMS_harmonics),
+                  ("L2", I_L2_RMS_harmonics)]:
+    n_sec, n_h = arr.shape
+    frames.append(pd.DataFrame({
+        "second":    np.repeat(np.arange(n_sec), n_h),
+        "component": name,
+        "order":     np.tile(harmonic_orders, n_sec),
+        "I_rms":     arr.ravel(),
+    }))
+
+df_7_harmonics = pd.concat(frames, ignore_index=True)
+df_7_harmonics["component"] = df_7_harmonics["component"].astype("category")
+df_7_harmonics.to_parquet(f"{dataframes_dir}/df_7_harmonics.parquet")
+
+Plotting_function.plot_df_7_harmonics(df_7_harmonics=df_7_harmonics, figures_dir=figures_dir, h_max_plot=500)
+
 

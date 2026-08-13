@@ -502,8 +502,7 @@ class Plotting_functions_class:
         plt.close(fig20)
 
     @staticmethod
-    def plot_lifetime_monte_carlo(Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, Lifetime_LCL_MC,figures_dir,
-                                  B10_C=None, B10_L1=None, B10_L2=None, B10_LCL=None,plot_type="histogram", bins=50):
+    def plot_lifetime_monte_carlo(Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, Lifetime_LCL_MC,figures_dir,B10_C=None, B10_L1=None, B10_L2=None, B10_LCL=None,plot_type="histogram", bins=50):
 
         """
         Plot Monte Carlo lifetime distributions as four separate figures
@@ -579,136 +578,120 @@ class Plotting_functions_class:
             fig.tight_layout()
             fig.savefig(f"{figures_dir}/Fig_25_B10_bar.png", dpi=300)
             plt.close(fig)
-
     '''
-
     @staticmethod
-    def plot_Ig_ref_vs_I_L2(df_2_power_flow_inst, figures_dir, resolution_per_cycle, y_margin, f=50, t=None,xlabel="Time [s]"):
+    def plot_df_7_harmonics(df_7_harmonics, figures_dir, h_max_plot=100,second=-1):
         """
-        Compare the reference grid current (Ig_ref) against the delivered
-        grid-side current (I_L2) over the last fundamental cycle, overlaid
-        on a single axes. Ig_ref is drawn as a continuous line and I_L2 as
-        sparse hollow markers on top. Saves Fig_I_ref_vs_IL_2.png in figures_dir.
-        """
+        Plot the harmonic spectrum of each LCL branch current as a bar chart,
+        one figure per component, saved in figures_dir.
 
-        df = df_2_power_flow_inst
-        last = slice(-resolution_per_cycle, None)
+            Fig_26 : I_L1 spectrum
+            Fig_27 : I_C  spectrum
+            Fig_28 : I_L2 spectrum
 
-        # x-axis: real time if provided, else build one fundamental cycle
-        if t is not None:
-            x = np.asarray(t)[last]
-            dt = x[1] - x[0]
-        else:
-            dt = (1.0 / f) / resolution_per_cycle
-            x = np.arange(resolution_per_cycle) * dt
-        x_range = (x[0], x[-1] + dt)
-        x_tick = (x_range[1] - x_range[0]) / 4.0
-
-        def col(name):
-            return df[name].to_numpy()[last]
-
-        def ylim_from(*series):
-            lo = min(np.min(s) for s in series)
-            hi = max(np.max(s) for s in series)
-            if lo == hi:
-                pad = abs(lo) * y_margin or 1.0
-            else:
-                pad = (hi - lo) * y_margin
-            return lo - pad, hi + pad
-
-        Ig_ref = col("Ig_ref")
-        I_L2 = col("I_L2")
-        n = len(x)
-        step = max(1, n // 50)  # ~50 markers across the cycle
-
-        # ---------- Overlay: Ig_ref line + I_L2 sparse hollow markers ----------
-        fig, ax = plt.subplots(figsize=(6.4, 4.8 * 0.525))
-
-        ax.plot(x[::step], I_L2[::step], color="red",
-                linestyle="none", marker="o", markersize=5,
-                markerfacecolor="none", markeredgewidth=1.6,
-                label="Actual current")
-        ax.plot(x, Ig_ref, color="blue", linewidth=1.6, label="Reference current")
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel("Current [A]")
-        #ax.set_title("Reference vs delivered grid current")
-        ax.set_xlim(x_range)
-        ax.xaxis.set_major_locator(MultipleLocator(x_tick))
-        ax.set_ylim(-1300,1300)
-        ax.legend()
-        #ax.grid(True, alpha=0.3)
-        fig.tight_layout()
-        fig.savefig(f"{figures_dir}/Fig_I_ref_vs_IL_2.pdf", dpi=300)
-        plt.close(fig)
-
-    @staticmethod
-    def plot_six_waveforms(df_2_power_flow_inst, figures_dir, resolution_per_cycle, f=50, t=None, y_margin=0.05,xlabel="Time [s]"):
-        """
-        Plot the six LCL branch waveforms over the last fundamental cycle in a
-        single 6-row, 1-column figure:
-
-            Row 1 : V_L1   Row 2 : I_L1
-            Row 3 : V_C    Row 4 : I_C
-            Row 5 : V_L2   Row 6 : I_L2
-
-        Saves Fig_six_waveforms.png in figures_dir.
+        Parameters
+        ----------
+        df_7_harmonics : pd.DataFrame
+            Long-format frame with columns second, component, order, I_rms.
+        figures_dir : str
+            Directory to save the figures into.
+        h_max_plot : int
+            Highest harmonic order shown on the x axis.
+        second : int
+            Mission-profile second to plot. -1 gives the last second.
         """
 
-        df = df_2_power_flow_inst
-        last = slice(-resolution_per_cycle, None)
+        y_margin = 0.05
 
+        df = df_7_harmonics
+        sec = df["second"].max() if second == -1 else second
+        df = df[df["second"] == sec]
 
-        df = df.groupby(np.arange(len(df)) // 3).transform('mean')
-
-        # x-axis: real time if provided, else build one fundamental cycle
-        if t is not None:
-            x = np.asarray(t)[last]
-            dt = x[1] - x[0]
-        else:
-            dt = (1.0 / f) / resolution_per_cycle
-            x = np.arange(resolution_per_cycle) * dt
-        x_range = (x[0], x[-1] + dt)
-        x_tick = (x_range[1] - x_range[0]) / 4.0
-
-        def col(name):
-            return df[name].to_numpy()[last]
-
-        def ylim_from(s):
-            lo, hi = np.min(s), np.max(s)
-            if lo == hi:
-                pad = abs(lo) * y_margin or 1.0
-            else:
-                pad = (hi - lo) * y_margin
-            return lo - pad, hi + pad
-
-        # name, color, ylabel, title
-        rows = [
-            ("V_L1", "blue", "Voltage [V]", r"Inverter-side inductor voltage ($V_{L1}$)"),
-            ("I_L1", "red", "Current [A]", r"Inverter-side inductor current ($I_{L1}$)"),
-            ("V_C", "blue", "Voltage [V]", r"Capacitor voltage ($V_{C}$)"),
-            ("I_C", "red", "Current [A]", r"Capacitor current ($I_{C}$)"),
-            ("V_L2", "blue", "Voltage [V]", r"Grid-side inductor voltage ($V_{L2}$)"),
-            ("I_L2", "red", "Current [A]", r"Grid-side inductor current ($I_{L2}$)"),
+        panels = [
+            ("L1", "Inverter-side inductor $L_1$", "Fig_26_spectrum_L1", "tab:blue"),
+            ("C", "Filter capacitor $C$", "Fig_27_spectrum_C", "tab:orange"),
+            ("L2", "Grid-side inductor $L_2$", "Fig_28_spectrum_L2", "tab:green"),
         ]
 
-        fig, axes = plt.subplots(6, 1, figsize=(6.4, 4.8 * 6 * 0.33), sharex=True)
+        for comp, title, fname, color in panels:
+            sub = df[df["component"] == comp]
+            sub = sub[sub["order"] <= h_max_plot].sort_values("order")
 
-        for ax, (name, color, ylabel, title) in zip(axes, rows):
-            y = col(name)
-            ax.plot(x, y, color=color, label=name)
-            ax.set_ylabel(ylabel)
-            ax.set_title(title)
-            ax.set_ylim(ylim_from(y))
+            orders = sub["order"].to_numpy()
+            I_rms = sub["I_rms"].to_numpy()
 
-            #ax.legend(loc="upper right")
-            #ax.grid(True, alpha=0.3)
+            hi = np.max(I_rms)
+            pad = hi * y_margin if hi > 0 else 1.0
 
-        axes[-1].set_xlabel(xlabel)
-        axes[-1].set_xlim(x_range)
-        axes[-1].xaxis.set_major_locator(MultipleLocator(x_tick))
-
-        fig.tight_layout()
-        #fig.subplots_adjust(hspace=1.0, top=1.0, bottom=0.0, left=0.0, right=1.0)
-        fig.savefig(f"{figures_dir}/Python_benchmarking_visualization.pdf", dpi=300)
-        plt.close(fig)
+            fig, ax = plt.subplots(figsize=(6.4, 4.8))
+            ax.bar(orders, I_rms, width=0.8, color=color, edgecolor=color)
+            ax.set_xlabel("Harmonic order [-]")
+            ax.set_ylabel("Current [A]")
+            ax.set_title(f"Harmonic spectrum of {title}")
+            ax.set_xlim(0, h_max_plot + 1)
+            ax.set_ylim(0, hi + pad)
+            ax.grid(True, alpha=0.3)
+            fig.tight_layout()
+            fig.savefig(f"{figures_dir}/{fname}.png", dpi=300)
+            plt.close(fig)
     '''
+
+    @staticmethod
+    def plot_df_7_harmonics(df_7_harmonics, figures_dir, h_max_plot=500,second=-1, normalise=True):
+        """
+        Plot the harmonic spectrum of each LCL branch current, one figure per
+        component, saved in figures_dir.
+
+            Fig_26 : I_L1 spectrum
+            Fig_27 : I_C  spectrum
+            Fig_28 : I_L2 spectrum
+
+        Parameters
+        ----------
+        normalise : bool
+            True  -> plot I_h / I_1 on a logarithmic axis, so the sideband
+                     content of all three components is directly comparable.
+            False -> plot absolute RMS current on a linear axis.
+        """
+
+        df = df_7_harmonics
+        sec = df["second"].max() if second == -1 else second
+        df = df[df["second"] == sec]
+
+        panels = [
+            ("L1", "Inverter-side inductor $L_1$", "Fig_26_spectrum_L1", "tab:blue"),
+            ("C", "Filter capacitor $C$", "Fig_27_spectrum_C", "tab:orange"),
+            ("L2", "Grid-side inductor $L_2$", "Fig_28_spectrum_L2", "tab:green"),
+        ]
+
+        for comp, title, fname, color in panels:
+
+            sub = df[df["component"] == comp]
+            sub = sub[sub["order"] <= h_max_plot].sort_values("order")
+
+            orders = sub["order"].to_numpy()
+            I_rms = sub["I_rms"].to_numpy()
+
+            fig, ax = plt.subplots(figsize=(6.4, 4.8))
+
+            if normalise:
+                y = I_rms / I_rms[0]
+                floor = 1e-6
+                y = np.maximum(y, floor)
+                ax.bar(orders, y, width=1.0, color=color, edgecolor=color)
+                ax.set_yscale("log")
+                ax.set_ylim(floor, 2.0)
+                ax.set_ylabel("$I_h / I_1$  [-]")
+            else:
+                ax.bar(orders, I_rms, width=1.0, color=color, edgecolor=color)
+                ax.set_ylim(0, np.max(I_rms) * 1.05)
+                ax.set_ylabel("Current [A]")
+
+            ax.set_xlabel("Harmonic order [-]")
+            ax.set_title(f"Harmonic spectrum of {title}")
+            ax.set_xlim(0, h_max_plot)
+            #ax.set_ylim(1e-4, 2)
+            ax.grid(True, alpha=0.3, which="both")
+            fig.tight_layout()
+            fig.savefig(f"{figures_dir}/{fname}.png", dpi=300)
+            plt.close(fig)
