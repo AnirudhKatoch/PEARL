@@ -14,9 +14,10 @@ reliability evaluation.
 ## 👤 Author
 **Anirudh Katoch**  
 PhD Candidate, Technical University of Munich (TUM)  
-Chair of Renewable and Sustainable Energy Systems (ENS), CoSES Team  
+Munich Institute of Integrated Materials, Energy and Process Engineering (MEP), 
+Technische Universität München,
+Lichtenbergstr. 4a 85748 Garching
 Supervisor: **Prof. Dr. Thomas Hamacher**  
-Mentor: **Prashant Pant**  
 📧 anirudh.katoch@tum.de  
 
 ---
