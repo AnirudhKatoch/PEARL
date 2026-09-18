@@ -13,7 +13,7 @@ reliability evaluation.
 
 ## 👤 Author
 **Anirudh Katoch**  
-PhD Candidate, Technical University of Munich (TUM)  
+PhD Candidate
 Munich Institute of Integrated Materials, Energy and Process Engineering (MEP), 
 Technische Universität München,
 Lichtenbergstr. 4a 85748 Garching
