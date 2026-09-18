@@ -13,8 +13,8 @@ if str(PROJECT_ROOT) not in sys.path:
 from Calculation_functions import Calculation_functions_class
 Calculation_functions = Calculation_functions_class()
 
-plt.rcParams.update({"font.size": 15, "font.family": "Times New Roman", "axes.labelsize": 15, "axes.titlesize": 15,
-                     "xtick.labelsize": 15, "ytick.labelsize": 15, "legend.fontsize": 15})
+plt.rcParams.update({"font.size": 17.5, "font.family": "Calibri", "axes.labelsize": 17.5, "axes.titlesize": 17.5,
+                     "xtick.labelsize": 17.5, "ytick.labelsize": 17.5, "legend.fontsize": 17.5})
 
 
 def a_Current_per_capacitor():
@@ -854,18 +854,19 @@ def Apparent_power():
     df.to_parquet("Apparent_power.parquet")
 
     # -------- Plot --------
-    plt.figure(figsize=(6.4, 4.8*0.625))
-    plt.plot(time/3600, S_in, label="Apparent power")
+    plt.figure(figsize=(6.4, 4.8*0.5))
+    plt.plot(time/3600, S_in/1e6, color="#007E4F")
+    plt.title("Apparent power")
     plt.xlabel("Time [Hours]")
-    plt.ylabel("Power [W]")
+    plt.ylabel("Power [MW]")
     plt.xlim(min(time/3600), max(time/3600))
-    plt.grid(True)
-    plt.tight_layout()
-    plt.legend()
-    plt.savefig("Conference paper images/Apparent_power.pdf")
+
+    plt.savefig("Conference paper images/Apparent_power.png", dpi=600, bbox_inches="tight")
     plt.close()
 
+
 #Apparent_power()
+
 
 
 
@@ -1001,10 +1002,145 @@ def combined_capacitor_summary_plot():
     )
 
     plt.tight_layout(rect=[0, 0, 1, 0.9575])
-    plt.savefig("Final_results/Figures/capacitor_summary_4x1.pdf")
+    plt.savefig("Final_results/Figures/capacitor_summary_4x1.png",dpi=600, bbox_inches="tight")
     plt.close()
 
-combined_capacitor_summary_plot()
+#combined_capacitor_summary_plot()
+
+
+def combined_capacitor_summary_plot_updated():
+
+    pf_values = [1, 0, 0.9, -0.9, 0.8, -0.8, 0.7, -0.7, 0.6, -0.6,
+        0.5, -0.5, 0.4, -0.4, 0.3, -0.3, 0.2, -0.2, 0.1, -0.1]
+
+    def prepare_metric_dict(column_name, agg="mean", offset=0.0):
+        metric_dict = {}
+
+        # --- Fill dictionary from simulations ---
+        for i, pf in enumerate(pf_values, start=1):
+            base_folder = Path("Final_results") / f"Simulation_{i}"
+            df = pd.read_parquet(base_folder / "Dataframes" / "df.parquet")
+
+            if pf < 0:
+                key_prefix = f"pf__{abs(pf)}"   # inductive
+            else:
+                key_prefix = f"pf_{pf}"         # capacitive
+
+            if agg == "mean":
+                value = float(df[column_name].mean()) + offset
+            elif agg == "first":
+                value = float(df[column_name].iloc[0]) + offset
+            else:
+                raise ValueError(f"Unsupported aggregation: {agg}")
+
+            metric_dict[f"{key_prefix}_val"] = value
+            del df
+
+        # --- Add synthetic inductive values at pf = 0 and pf = 1 ---
+        for pf in (1, 0):
+            cap_key = f"pf_{pf}_val"
+            ind_key = f"pf__{pf}_val"
+
+            if cap_key in metric_dict and ind_key not in metric_dict:
+                metric_dict[ind_key] = metric_dict[cap_key]
+
+        return metric_dict
+
+    def extract_arrays(metric_dict):
+        pf_abs = []
+        values = []
+        is_inductive = []
+
+        for key in metric_dict:
+            if key.startswith("pf__"):
+                pf_str = key.split("__")[1].replace("_val", "")
+                inductive = True
+            else:
+                pf_str = key.split("pf_")[1].replace("_val", "")
+                inductive = False
+
+            pf_abs.append(float(pf_str))
+            values.append(metric_dict[key])
+            is_inductive.append(inductive)
+
+        pf_abs = np.array(pf_abs)
+        values = np.array(values)
+        is_inductive = np.array(is_inductive)
+
+        idx = np.argsort(pf_abs)
+        pf_abs = pf_abs[idx]
+        values = values[idx]
+        is_inductive = is_inductive[idx]
+
+        cap = ~is_inductive
+        ind = is_inductive
+
+        return pf_abs, values, cap, ind
+
+    # --- Prepare data for each quantity ---
+    current_dict = prepare_metric_dict("I_per_cap", agg="mean")
+    loss_dict = prepare_metric_dict("P_losses", agg="mean")
+    temp_dict = prepare_metric_dict("T_core", agg="mean", offset=-273.15)
+    life_dict = prepare_metric_dict("L_tot", agg="first")
+
+    pf_abs, current_vals, cap, ind = extract_arrays(current_dict)
+    _, loss_vals, _, _ = extract_arrays(loss_dict)
+    _, temp_vals, _, _ = extract_arrays(temp_dict)
+    _, life_vals, _, _ = extract_arrays(life_dict)
+
+
+    # --- Create subplot figure ---
+    fig, axes = plt.subplots(2, 2, figsize=(6.4 * 2, 4.8 * 2 * 0.5 ), sharex=True)
+    axes = axes.flatten()
+
+    # (a) Current per capacitor
+    axes[0].plot(pf_abs[cap], current_vals[cap], "-", marker="o",label="Capacitive", linewidth=2.5, markersize=10, color="black")
+    axes[0].plot(pf_abs[ind], current_vals[ind], "--", marker="o",label="Inductive", color="#007E4F")
+    axes[0].set_title("Average DC-link capacitor RMS ripple current")
+    axes[0].set_ylabel("Current [A]")
+    axes[0].set_xlim(0, 1)
+
+    # (c) Core temperature per capacitor
+    axes[1].plot(pf_abs[cap], temp_vals[cap], "-", marker="o",linewidth=2.5, markersize=10, color="black")
+    axes[1].plot(pf_abs[ind], temp_vals[ind], "--", marker="o",color="#007E4F")
+    axes[1].set_title("Average DC-link capacitor core temperature")
+    axes[1].set_ylabel("Temperature [°C]")
+    axes[1].set_xlim(0, 1)
+    #axes[2].grid(True)
+
+    # (b) Total power losses per capacitor
+    axes[2].plot(pf_abs[cap], loss_vals[cap], "-", marker="o",linewidth=2.5, markersize=10, color="black")
+    axes[2].plot(pf_abs[ind], loss_vals[ind], "--", marker="o", color="#007E4F")
+    axes[2].set_title("Average DC-link capacitor total power losses")
+    axes[2].set_ylabel("Power losses [W]")
+    axes[2].set_xlabel("Power factor [-]")
+    axes[2].set_xlim(0, 1)
+    #axes[1].grid(True)
+
+    # (d) Lifetime
+    axes[3].plot(pf_abs[cap], life_vals[cap], "-", marker="o",linewidth=2.5, markersize=10, color="black")
+    axes[3].plot(pf_abs[ind], life_vals[ind], "--", marker="o",color="#007E4F")
+    axes[3].set_title("DC-link capacitor lifetime")
+    axes[3].set_ylabel("Lifetime [years]")
+    axes[3].set_xlabel("Power factor [-]")
+    axes[3].set_xlim(0, 1)
+    #axes[3].grid(True)
+
+
+
+    handles, labels = axes[0].get_legend_handles_labels()
+
+    fig.legend(handles=handles, labels=labels, ncol=2,
+               loc="lower center", bbox_to_anchor=(0.5, 0.95),
+               frameon=True, handlelength=2, markerscale=1.0,
+               borderpad=0.5, columnspacing=1, labelspacing=0.25)
+
+
+    plt.savefig("Final_results/Figures/capacitor_summary_2x2.png",
+                dpi=600, bbox_inches="tight")
+    plt.close()
+
+#combined_capacitor_summary_plot_updated()
 
 
 def temp_vs_lifetime_V_0_9():
@@ -1094,10 +1230,7 @@ def temp_vs_lifetime_V_0_9():
     plt.savefig("Final_results_temp/Figures/temp_vs_lifetime_2x1.png")
     plt.close()
 
-
 #temp_vs_lifetime_V_0_9()
-
-
 
 
 def temp_vs_lifetime_V_0_7():
@@ -1186,13 +1319,86 @@ def temp_vs_lifetime_V_0_7():
 
 
     plt.tight_layout()
-    plt.savefig("Final_results_temp/Figures/temp_vs_lifetime_2x1_V_0_7.pdf")
+    plt.savefig("Final_results_temp/Figures/temp_vs_lifetime_2x1_V_0_7.png")
     plt.close()
-
 
 #temp_vs_lifetime_V_0_7()
 
 
+def temp_vs_lifetime_V_0_7_updated():
+
+    temp_array = np.arange(0, 150, .1)
+
+    temp_env_vs_lifetime_dict = {}
+    temp_core_vs_lifetime_dict = {}
+
+    # --- Fill dictionary from simulations ---
+    for i, temp in enumerate(temp_array, start=1):
+
+        base_folder = Path("Final_results_temp/V_0.7") / f"Simulation_{i}"
+        df = pd.read_parquet(base_folder / "Dataframes" / "df.parquet")
+
+        lifetime = df["L_tot"][0]
+        temp_core = df["T_core"].mean() - 273.15
+
+        # --- Rule 1: if core temp > 99°C lifetime = 0 ---
+        if temp_core > 99:
+            lifetime = 0
+
+        temp_env_vs_lifetime_dict[temp] = lifetime
+        temp_core_vs_lifetime_dict[temp_core] = lifetime
+
+    # --- Convert dictionaries to sorted arrays ---
+    env_temp = np.array(sorted(temp_env_vs_lifetime_dict.keys()))
+    life_env = np.array([temp_env_vs_lifetime_dict[t] for t in env_temp])
+
+    core_temp = np.array(sorted(temp_core_vs_lifetime_dict.keys()))
+    life_core = np.array([temp_core_vs_lifetime_dict[t] for t in core_temp])
+
+    # --- Find threshold locations (first point where lifetime becomes zero) ---
+    env_zero_idx = np.where(life_env == 0)[0]
+    core_zero_idx = np.where(life_core == 0)[0]
+
+    env_threshold = env_temp[env_zero_idx[0]] if len(env_zero_idx) > 0 else None
+    core_threshold = core_temp[core_zero_idx[0]] if len(core_zero_idx) > 0 else None
+
+    # --- Create subplots ---
+    #fig, axes = plt.subplots(2, 1, figsize=(6.4, 4.8*2*0.5), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(6.4*2, 4.8  * 0.5), sharey=True)
+    axes = axes.flatten()
+
+    # ---- (a) Ambient temperature vs lifetime ----
+    axes[0].plot(env_temp, life_env, linewidth=2.5, color="black")
+    axes[0].set_title("Ambient temperature impact on lifetime")
+    axes[0].set_xlabel("Ambient temperature [°C]")
+    axes[0].set_ylabel("Lifetime [years]")
+    axes[0].set_xlim(0, 125)
+
+    if env_threshold is not None:
+        axes[0].axvline(env_threshold, color="#007E4F", linewidth=2.5, linestyle="--")
+        y_mid = 0.525 * (axes[0].get_ylim()[0] + axes[0].get_ylim()[1])
+        axes[0].text(env_threshold + 2, y_mid, "Capacitor\nfailure", color="#007E4F",
+                     va="center", ha="left", linespacing=1.2)
+
+    # ---- (b) Core temperature vs lifetime ----
+    axes[1].plot(core_temp, life_core, linewidth=2.5, color="black")
+    axes[1].set_title("Core temperature impact on lifetime")
+    axes[1].set_xlabel("Core temperature [°C]")
+    axes[1].set_ylabel("Lifetime [years]")
+    axes[1].set_xlim(0, 125)
+
+    if core_threshold is not None:
+        axes[1].axvline(core_threshold, color="#007E4F", linewidth=2.5, linestyle="--")
+        y_mid = 0.525 * (axes[1].get_ylim()[0] + axes[1].get_ylim()[1])
+        axes[1].text(core_threshold + 2, y_mid, "Capacitor\nfailure", color="#007E4F",
+                     va="center", ha="left", linespacing=1.2)
+
+    plt.tight_layout()
+    plt.savefig("Final_results_temp/Figures/temp_vs_lifetime_1x2_V_0_7.png",
+                dpi=600, bbox_inches="tight")
+    plt.close()
+
+temp_vs_lifetime_V_0_7_updated()
 
 
 def capacitor_electro_thermal_timeseries():

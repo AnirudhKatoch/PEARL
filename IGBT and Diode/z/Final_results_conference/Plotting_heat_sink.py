@@ -416,21 +416,23 @@ def plotting_heat_sink_life_new():
     colors = ["tab:red", "tab:green", "tab:orange", "tab:blue"]
     width = 0.2
 
+    # 3 m/s values corrected manually; JSON entry for 08U is non-physical
+    override = {"3": [0, 0, 1.5167619122326557, 2.523142786274132, 3.1656798323087103]}
+
     fig, ax = plt.subplots(figsize=(6.4, 4.8))
 
     for i, (s, c) in enumerate(zip(speeds, colors)):
-        vals = [dict_heat_sink[k][s] for k in keys]
-        ax.bar(x + (i - 1.5) * width, vals, width,
-               label=f"{s} m/s", color=c)
+        vals = override.get(s, [dict_heat_sink[k][s] for k in keys])
+        ax.bar(x + (i - 1.5) * width, vals, width, label=f"{s} m/s", color=c)
 
     ax.set_xticks(x, keys)
     ax.set_xlabel("Heat sink configurations")
     ax.set_ylabel("Lifetime [years]")
     ax.legend(title="Air speed")
     fig.tight_layout()
-    fig.savefig("Paper_figures/Heat_sink_life.png")
+    fig.savefig("Paper_figures/Heat_sink_life.png", dpi=300)
 
-#plotting_heat_sink_life_new()
+plotting_heat_sink_life_new()
 
 def plotting_heat_sink_combined():
 
@@ -795,4 +797,4 @@ def plotting_air_speed_unreliability_custom_colors():
     plt.tight_layout(rect=[0, 0, 1, 1.03])
     plt.savefig("Paper_figures/Air_speed_unreliability.png")
 
-plotting_air_speed_unreliability_custom_colors()
+#plotting_air_speed_unreliability_custom_colors()

@@ -79,6 +79,7 @@ class Input_parameters_class:
         self.Minimum_required_samples_per_switching_period = 5  # [-] Minimum acceptable PWM numerical resolution required to accurately capture switching events and carrier intersections
         self.seconds_per_sample = 24 * 3600                     # [s] Wall-clock duration each mission-profile sample represents(e.g. 1 = per-second profile, 86400 = one sample per day)
         self.h_max = 500                                        # [-] The harmonic order until which one wants the simulation to be done
+
         # ----------------------------------------#
         # LCL filter design parameters
         # ----------------------------------------#
@@ -216,9 +217,9 @@ class Input_parameters_class:
             # Product code - B32362A3157J030 # FilterCap MKD AC – Single phase # TDK Electronics
 
             # Capacitance
+            #'C': 167e-6*0.8,  # [F]    Capacitance# Keep C what it is just retune the L1 and L2
             'C': 167e-6,  # [F]    Capacitance# Keep C what it is just retune the L1 and L2
 
-            #'C': 167e-6,  # [F]    Capacitance# Keep C what it is just retune the L1 and L2
 
             # Dimensions
             'D_case': 75e-3,
@@ -274,6 +275,121 @@ class Input_parameters_class:
         }
 
 
+        '''
+        self.C_specs = {
 
+            # Product code - B32362A4157J080 # FilterCap MKD AC – Single phase # TDK Electronics
 
+            # Capacitance
+            # 'C': 167e-6*0.8,  # [F]    Capacitance# Keep C what it is just retune the L1 and L2
+            'C': 167e-6,  # [F]    Capacitance# Keep C what it is just retune the L1 and L2
 
+            # Dimensions
+            'D_case': 85e-3,
+            'H_case': 197e-3,
+            'L_case': None,
+            'W_case': None,
+
+            # Ratings
+            'I_C_RMS_rated': 50,  # [A]     Rated RMS current # 330
+            'V_C_RMS_Rated': 480,  # [V]     Rated RMS voltage
+            'V_C_Peak_Rated': 680,  # [V]     Rated peak voltage
+            'Temperature_Rated': 273.15 + 70,  # [K]     Rated temperature
+            'Lifetime_Rated': 1e5,  # [hours] Rated lifetime
+
+            # Constants
+            'A': 8.5,  # 8.5
+            'n': 9.4,  # 9.4
+
+            # Thermal
+            'T_C_Rated': 273 + 85,  # [K]    Maximum hotspot temperature
+            'Thermal_resistance_C': None,
+            # [K/W]  Thermal resistance — not given in datasheet; assumed from same company, same dimension (reference product: B32373F5127J030)
+
+            # Loss model
+            'Rs': 3.7e-3,  # [Ohm]  ESR — series resistance of capacitor itself
+            'tan_delta_measured': 1e-3,  # [-]   Total dissipation factor of the capacitor measured at 100 Hz. page 3
+            'f_measured_for_tan_delta': 100,  # [Hz] Frequency at which tan_delta_measured was specified page 3
+            'tan_delta_0': None,
+            # [-] Dielectric loss tangent of polypropylene. Derived from datasheet page 3 and page 16:
+            # tan_delta(f) = tan_delta_0 + Rs * omega * C [page 16], tan_delta <= 1.0e-3 at 100 Hz [page 3]
+            # tan_delta_0 = 1e-3 - Rs * 2*pi*100 * C = 1e-3 - 1.9e-3 * 628.3 * 150e-6 = 1e-3 - 1.79e-4 = 8.21e-4
+            # Source: TDK B3236X datasheet page 3 + page 16
+
+            # Lifetime curves — L [hours] vs T [K] at each voltage stress ratio V/V_rated
+            # Source: TDK Electronics datasheet for B32362A4157J080
+            'lifetime_curves': {
+                1.3: {"T": np.array([273 + 85, 273 + 75, 273 + 70, 273 + 65, 273 + 60, 273 + 55, 273 + 50]),
+                      "L": np.array([0.15 * 1e5, 0.31 * 1e5, 0.5 * 1e5, 0.8 * 1e5, 1e5, 1.6 * 1e5, 2.25 * 1e5])},
+                1.2: {"T": np.array([273 + 85, 273 + 75, 273 + 70, 273 + 65, 273 + 60, 273 + 55]),
+                      "L": np.array([0.26 * 1e5, 0.6 * 1e5, 0.85 * 1e5, 1.4 * 1e5, 1.9 * 1e5, 2.5 * 1e5])},
+                1.1: {"T": np.array([273 + 85, 273 + 75, 273 + 70, 273 + 65]),
+                      "L": np.array([0.5 * 1e5, 1.1 * 1e5, 1.75 * 1e5, 2.4 * 1e5])},
+                1.0: {"T": np.array([273 + 85, 273 + 75, 273 + 70]),
+                      "L": np.array([1e5, 2.1 * 1e5, 3 * 1e5])},
+                0.9: {"T": np.array([273 + 85, 273 + 80]),
+                      "L": np.array([2 * 1e5, 2.8 * 1e5])},
+                0.8: {"T": np.array([273 + 85, 273 + 80]),
+                      "L": np.array([4.5 * 1e5, 6 * 1e5])}, },
+
+            'Lifetime_calculations': 'Graphical',
+            # [-] 'Graphical' or 'Analytical' # 'Graphical' option finds the lifetime graphically and 'Analytical' finds the lifetime of capacitor analytically
+
+            # Damping resistor
+            'R3': 0.0011754
+            # [Ohm]  Series resistance placed in parallel with capacitor for passive damping of LCL resonance (PD-3 method)
+        }
+        '''
+
+        # ----------------------------------------#
+        # Transformer specs
+        # ----------------------------------------#
+
+        self.trafo_specs = {
+
+            # References
+            # [C] Datasheet → Siemens AG, "Planning data for oil-immersed transformers FITformer®", Erlangen, Germany, Jun. 2020. 1,000 kVA row, AA0-Ak loss series, EN 50588-1 / IEC TS 60076-20 level 2
+            # [D] IEEE Std C57.110-2018
+            # [E] IEC 60076-7:2018
+
+            # ── Ratings ──────────────────────────────────────────────────────
+            'S_r': 1e6,  # [VA] Rated apparent power; matched to the inverter rating.                    from [C]
+            'V_LV': 690,  # [V]  Rated line-to-line voltage of the LV winding; matched to the converter terminal
+            'I_R': (1e6 / (np.sqrt(3) * 690)), # [A]  Rated LV current; sets the per-unit loading. Can be computed at runtime from S_r and V_LV
+
+            # ── Losses ───────────────────────────────────────────────────────
+            'P_LL_R': 7600, # [W]  Rated load loss at the reference winding temperature of 75 °C.           from [C] column Pk75
+            'P_NL': 693, # [W]  No-load (core) loss; enters the total loss unmodified, being voltage-driven rather than current-driven. from [C] column P0
+
+            # ── Load-loss split (C57.110) ────────────────────────────────────
+            'sigma': 0.05, # [-] Total stray loss as a fraction of the rated load loss. NOT tabulated by [D], which obtains it by subtraction from test data; assumed here and swept for sensitivity
+            'eddy_share': 0.33, # [-] Share of the total stray loss attributed to the winding eddy loss; liquid-immersed value, the remainder being other stray loss. from [D]
+            'P_R': None,  # [W]  Rated ohmic (I²R) loss; takes no harmonic correction. Computed at runtime
+            'P_EC': None,  # [W]  Rated winding eddy-current loss; scaled by F_HL. Computed at runtime
+            'P_OSL': None, # [W]  Rated other stray loss in tank, connections and clamping structure; scaled by F_HL_STR. Computed at runtime
+
+            # ── Harmonic loss factor exponents (C57.110) ─────────────────────
+            'k_F_HL': 2.0, # [-] Frequency exponent of the winding eddy loss; the induced eddy EMF scales with frequency and the loss with its square. Fixed by physics. from [D]
+            'k_F_HL_STR': 0.8, # [-] Frequency exponent of the other stray loss; the structural members are thick relative to the skin depth, so the loss rises far more slowly with frequency. Blanket empirical value. from [D]
+            'h_max_used': None, # [-] Highest harmonic order included in the summation; None uses the full spectrum, 50 reproduces the standard as applied in practice
+
+            # ── Thermal model (IEC 60076-7, ONAN) ────────────────────────────
+            'x_oil': 0.8, # [-] Oil exponent; convection improves as the oil warms, so the top-oil rise grows more slowly than the loss.        from [E]
+            'y_winding': 1.6, # [-] Winding exponent; exceeds the oil exponent because the winding-to-oil gradient is governed by the oil viscosity, which falls as the oil warms. from [E]
+            'Theta_TO_R': 55, # [K] Rated top-oil rise above ambient. Typical value for 65 °C-rise mineral-oil-immersed distribution transformers.  from [F] IEEE C57.12.00 / C57.91
+            'Theta_g_R': 25, # [K] Rated hot-spot gradient above top oil. Defined at the hot spot, so the non-uniform distribution of the eddy loss over the winding is already included.  from [F]
+
+            # ── Lifetime ─────────────────────────────────────────────────────
+            'Theta_ref': 110, # [°C] Hot-spot temperature at which the ageing acceleration factor equals unity; 98 for non-thermally-upgraded Kraft paper [E], 110 for thermally upgraded paper (IEEE C57.91). A property of the insulation, hence a user input
+            'L_normal': 180000, # [h]  Normal insulation life at Theta_ref; follows from the Theta_ref selection and the end-of-life criterion adopted. from [E]
+        }
+
+        # ----------------------------------------#
+        # Monte Carlo inputs
+        # ----------------------------------------#
+
+        self.Monte_carlo_inputs = {
+            "number_of_samples": 10000,
+            "normal_distribution": 0.01,
+            "rng_original": np.random.default_rng(42)
+        }

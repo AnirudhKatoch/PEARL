@@ -3486,7 +3486,6 @@ class Calculation_functions_class:
         print("=" * len(line))
 
 
-
     @staticmethod
     def normal_distribution_function(value, frac_sigma, n_samples, rng):
         """Draw n_samples ~ N(value, (frac_sigma*|value|)^2)."""
@@ -3891,3 +3890,1013 @@ class Calculation_functions_class:
         I_RMS_harmonics = amplitudes_peak / np.sqrt(2)
 
         return I_RMS_harmonics, harmonic_orders
+
+    @staticmethod
+    def calculate_harmonic_loss_factor(I_RMS_harmonics, k, h_max_used=None, harmonic_orders=None):
+        """
+        Compute the harmonic loss factor of IEEE C57.110 for each mission-profile
+        sample, from the per-harmonic RMS current spectrum of the current entering
+        the transformer.
+
+        The factor takes the form
+
+            F = sum_h (I_h / I_1)^2 * h^k  /  sum_h (I_h / I_1)^2
+
+        and is evaluated here in the algebraically identical form
+
+            F = sum_h I_h^2 * h^k  /  sum_h I_h^2
+
+        in which the fundamental cancels. This avoids the division by I_1, which
+        is numerically ill-conditioned at light load, and makes explicit that F
+        is simply the energy-weighted mean of h^k, i.e. a description of the
+        SHAPE of the spectrum alone. F is therefore independent of the loading
+        and of the transformer turns ratio; the magnitude of the current enters
+        the loss equations separately through the per-unit loading I_RMS / I_R.
+        For an undistorted current F = 1, and F >= 1 for all k > 0.
+
+        Two exponents are used, following IEEE C57.110:
+
+        k = 2    Winding eddy-current loss. The eddy EMF induced in a conductor
+                 scales with frequency and the resulting loss with its square,
+                 so the loss of harmonic h scales as I_h^2 * h^2. The factor is
+                 denoted F_HL.
+
+        k = 0.8  Other stray loss in the tank, connections and clamping
+                 structure. These members are thick relative to the skin depth,
+                 so the loss rises far more slowly with frequency. The value 0.8
+                 is the blanket empirical exponent adopted throughout the
+                 standard. The factor is denoted F_HL_STR.
+
+        Reference
+        ---------
+        IEEE Std C57.110-2018, "IEEE Recommended Practice for Establishing
+        Liquid-Immersed and Dry-Type Power and Distribution Transformer
+        Capability When Supplying Nonsinusoidal Load Currents".
+
+        Parameters
+        ----------
+        I_RMS_harmonics : np.ndarray, shape (Profile_size, h_max) or (h_max,)
+            RMS current of each harmonic order [A], one row per mission-profile
+            sample, as returned by compute_RMS_per_harmonic. Column j is taken
+            to hold harmonic order j + 1 unless harmonic_orders is supplied.
+
+        k : float
+            Frequency exponent of the loss mechanism. Use 2.0 for the winding
+            eddy loss (F_HL) and 0.8 for the other stray loss (F_HL_STR).
+
+        h_max_used : int or None, optional
+            Highest harmonic order included in the summation. None (default)
+            uses every order present in I_RMS_harmonics. Setting this to 50
+            reproduces the factor as the standard is applied in practice, where
+            the measured spectrum is truncated at the fiftieth order in line
+            with the harmonic subgroups of IEC 61000-4-7.
+
+        harmonic_orders : np.ndarray, shape (h_max,), optional
+            Harmonic order of each column. Supply this if the spectrum does not
+            start at order 1 or is not unit-spaced. Any order of zero (a DC bin)
+            must be excluded by the caller, since it contributes nothing to the
+            numerator but does contribute to the denominator and would bias F
+            downward.
+
+        Returns
+        -------
+        F : np.ndarray, shape (Profile_size,)
+            Harmonic loss factor [-] at each mission-profile sample. A scalar
+            input row returns a one-element array.
+        """
+        import numpy as np
+
+        I = np.atleast_2d(np.asarray(I_RMS_harmonics, dtype=float))
+
+        if harmonic_orders is None:
+            h = np.arange(1, I.shape[1] + 1, dtype=float)
+        else:
+            h = np.asarray(harmonic_orders, dtype=float)
+            if h.size != I.shape[1]:
+                raise ValueError(
+                    "harmonic_orders has length %d but the spectrum has %d columns."
+                    % (h.size, I.shape[1]))
+
+        if np.any(h <= 0):
+            raise ValueError(
+                "Harmonic orders must all be positive. A DC (order 0) bin is "
+                "present and must be removed before calling this function, "
+                "since it inflates the denominator without contributing to the "
+                "numerator and biases F downward.")
+
+        if h_max_used is not None:
+            mask = h <= h_max_used
+            if not np.any(mask):
+                raise ValueError(
+                    "h_max_used = %s excludes every harmonic in the spectrum."
+                    % h_max_used)
+            I = I[:, mask]
+            h = h[mask]
+        w = I ** 2  # energy weight of each harmonic
+        denominator = w.sum(axis=1)
+
+        if np.any(denominator <= 0):
+            raise ValueError(
+                "The harmonic spectrum of at least one mission-profile sample "
+                "carries no energy, so the harmonic loss factor is undefined.")
+
+        numerator = w @ (h ** k)
+
+
+        return numerator / denominator
+
+    @staticmethod
+    def split_transformer_load_loss(P_LL_R, sigma, eddy_share):
+        """
+        Split the rated load loss of a transformer into its ohmic, winding
+        eddy-current and other stray components, as required by the load-loss
+        equation of IEEE C57.110.
+
+        The load loss is composed of three parts,
+
+            P_LL_R = P_R + P_EC + P_OSL
+
+        of which only P_EC and P_OSL are corrected by a harmonic loss factor,
+        the ohmic loss P_R taking no correction since the DC resistance is
+        independent of frequency. The three parts must therefore be known
+        separately before the load loss under a distorted current can be
+        evaluated.
+
+        IEEE C57.110 obtains the total stray loss by subtraction from test data,
+
+            P_TSL = P_EC + P_OSL = P_LL_R - P_R
+
+        with P_R computed from the measured winding DC resistance. Where a test
+        report is available this route should be preferred and sigma set from
+        the measured values. Manufacturer planning data, however, normally
+        quotes only the total load loss, in which case the ohmic and stray parts
+        cannot be separated by measurement and the split is assumed:
+
+            P_TSL = sigma * P_LL_R
+            P_R   = (1 - sigma) * P_LL_R
+
+        The total stray loss is then divided between the two stray mechanisms
+        following IEEE C57.110, which apportions a larger share to the winding
+        eddy loss in dry-type units and a smaller share in liquid-immersed
+        units, the difference arising from the tank and clamping structure of
+        the latter:
+
+            P_EC  = eddy_share * P_TSL
+            P_OSL = (1 - eddy_share) * P_TSL
+
+        Note on the choice of sigma. The value is not tabulated by IEEE C57.110
+        and is therefore an assumption of the present work rather than a
+        standard value. The default of 0.12 is taken from the range commonly
+        reported for distribution transformers, with the upper part of that
+        range being the more representative for the high-current low-voltage
+        winding considered here. Because the winding eddy loss is the only
+        component amplified strongly by the harmonic loss factor, the predicted
+        temperature rise is sensitive to this value, and results should be
+        reported together with a sensitivity study over the plausible range.
+
+        Reference
+        ---------
+        IEEE Std C57.110-2018, "IEEE Recommended Practice for Establishing
+        Liquid-Immersed and Dry-Type Power and Distribution Transformer
+        Capability When Supplying Nonsinusoidal Load Currents".
+
+        Parameters
+        ----------
+        P_LL_R : float
+            Rated load loss of the transformer [W], measured at the reference
+            winding temperature. This is the quantity quoted as Pk on a
+            manufacturer datasheet.
+
+        sigma : float, optional
+            Total stray loss expressed as a fraction of the rated load loss [-].
+            Default 0.12. Set from the test report where the winding DC
+            resistance is known.
+
+        eddy_share : float, optional
+            Share of the total stray loss attributed to the winding eddy
+            current loss [-]. Default 0.33 for liquid-immersed transformers
+            following IEEE C57.110; use the dry-type value instead for a
+            dry-type unit.
+
+        Returns
+        -------
+        P_R : float
+            Rated ohmic (I^2 R) loss [W]. Takes no harmonic correction.
+
+        P_EC : float
+            Rated winding eddy-current loss [W]. Scaled by F_HL (k = 2).
+
+        P_OSL : float
+            Rated other stray loss [W], arising in the tank, connections and
+            clamping structure. Scaled by F_HL_STR (k = 0.8).
+        """
+        if not 0.0 <= sigma < 1.0:
+            raise ValueError(
+                "sigma must lie in [0, 1). The total stray loss cannot equal or "
+                "exceed the load loss, since the ohmic loss would then vanish. "
+                "Received sigma = %s." % sigma)
+
+        if not 0.0 <= eddy_share <= 1.0:
+            raise ValueError(
+                "eddy_share must lie in [0, 1], being the fraction of the total "
+                "stray loss attributed to the winding eddy loss. "
+                "Received eddy_share = %s." % eddy_share)
+
+        if P_LL_R <= 0.0:
+            raise ValueError(
+                "P_LL_R must be positive. Received %s W." % P_LL_R)
+
+        P_TSL = sigma * P_LL_R
+        P_R = (1.0 - sigma) * P_LL_R
+        P_EC = eddy_share * P_TSL
+        P_OSL = (1.0 - eddy_share) * P_TSL
+
+        return P_R, P_EC, P_OSL
+
+    @staticmethod
+    def calculate_transformer_load_loss(I_RMS, I_R, P_R, P_EC, P_OSL, F_HL, F_HL_STR):
+
+        """
+        Compute the load loss of a transformer carrying a distorted current,
+        following IEEE C57.110.
+
+        The load loss is composed of three mechanisms, which respond differently
+        to the harmonic content of the current:
+
+            P_LL = (I_RMS / I_R)^2 * [ P_R + P_EC * F_HL + P_OSL * F_HL_STR ]
+
+        The rated ohmic loss P_R takes no correction, since the DC resistance of
+        the winding is independent of frequency. The rated winding eddy loss
+        P_EC is scaled by the harmonic loss factor F_HL (k = 2) and the rated
+        other stray loss P_OSL by F_HL_STR (k = 0.8), each factor describing how
+        strongly its mechanism responds to the shape of the spectrum.
+
+        The magnitude of the current enters separately, and identically for all
+        three mechanisms, through the squared per-unit loading (I_RMS / I_R).
+        The separation is possible because the harmonic loss factors are
+        normalised by the total harmonic content and therefore carry only the
+        shape of the spectrum, not its magnitude. Consequently the loading and
+        the loss factors are independent inputs and multiplying them is not a
+        double counting of the harmonic content.
+
+        The total transformer loss is obtained by adding the no-load loss,
+
+            P_T = P_LL + P_NL
+
+        which enters unmodified because it is driven by the applied voltage
+        rather than by the load current.
+
+        Consistency of truncation. Where the harmonic loss factors have been
+        evaluated over a truncated spectrum, for instance to reproduce the
+        standard as it is applied in practice, I_RMS should be the RMS of the
+        same truncated spectrum, so that the magnitude and the shape describe
+        the same current.
+
+        Reference
+        ---------
+        IEEE Std C57.110-2018, "IEEE Recommended Practice for Establishing
+        Liquid-Immersed and Dry-Type Power and Distribution Transformer
+        Capability When Supplying Nonsinusoidal Load Currents".
+
+        Parameters
+        ----------
+        I_RMS : float or np.ndarray, shape (Profile_size,)
+            Total RMS current entering the transformer [A] at each
+            mission-profile sample, taken across all harmonics rather than the
+            fundamental alone.
+
+        I_R : float
+            Rated current of the transformer winding [A], on the side at which
+            I_RMS is evaluated.
+
+        P_R : float
+            Rated ohmic (I^2 R) loss [W].
+
+        P_EC : float
+            Rated winding eddy-current loss [W].
+
+        P_OSL : float
+            Rated other stray loss [W].
+
+        F_HL : float or np.ndarray, shape (Profile_size,)
+            Harmonic loss factor for the winding eddy loss [-], evaluated with
+            k = 2.
+
+        F_HL_STR : float or np.ndarray, shape (Profile_size,)
+            Harmonic loss factor for the other stray loss [-], evaluated with
+            k = 0.8.
+
+        Returns
+        -------
+        P_LL : np.ndarray, shape (Profile_size,)
+            Load loss of the transformer [W] at each mission-profile sample.
+        """
+        import numpy as np
+
+        I_RMS = np.atleast_1d(np.asarray(I_RMS, dtype=float))
+        F_HL = np.atleast_1d(np.asarray(F_HL, dtype=float))
+        F_HL_STR = np.atleast_1d(np.asarray(F_HL_STR, dtype=float))
+
+        if I_R <= 0.0:
+            raise ValueError(
+                "I_R must be positive. Received %s A." % I_R)
+
+        if np.any(I_RMS < 0.0):
+            raise ValueError(
+                "I_RMS must be non-negative at every mission-profile sample.")
+
+        if np.any(F_HL < 1.0) or np.any(F_HL_STR < 1.0):
+            raise ValueError(
+                "A harmonic loss factor below unity is non-physical, since the "
+                "factor is the energy-weighted mean of h^k with k > 0 and "
+                "therefore cannot fall below the value of unity returned by an "
+                "undistorted current. Check that the spectrum passed to "
+                "calculate_harmonic_loss_factor includes the fundamental.")
+
+        per_unit_loading_squared = (I_RMS / I_R) ** 2
+
+        P_LL = per_unit_loading_squared * (P_R + P_EC * F_HL + P_OSL * F_HL_STR)
+
+        return P_LL
+
+    @staticmethod
+    def calculate_transformer_top_oil_rise(P_LL, P_LL_R, P_NL, Theta_TO_R, x_oil):
+        """
+        Compute the steady-state top-oil temperature rise above ambient of an
+        oil-immersed transformer, following the thermal model of IEC 60076-7.
+
+        The oil is heated by the total loss of the transformer, comprising both
+        the load loss and the no-load loss, and gives that heat up to the
+        surroundings by convection. The rise is expressed relative to its rated
+        value through the ratio of the total loss to the total loss at rated
+        current:
+
+            Theta_TO = Theta_TO_R * [ (P_LL + P_NL) / (P_LL_R + P_NL) ]^x
+
+        The bracket reduces to unity at rated current, so that the rise reduces
+        to Theta_TO_R under rated conditions, which is the condition at which
+        Theta_TO_R is defined.
+
+        The no-load loss appears in both numerator and denominator because it
+        heats the oil in the same way as the load loss but does not vary with
+        the load current. It is therefore constant, not a scaling term. The
+        standard writes the same expression through the loss ratio
+        R = P_LL_R / P_NL and the load factor K, which is algebraically
+        identical to the loss form used here.
+
+        The harmonic content of the current enters this model through P_LL,
+        which carries the harmonic loss factors of IEEE C57.110, rather than
+        through the load factor of the standard, which presumes a sinusoidal
+        current.
+
+        The oil exponent x is less than unity because convection improves as the
+        oil warms, the oil viscosity falling with temperature, so that the
+        temperature rises somewhat more slowly than the loss that drives it. Its
+        value is tabulated by the standard according to the cooling mode.
+
+        Reference
+        ---------
+        IEC 60076-7:2018, "Power Transformers — Part 7: Loading Guide for
+        Mineral-Oil-Immersed Power Transformers".
+
+        Parameters
+        ----------
+        P_LL : float or np.ndarray, shape (Profile_size,)
+            Load loss of the transformer [W] at each mission-profile sample,
+            corrected for the harmonic content of the current.
+
+        P_LL_R : float
+            Rated load loss of the transformer [W], that is the load loss at
+            rated current with a sinusoidal current.
+
+        P_NL : float
+            No-load (core) loss [W]. Constant whenever the transformer is
+            energised, being driven by the applied voltage rather than by the
+            load current.
+
+        Theta_TO_R : float
+            Rated top-oil rise above ambient [K]. Taken from the transformer
+            datasheet where available and otherwise from the default of the
+            standard for the cooling mode considered.
+
+        x_oil : float
+            Oil exponent [-], tabulated by the standard for the cooling mode.
+
+        Returns
+        -------
+        Theta_TO : np.ndarray, shape (Profile_size,)
+            Top-oil temperature rise above ambient [K] at each mission-profile
+            sample. This is a temperature DIFFERENCE, not an absolute
+            temperature; the ambient is added when the hotspot is assembled.
+        """
+        import numpy as np
+
+        P_LL = np.atleast_1d(np.asarray(P_LL, dtype=float))
+
+        if P_LL_R <= 0.0:
+            raise ValueError(
+                "P_LL_R must be positive. Received %s W." % P_LL_R)
+
+        if P_NL < 0.0:
+            raise ValueError(
+                "P_NL must be non-negative. Received %s W." % P_NL)
+
+        if Theta_TO_R <= 0.0:
+            raise ValueError(
+                "Theta_TO_R must be positive. Received %s K." % Theta_TO_R)
+
+        if np.any(P_LL < 0.0):
+            raise ValueError(
+                "P_LL must be non-negative at every mission-profile sample.")
+
+        Theta_TO = Theta_TO_R * ((P_LL + P_NL) / (P_LL_R + P_NL)) ** x_oil
+
+        return Theta_TO
+
+    @staticmethod
+    def calculate_transformer_hotspot_gradient(I_RMS, I_R, P_R, P_EC, F_HL,Theta_g_R, y_winding):
+        """
+        Compute the steady-state winding hot-spot temperature rise above the top
+        oil of an oil-immersed transformer.
+
+        Where the top-oil rise is driven by the total loss of the transformer,
+        the gradient between the winding and the oil surrounding it is driven
+        only by the losses generated within the winding itself, namely the
+        ohmic loss and the winding eddy-current loss. The other stray loss is
+        excluded because it arises in the tank, connections and clamping
+        structure rather than in the winding, and the no-load loss is excluded
+        because it arises in the core. Both heat the oil, and so appear in the
+        top-oil stage, but neither contributes to the gradient across the
+        winding insulation.
+
+        The operating values of the two winding losses are the rated values
+        scaled by the squared per-unit loading and, in the case of the eddy
+        loss, by the harmonic loss factor:
+
+            P_R_op  = (I_RMS / I_R)^2 * P_R
+            P_EC_op = (I_RMS / I_R)^2 * P_EC * F_HL
+
+        and the gradient follows as
+
+            Theta_g = Theta_g_R * [ (P_R_op + 4 P_EC_op) / (P_R + 4 P_EC) ]^y
+
+        The winding eddy loss is not uniformly distributed over the winding,
+        being concentrated near the winding ends where the stray flux is
+        greatest. The factor of four accounts for the maximum eddy loss at the
+        hot-spot region relative to the winding average, and is the reason the
+        harmonic loss factor acts so strongly on the hot spot: the amplification
+        of the eddy loss by F_HL is itself amplified fourfold at the location
+        that governs the life of the insulation. The factor appears in both
+        numerator and denominator, so that the bracket reduces to unity and the
+        gradient to Theta_g_R under rated sinusoidal conditions, which is the
+        condition at which Theta_g_R is defined.
+
+        The winding exponent y exceeds the oil exponent of the top-oil stage
+        because the winding-to-oil gradient is governed by the viscosity of the
+        oil, which falls as the oil warms.
+
+        The hot-spot temperature is assembled subsequently as
+
+            Theta_H = Theta_amb + Theta_TO + Theta_g
+
+        the sum of the ambient temperature and the two rises.
+
+        Reference
+        ---------
+        IEEE Std C57.110-2018, for the separation of the winding eddy loss and
+        the hot-spot concentration factor.
+        IEC 60076-7:2018, for the form of the gradient and the winding exponent.
+
+        Parameters
+        ----------
+        I_RMS : float or np.ndarray, shape (Profile_size,)
+            Total RMS current entering the transformer [A] at each
+            mission-profile sample, taken across all harmonics.
+
+        I_R : float
+            Rated current of the transformer winding [A], on the side at which
+            I_RMS is evaluated.
+
+        P_R : float
+            Rated ohmic (I^2 R) loss [W].
+
+        P_EC : float
+            Rated winding eddy-current loss [W].
+
+        F_HL : float or np.ndarray, shape (Profile_size,)
+            Harmonic loss factor for the winding eddy loss [-], evaluated with
+            k = 2.
+
+        Theta_g_R : float
+            Rated hot-spot gradient above top oil [K]. Taken from the
+            transformer datasheet where available and otherwise from the default
+            of the standard for the cooling mode considered.
+
+        y_winding : float
+            Winding exponent [-], tabulated by the standard for the cooling
+            mode.
+
+        Returns
+        -------
+        Theta_g : np.ndarray, shape (Profile_size,)
+            Winding hot-spot temperature rise above the top oil [K] at each
+            mission-profile sample. This is a temperature DIFFERENCE, not an
+            absolute temperature.
+        """
+        import numpy as np
+
+        I_RMS = np.atleast_1d(np.asarray(I_RMS, dtype=float))
+        F_HL = np.atleast_1d(np.asarray(F_HL, dtype=float))
+
+        if I_R <= 0.0:
+            raise ValueError(
+                "I_R must be positive. Received %s A." % I_R)
+
+        if Theta_g_R <= 0.0:
+            raise ValueError(
+                "Theta_g_R must be positive. Received %s K." % Theta_g_R)
+
+        denominator = P_R + 1 * P_EC
+
+        if denominator <= 0.0:
+            raise ValueError(
+                "The rated winding loss P_R + %s * P_EC must be positive, since "
+                "it normalises the gradient to its rated value. Check the load "
+                "loss split." % 1)
+
+        per_unit_loading_squared = (I_RMS / I_R) ** 2
+
+        P_R_op = per_unit_loading_squared * P_R
+        P_EC_op = per_unit_loading_squared * P_EC * F_HL
+
+        numerator = P_R_op + 1 * P_EC_op
+
+        Theta_g = Theta_g_R * (numerator / denominator) ** y_winding
+
+        return Theta_g
+
+
+    @staticmethod
+    def calculate_transformer_ageing_acceleration(Theta_H, Theta_ref,doubling_interval=6.0):
+        """
+        Compute the ageing acceleration factor of the transformer winding
+        insulation from its hot-spot temperature.
+
+        The ageing of the cellulose insulation is thermally activated, so the
+        rate at which life is consumed rises steeply with temperature. The rate
+        is expressed relative to a reference condition,
+
+            F_AA = 2^((Theta_H - Theta_ref) / doubling_interval)
+
+        so that F_AA = 1 at the reference temperature, F_AA > 1 above it and
+        F_AA < 1 below it. The factor is a RATE, not a duration: a value of two
+        means the insulation is consuming its life twice as fast as it would at
+        the reference condition, and the accumulation over a mission profile is
+        performed subsequently by weighting each interval by the factor
+        prevailing within it.
+
+        The hot spot is used rather than the average winding temperature because
+        it is the hottest point of the paper-insulated winding and therefore the
+        location at which the insulation fails first, governing the life of the
+        transformer as a whole.
+
+        The reference temperature is a property of the winding insulation rather
+        than of the method, and is therefore an input:
+
+            98 degC   non thermally upgraded Kraft paper, usual in transformers
+                      built to the IEC series [IEC 60076-7]
+            110 degC  thermally upgraded paper, usual in transformers built to
+                      the IEEE series [IEEE C57.91]
+
+        The base-2 form makes explicit that the ageing rate doubles for every
+        6 degC of hot-spot temperature rise above the reference, whichever
+        reference applies.
+
+        Note on the reference temperature. Theta_ref sets the absolute rate but
+        cancels in the ratio of F_AA between two operating states, since
+
+            F_AA(A) / F_AA(B) = 2^((Theta_H_A - Theta_H_B) / 6)
+
+        is independent of it. Any relative acceleration reported between two
+        states of degradation is therefore unaffected by the choice of
+        insulation reference, while the absolute loss of life depends on it and
+        on the normal insulation life adopted alongside it.
+
+        Reference
+        ---------
+        IEC 60076-7:2018, "Power Transformers — Part 7: Loading Guide for
+        Mineral-Oil-Immersed Power Transformers".
+        IEEE Std C57.91-2011, "IEEE Guide for Loading Mineral-Oil-Immersed
+        Transformers and Step-Voltage Regulators".
+
+        Parameters
+        ----------
+        Theta_H : float or np.ndarray, shape (Profile_size,)
+            Winding hot-spot temperature [degC] at each mission-profile sample,
+            assembled as the sum of the ambient temperature and the top-oil and
+            gradient rises. Note the unit: this function expects degrees
+            Celsius, not kelvin, since the reference temperatures of both
+            standards are stated in Celsius.
+
+        Theta_ref : float
+            Reference hot-spot temperature [degC] at which the factor equals
+            unity, determined by the insulation type of the winding.
+
+        doubling_interval : float, optional
+            Temperature rise above the reference at which the ageing rate
+            doubles [K]. Default 6.0, as given by both standards for cellulose
+            insulation.
+
+        Returns
+        -------
+        F_AA : np.ndarray, shape (Profile_size,)
+            Ageing acceleration factor [-] at each mission-profile sample,
+            relative to the reference condition.
+        """
+
+
+        Theta_H = np.atleast_1d(np.asarray(Theta_H, dtype=float))
+
+        if doubling_interval <= 0.0:
+            raise ValueError(
+                "doubling_interval must be positive. Received %s K."
+                % doubling_interval)
+
+        if np.any(Theta_H > 300.0) or np.any(Theta_H < -100.0):
+            raise ValueError(
+                "Theta_H lies outside any plausible range for a transformer "
+                "winding hot spot in degrees Celsius. A common cause is passing "
+                "the temperature in kelvin; this function expects degC, to match "
+                "the reference temperatures of the standards.")
+
+        F_AA = 2.0 ** ((Theta_H - Theta_ref) / doubling_interval)
+
+        return F_AA
+
+    @staticmethod
+    def calculate_transformer_loss_of_life(F_AA, seconds_per_sample, L_normal):
+        """
+        Accumulate the ageing acceleration factor over a mission profile to
+        obtain the equivalent ageing rate, the life consumed and the equivalent
+        life of the transformer winding insulation.
+
+        The ageing acceleration factor is a rate relative to the reference
+        condition, so the ageing accrued over a period is obtained by weighting
+        each interval by the factor prevailing within it. The equivalent ageing
+        factor is the duration-weighted mean,
+
+            F_EQA = sum( F_AA_i * dt_i ) / sum( dt_i )
+
+        and is the single constant ageing rate that would consume the same life
+        as the varying mission profile. The life consumed follows as a fraction
+        of the normal insulation life at the reference temperature,
+
+            LOL = F_EQA * sum( dt_i ) / L_normal
+                = sum( F_AA_i * dt_i ) / L_normal
+
+        in which the total duration cancels, so that the loss of life is simply
+        the accumulated ageing divided by the normal insulation life. This
+        accumulation is the transformer counterpart of the Miner damage rule
+        applied to the filter elements, and a value of unity likewise marks the
+        end of the insulation life.
+
+        The equivalent life is the time to reach that unity when the mission
+        profile is repeated indefinitely,
+
+            L_eq = Profile_duration / LOL
+
+        by direct analogy with the equivalent lifetime returned for the filter
+        components.
+
+        Note on the reference condition. Both Theta_ref, through F_AA, and
+        L_normal set the absolute life, and both must be taken from the same
+        insulation model: 110 degC with 180 000 h for thermally upgraded paper
+        [IEEE C57.91], or the corresponding pair for non thermally upgraded
+        Kraft paper [IEC 60076-7]. Mixing a reference temperature from one with
+        a normal life from the other is not meaningful. The relative ageing
+        between two operating states is unaffected by either choice.
+
+        Reference
+        ---------
+        IEEE Std C57.91-2011, "IEEE Guide for Loading Mineral-Oil-Immersed
+        Transformers and Step-Voltage Regulators".
+        IEC 60076-7:2018, "Power Transformers — Part 7: Loading Guide for
+        Mineral-Oil-Immersed Power Transformers".
+        Miner, M.A., "Cumulative damage in fatigue", Journal of Applied
+        Mechanics, 1945, for the analogous accumulation applied to the filter.
+
+        Parameters
+        ----------
+        F_AA : np.ndarray, shape (Profile_size,)
+            Ageing acceleration factor [-] at each mission-profile sample.
+
+        seconds_per_sample : float or np.ndarray
+            Wall-clock duration [s] that each entry of F_AA represents. Pass a
+            scalar for a regular profile or an array of per-sample durations for
+            an irregular one.
+
+        L_normal : float
+            Normal insulation life [h] at the reference hot-spot temperature,
+            that is the life the insulation would reach if held forever at
+            Theta_ref. Must correspond to the same insulation model as the
+            Theta_ref used to compute F_AA.
+
+        Returns
+        -------
+        F_EQA : float
+            Equivalent ageing factor [-] over the mission profile, the
+            duration-weighted mean of F_AA.
+
+        LOL : float
+            Fraction of the normal insulation life consumed by one complete run
+            of the mission profile [-]. Unity marks the end of insulation life.
+
+        L_eq_years : float
+            Equivalent life of the insulation [years], the time to reach
+            LOL = 1 when the mission profile is repeated indefinitely.
+        """
+        import numpy as np
+
+        F_AA = np.atleast_1d(np.asarray(F_AA, dtype=float))
+
+        if L_normal <= 0.0:
+            raise ValueError(
+                "L_normal must be positive. Received %s h." % L_normal)
+
+        if np.any(F_AA < 0.0):
+            raise ValueError(
+                "F_AA must be non-negative at every mission-profile sample.")
+
+        hours_per_sample = np.broadcast_to(
+            np.asarray(seconds_per_sample, dtype=float) / 3600.0, F_AA.shape)
+
+        Profile_duration_hours = hours_per_sample.sum()
+
+        if Profile_duration_hours <= 0.0:
+            raise ValueError(
+                "The mission profile has zero duration, so no ageing can be "
+                "accumulated. Check seconds_per_sample.")
+
+        accumulated_ageing_hours = np.sum(F_AA * hours_per_sample)
+
+        F_EQA = accumulated_ageing_hours / Profile_duration_hours
+        LOL = accumulated_ageing_hours / L_normal
+
+        if LOL <= 0.0:
+            L_eq_years = np.inf
+        else:
+            L_eq_years = (Profile_duration_hours / LOL) / (365.0 * 24.0)
+
+        return F_EQA, LOL, L_eq_years
+
+    @staticmethod
+    def report_transformer(trafo_specs, P_R, P_EC, P_OSL,
+                           F_HL, F_HL_STR, P_LL, P_T,
+                           Theta_TO, Theta_g, Theta_H,
+                           F_AA, F_EQA, LOL, Lifetime_years,
+                           I_RMS=None, T_amb=None):
+        """
+        Print a summary of the transformer stage, from the harmonic loss factors
+        through the losses, temperatures and ageing to the equivalent life.
+
+        Quantities that vary over the mission profile are reduced to a single
+        representative value before printing. Losses, temperatures and ageing
+        factors are reported as the arithmetic mean over the profile, since it
+        is their average level that characterises the operating point, while
+        currents are reported as the root mean square, which is the quantity
+        that enters the loss equations. Where a per-sample quantity varies, its
+        minimum and maximum are printed alongside the mean so that the spread
+        over the profile is visible.
+
+        Note that the mean of F_AA is not the driver of the loss of life, since
+        the factor is exponential in temperature and the accumulation is
+        dominated by the hottest samples. The mean is printed for orientation
+        only; F_EQA is the correct duration-weighted equivalent and is printed
+        separately.
+
+        Parameters
+        ----------
+        trafo_specs : dict
+            Transformer specification dictionary, used for the rated quantities
+            and the model settings printed in the header.
+
+        P_R, P_EC, P_OSL : float
+            Rated ohmic, winding eddy and other stray losses [W].
+
+        F_HL, F_HL_STR : np.ndarray or float
+            Harmonic loss factors [-] per mission-profile sample.
+
+        P_LL, P_T : np.ndarray or float
+            Load loss and total loss [W] per mission-profile sample.
+
+        Theta_TO, Theta_g : np.ndarray or float
+            Top-oil rise above ambient and winding hot-spot gradient above top
+            oil [K] per mission-profile sample.
+
+        Theta_H : np.ndarray or float
+            Winding hot-spot temperature [degC] per mission-profile sample.
+
+        F_AA : np.ndarray or float
+            Ageing acceleration factor [-] per mission-profile sample.
+
+        F_EQA : float
+            Equivalent ageing factor over the mission profile [-].
+
+        LOL : float
+            Fraction of normal insulation life consumed by one run of the
+            mission profile [-].
+
+        Lifetime_years : float
+            Equivalent life of the insulation [years].
+
+        I_RMS : np.ndarray or float, optional
+            Total RMS current entering the transformer [A] per sample. Printed
+            with the resulting per-unit loading when supplied.
+
+        T_amb : np.ndarray or float, optional
+            Ambient temperature [K] per sample. Printed when supplied.
+
+        Returns
+        -------
+        None
+        """
+        import numpy as np
+
+        def stats(x):
+            """Mean, min and max of a per-sample quantity."""
+            a = np.atleast_1d(np.asarray(x, dtype=float))
+            return a.mean(), a.min(), a.max()
+
+        def rms(x):
+            """Root mean square of a per-sample quantity."""
+            a = np.atleast_1d(np.asarray(x, dtype=float))
+            return np.sqrt(np.mean(a ** 2))
+
+        def line(label, value, unit, spread=None, fmt="{:.4f}"):
+            text = ("  " + label.ljust(34) + fmt.format(value) + " " + unit)
+            if spread is not None:
+                lo, hi = spread
+                text += "   (min " + fmt.format(lo) + ", max " + fmt.format(hi) + ")"
+            print(text)
+
+        P_LL_R = trafo_specs["P_LL_R"]
+        P_NL = trafo_specs["P_NL"]
+        I_R = trafo_specs["I_R"]
+
+        print("\n" + "=" * 78)
+        print("  TRANSFORMER AT THE CONNECTION POINT")
+        print("=" * 78)
+
+        print("\n Ratings and model settings")
+        line("Rated apparent power", trafo_specs["S_r"] / 1e3, "kVA", fmt="{:.1f}")
+        line("Rated LV voltage", trafo_specs["V_LV"], "V", fmt="{:.0f}")
+        line("Rated LV current  I_R", I_R, "A", fmt="{:.1f}")
+        line("Rated load loss   P_LL_R", P_LL_R, "W", fmt="{:.1f}")
+        line("No-load loss      P_NL", P_NL, "W", fmt="{:.1f}")
+        line("Oil exponent      x", trafo_specs["x_oil"], "-", fmt="{:.2f}")
+        line("Winding exponent  y", trafo_specs["y_winding"], "-", fmt="{:.2f}")
+        line("Rated top-oil rise", trafo_specs["Theta_TO_R"], "K", fmt="{:.1f}")
+        line("Rated hotspot gradient", trafo_specs["Theta_g_R"], "K", fmt="{:.1f}")
+        line("Insulation reference", trafo_specs["Theta_ref"], "degC", fmt="{:.0f}")
+        line("Normal insulation life", trafo_specs["L_normal"], "h", fmt="{:.0f}")
+
+        print("\n Rated load loss split")
+        line("Stray fraction    sigma", trafo_specs["sigma"], "-", fmt="{:.3f}")
+        line("Eddy share of stray", trafo_specs["eddy_share"], "-", fmt="{:.3f}")
+        line("Ohmic loss        P_R", P_R, "W", fmt="{:.1f}")
+        line("Winding eddy loss P_EC", P_EC, "W", fmt="{:.1f}")
+        line("Other stray loss  P_OSL", P_OSL, "W", fmt="{:.1f}")
+
+        print("\n Harmonic loss factors")
+        m, lo, hi = stats(F_HL)
+        line("Winding eddy      F_HL", m, "-", (lo, hi))
+        m, lo, hi = stats(F_HL_STR)
+        line("Other stray   F_HL_STR", m, "-", (lo, hi))
+
+        print("\n Losses")
+        if I_RMS is not None:
+            line("Current entering  I_RMS", rms(I_RMS), "A", fmt="{:.2f}")
+            line("Per-unit loading", rms(I_RMS) / I_R, "-", fmt="{:.4f}")
+        m, lo, hi = stats(P_LL)
+        line("Load loss         P_LL", m, "W", (lo, hi), fmt="{:.1f}")
+        line("Load loss vs rated", m / P_LL_R, "-", fmt="{:.4f}")
+        m, lo, hi = stats(P_T)
+        line("Total loss        P_T", m, "W", (lo, hi), fmt="{:.1f}")
+
+        print("\n Temperatures")
+        if T_amb is not None:
+            m, lo, hi = stats(np.asarray(T_amb, dtype=float) - 273.15)
+            line("Ambient", m, "degC", (lo, hi), fmt="{:.2f}")
+        m, lo, hi = stats(Theta_TO)
+        line("Top-oil rise      Theta_TO", m, "K", (lo, hi), fmt="{:.2f}")
+        m, lo, hi = stats(Theta_g)
+        line("Hotspot gradient  Theta_g", m, "K", (lo, hi), fmt="{:.2f}")
+        m, lo, hi = stats(Theta_H)
+        line("Hotspot           Theta_H", m, "degC", (lo, hi), fmt="{:.2f}")
+        line("Above reference", m - trafo_specs["Theta_ref"], "K", fmt="{:+.2f}")
+
+        print("\n Ageing and life")
+        m, lo, hi = stats(F_AA)
+        line("Ageing factor     F_AA", m, "-", (lo, hi))
+        line("Equivalent ageing F_EQA", F_EQA, "-")
+        line("Life consumed     LOL", LOL * 100.0, "%", fmt="{:.6f}")
+        line("Equivalent life", Lifetime_years, "years", fmt="{:.2f}")
+
+        print("=" * 78 + "\n")
+
+    @staticmethod
+    def equivalent_temperature_transformer(L_eq_years, Theta_ref, L_normal,
+                                           doubling_interval=6.0):
+        """
+        Recover the equivalent winding hot-spot temperature of a transformer
+        from its equivalent life, by inverting the ageing chain.
+
+        The mission profile subjects the winding to a varying hot-spot
+        temperature, and the resulting equivalent life is the single figure that
+        summarises the accumulated ageing. The equivalent temperature is the
+        constant hot spot that would consume the insulation at the same rate,
+        that is the temperature which, if held indefinitely, would reach the end
+        of the insulation life at the same moment as the varying profile does.
+        It is the transformer counterpart of the equivalent temperature already
+        recovered for the inductors and the capacitor, and serves the same
+        purpose: it provides the single operating point about which a Monte
+        Carlo study can be built, rather than perturbing every sample of the
+        profile independently.
+
+        The inversion proceeds in two steps. Holding a constant ageing
+        acceleration factor, the loss of life over a period reduces to
+
+            LOL = F_AA * Profile_duration / L_normal
+
+        so that the equivalent life, being the duration at which LOL reaches
+        unity, is
+
+            L_eq = L_normal / F_AA
+
+        Inverting gives the equivalent ageing factor,
+
+            F_AA_eq = L_normal / L_eq
+
+        and inverting the ageing law in turn gives the equivalent temperature,
+
+            Theta_H_eq = Theta_ref + doubling_interval * log2( F_AA_eq )
+
+        An equivalent life shorter than the normal insulation life therefore
+        returns a temperature above the reference, and a longer life one below
+        it, as expected.
+
+        Note that the equivalent temperature is not the arithmetic mean of the
+        hot-spot temperatures over the profile. Because the ageing factor is
+        exponential in temperature, the accumulation is dominated by the hottest
+        samples, so the equivalent temperature lies above the mean whenever the
+        profile varies, and equals it only for a flat profile.
+
+        Reference
+        ---------
+        IEEE Std C57.91-2011 and IEC 60076-7:2018, for the ageing law inverted
+        here.
+
+        Parameters
+        ----------
+        L_eq_years : float
+            Equivalent life of the insulation [years], as returned by
+            calculate_transformer_loss_of_life.
+
+        Theta_ref : float
+            Reference hot-spot temperature [degC] at which the ageing
+            acceleration factor equals unity. Must be the same value used in
+            the forward calculation.
+
+        L_normal : float
+            Normal insulation life [h] at the reference temperature. Must be the
+            same value used in the forward calculation.
+
+        doubling_interval : float, optional
+            Temperature rise above the reference at which the ageing rate
+            doubles [K]. Default 6.0.
+
+        Returns
+        -------
+        Theta_H_eq : float
+            Equivalent winding hot-spot temperature [degC], the constant hot
+            spot that consumes the insulation life at the same rate as the
+            mission profile.
+        """
+        import numpy as np
+
+        if L_eq_years <= 0.0:
+            raise ValueError(
+                "L_eq_years must be positive. Received %s years." % L_eq_years)
+
+        if L_normal <= 0.0:
+            raise ValueError(
+                "L_normal must be positive. Received %s h." % L_normal)
+
+        L_eq_hours = L_eq_years * 365.0 * 24.0
+
+        F_AA_eq = L_normal / L_eq_hours
+
+        Theta_H_eq = Theta_ref + doubling_interval * np.log2(F_AA_eq)
+
+        return Theta_H_eq
+

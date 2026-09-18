@@ -14,7 +14,7 @@ Vdc_rated = params.Vdc_rated; Vo_rated = params.Vo_rated; inverter_phases = para
 Profile_size = params.Profile_size; Vdc_RMS = params.Vdc_RMS; M = params.M; Vo = params.Vo; Vg_RMS = params.Vg_RMS; S_RMS = params.S_RMS; pf = params.pf; P_RMS = params.P_RMS; Q_RMS = params.Q_RMS; Ig_RMS = params.Ig_RMS
 T_amb = params.T_amb; heat_transfer_coefficient = params.heat_transfer_coefficient
 resolution_per_cycle = params.resolution_per_cycle; dt = params.dt; samples_per_switching_period = params.samples_per_switching_period; Minimum_required_samples_per_switching_period = params.Minimum_required_samples_per_switching_period; seconds_per_sample = params.seconds_per_sample; h_max = params.h_max
-L1_specs = params.L1_specs; C_specs = params.C_specs; L2_specs = params.L2_specs
+L1_specs = params.L1_specs; C_specs = params.C_specs; L2_specs = params.L2_specs; trafo_specs = params.trafo_specs; Monte_carlo_inputs = params.Monte_carlo_inputs
 Vg_ll_RMS = params.Vg_ll_RMS; S_rated = params.S_rated; I_rated_RMS = params.I_rated_RMS; I_rated_peak = params.I_rated_peak; current_ripple_limit = params.current_ripple_limit; delta = params.delta; omega_sw = params.omega_sw
 
 sim_dir, dataframes_dir, figures_dir = Calculation_functions.create_simulation_folders(base="Results")
@@ -130,14 +130,11 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
     # required inverter voltage (pass single-element arrays, Profile_size=1)
     Vs_ref = Calculation_functions.compute_Vs_ref_phasor(t=t_one, f=f, Ig_RMS=np.array([Ig_RMS_i]), Vg_RMS=np.array([Vg_RMS_i]), phase_shift=phase_shift, L1=L1_specs["L1"], L2=L2_specs["L2"], C=C_specs["C"],R1=L1_specs["R1"], R2=L2_specs["R2"], R3=C_specs["R3"],Profile_size=1, samples_per_second=resolution_per_cycle * f)
 
-    # Function to specifically add distortion to the Vs_ref to destroy Vs to see the effect on LCL filter
-    #Vs_ref = Calculation_functions.distort_Vs_ref(Vs_ref=Vs_ref, t=t_one, omega=omega,harmonics={5: 0.08, 7: 0.05, 11: 0.04, 13: 0.03},noise_level=0.02, seed=0)
-
     Calculation_functions.validate_required_inverter_voltage(Vs_ref=Vs_ref, Vo_available=Vo_rated)
 
     # switching output (Vo passed as single-element array, Profile_size=1)
     Vs = Calculation_functions.Three_phase_switching_output(t=t_one, Vs_ref=Vs_ref, Vo=np.array([Vo_i]), Tsw=Tsw, f=f, Profile_size=1, modulation="spwm")
-    #Vs = Vs_ref
+    # Vs = Vs_ref
 
     _ = Calculation_functions.check_Vs_quality(t=t_one, Vs=Vs, Vs_ref=Vs_ref, f=f, fsw=fsw, Profile_size=1, raise_on_fail=True)
 
@@ -164,7 +161,7 @@ def solve_setpoint(Vdc_RMS_i, M_i, Vo_i, Vg_RMS_i, S_RMS_i, pf_i, P_RMS_i, Q_RMS
 
     V_C_RMS = Calculation_functions.Singal_RMS(Signal=V_C, resolution_per_cycle=resolution_per_cycle, f=f)
 
-    #Calculation_functions.validate_capacitor_operating_limits(T_C=T_C, V_C_RMS=V_C_RMS, V_C=V_C,T_C_Rated=C_specs["T_C_Rated"],V_C_RMS_Rated=C_specs["V_C_RMS_Rated"],V_C_Peak_Rated=C_specs["V_C_Peak_Rated"],V_RMS_overvoltage_factor=1.5, V_peak_overvoltage_factor=1.5)
+    Calculation_functions.validate_capacitor_operating_limits(T_C=T_C, V_C_RMS=V_C_RMS, V_C=V_C,T_C_Rated=C_specs["T_C_Rated"],V_C_RMS_Rated=C_specs["V_C_RMS_Rated"],V_C_Peak_Rated=C_specs["V_C_Peak_Rated"],V_RMS_overvoltage_factor=1.5, V_peak_overvoltage_factor=1.5)
 
     # ----------------------------------------#
     # LCL filter inverter side [L1]
@@ -295,7 +292,7 @@ if C_specs["Lifetime_calculations"] == "Graphical":
 elif C_specs["Lifetime_calculations"] == "Analytical":
     Lifetime_C_series = Calculation_functions.calculate_capacitor_lifetime_analytical(T_operating = T_C, V_C_RMS = V_C_RMS, V_C_RMS_Rated = C_specs["V_C_RMS_Rated"], t1 = C_specs["Lifetime_Rated"], T1 = C_specs["Temperature_Rated"], A = C_specs["A"], n = C_specs["n"])
 
-Lifetime_C, Lifetime_consumed_C, C_new, D_cum_previous,D_cycle = Calculation_functions.miners_rule_modified_capacitor(L_per_second=Lifetime_C_series, seconds_per_sample=seconds_per_sample, C_0=C_specs["C"] , D_cum_previous=0, k_capacitance=0.2)
+Lifetime_C, Lifetime_consumed_C, C_new, D_cum_previous,D_cycle_C = Calculation_functions.miners_rule_modified_capacitor(L_per_second=Lifetime_C_series, seconds_per_sample=seconds_per_sample, C_0=C_specs["C"] , D_cum_previous=0, k_capacitance=0.2)
 
 # ----------------------------------------#
 # LCL filter inverter side [L1]
@@ -315,6 +312,101 @@ C_report = dict(C=C_specs["C"], R_th=C_specs["Thermal_resistance_C"], V_RMS=V_C_
 L1_report = dict(L=L1_specs["L1"], N=N_L1, lg=lg_L1, B_peak=B_peak_L1, B_max=L1_specs["B_max"], Bsat=L1_specs["Bsat"], Ae=Ae_L1, le=le_L1, Ve=Ve_L1, A_surface=A_surface_L1, I_RMS=I_L1_RMS, V_RMS=V_L1_RMS, Rdc=Rdc_L1, N_parallel=N_parallel_wire_L1, A_wire=A_wire_actual_L1, l_turn=l_turn_L1, P_core=P_c_L1, P_winding=P_w_L1, P_total=P_total_L1, R_th=R_th_L1, T=T_inductor_L1, T_rated=L1_specs["T_insulation_rated"], Lifetime=Lifetime_L1, Lifetime_consumed=Lifetime_consumed_L1,)
 L2_report = dict(L=L2_specs["L2"], N=N_L2, lg=lg_L2, B_peak=B_peak_L2, B_max=L2_specs["B_max"], Bsat=L2_specs["Bsat"], Ae=Ae_L2, le=le_L2, Ve=Ve_L2, A_surface=A_surface_L2, I_RMS=I_L2_RMS, V_RMS=V_L2_RMS, Rdc=Rdc_L2, N_parallel=N_parallel_wire_L2, A_wire=A_wire_actual_L2, l_turn=l_turn_L2, P_core=P_c_L2, P_winding=P_w_L2, P_total=P_total_L2, R_th=R_th_L2, T=T_inductor_L2, T_rated=L2_specs["T_insulation_rated"], Lifetime=Lifetime_L2, Lifetime_consumed=Lifetime_consumed_L2, )
 #Calculation_functions.compare_components(C_report, L1_report, L2_report)
+
+
+# ----------------------------------------#
+# Monte Carlo Simulations LCL Filter
+# ----------------------------------------#
+
+# Capacitor
+
+if C_specs["Lifetime_calculations"] == "Graphical":
+
+    Monte_carlo_inputs["rng"] = Monte_carlo_inputs["rng_original"]
+    T_C_samples = Calculation_functions.normal_distribution_function(np.mean(T_C), Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    V_C_samples = Calculation_functions.normal_distribution_function(np.mean(V_C_RMS), Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    V_C_RMS_Rated_samples = Calculation_functions.normal_distribution_function(C_specs["V_C_RMS_Rated"], Monte_carlo_inputs["normal_distribution"],Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    lifetime_curves_samples = Calculation_functions.build_lifetime_curves_samples(C_specs["lifetime_curves"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    Lifetime_C_MC = np.empty(Monte_carlo_inputs["number_of_samples"])
+    for i in range(Monte_carlo_inputs["number_of_samples"]):
+        Lifetime_C_MC[i] = Calculation_functions.Capacitor_lifetime_graphical(T_C=np.atleast_1d(T_C_samples[i]),V_C_RMS=np.atleast_1d(V_C_samples[i]),V_C_RMS_Rated=V_C_RMS_Rated_samples[i],lifetime_curves=lifetime_curves_samples[i])[0]
+
+elif C_specs["Lifetime_calculations"] == "Analytical":
+
+    Monte_carlo_inputs["rng"] = Monte_carlo_inputs["rng_original"]
+    T_eq_C = Calculation_functions.equivalent_temperature_capacitor(L_eq_years=Lifetime_C,  V_C_RMS=np.mean(V_C_RMS), V_C_RMS_Rated=C_specs["V_C_RMS_Rated"], t1=C_specs["Lifetime_Rated"], T1=C_specs["Temperature_Rated"], A=C_specs["A"], n=C_specs["n"])
+    T_C_samples   = Calculation_functions.normal_distribution_function(T_eq_C, Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    V_C_samples   = Calculation_functions.normal_distribution_function(np.mean(V_C_RMS), Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    V_C_RMS_Rated_samples = Calculation_functions.normal_distribution_function(C_specs["V_C_RMS_Rated"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    t1_samples   = Calculation_functions.normal_distribution_function(C_specs["Lifetime_Rated"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    T1_samples   = Calculation_functions.normal_distribution_function(C_specs["Temperature_Rated"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    A_samples     = Calculation_functions.normal_distribution_function(C_specs["A"],    Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    n_samples     = Calculation_functions.normal_distribution_function(C_specs["n"],    Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+    Lifetime_C_MC = Calculation_functions.calculate_capacitor_lifetime_analytical(T_operating = T_C_samples,V_C_RMS = V_C_samples, V_C_RMS_Rated = V_C_RMS_Rated_samples,t1 = t1_samples, T1 = T1_samples, A = A_samples,n = n_samples,)
+
+# Inductor L1
+
+Monte_carlo_inputs["rng"] = Monte_carlo_inputs["rng_original"]
+L_eq_L1_years = Lifetime_L1
+T_eq_L1 = Calculation_functions.equivalent_temperature(L_eq_L1_years, L1_specs["T_insulation_rated"],L1_specs["L_insulation_rated"], L1_specs["Ea_insulation"],L1_specs["kb"])
+T_L1_samples      = Calculation_functions.normal_distribution_function(T_eq_L1,    Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+T_rated_L1_samples = Calculation_functions.normal_distribution_function(L1_specs["T_insulation_rated"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+L_rated_L1_samples = Calculation_functions.normal_distribution_function(L1_specs["L_insulation_rated"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+Ea_L1_samples     = Calculation_functions.normal_distribution_function(L1_specs["Ea_insulation"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+Lifetime_L1_MC = Calculation_functions.calculate_inductor_lifetime(T_operating = T_L1_samples,T_rated = T_rated_L1_samples, L_rated = L_rated_L1_samples, Ea = Ea_L1_samples, kb = L1_specs["kb"], L_max_years = L1_specs["L_max_years"],)
+
+# Inductor 2
+
+Monte_carlo_inputs["rng"] = Monte_carlo_inputs["rng_original"]
+L_eq_L2_years = Lifetime_L2
+T_eq_L2 = Calculation_functions.equivalent_temperature(L_eq_L2_years, L2_specs["T_insulation_rated"],L2_specs["L_insulation_rated"], L2_specs["Ea_insulation"],L2_specs["kb"])
+T_L2_samples      = Calculation_functions.normal_distribution_function(T_eq_L2, Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+T_rated_L2_samples = Calculation_functions.normal_distribution_function(L2_specs["T_insulation_rated"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+L_rated_L2_samples = Calculation_functions.normal_distribution_function(L2_specs["L_insulation_rated"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+Ea_L2_samples = Calculation_functions.normal_distribution_function(L2_specs["Ea_insulation"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+Lifetime_L2_MC = Calculation_functions.calculate_inductor_lifetime(T_operating = T_L2_samples,T_rated = T_rated_L2_samples, L_rated = L_rated_L2_samples, Ea = Ea_L2_samples,kb = L2_specs["kb"], L_max_years = L2_specs["L_max_years"],)
+Lifetime_LCL_MC = np.minimum.reduce([Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, ])
+
+###########################################################################################################################################
+
+# ----------------------------------------#
+# Transformer
+# ----------------------------------------#
+
+# Inputs
+
+F_HL     = Calculation_functions.calculate_harmonic_loss_factor(I_L2_RMS_harmonics, k=trafo_specs["k_F_HL"]) #, h_max_used=50)
+F_HL_STR = Calculation_functions.calculate_harmonic_loss_factor(I_L2_RMS_harmonics, k=trafo_specs["k_F_HL_STR"]) # , h_max_used=50)
+P_R, P_EC, P_OSL = Calculation_functions.split_transformer_load_loss(P_LL_R=trafo_specs["P_LL_R"], sigma=trafo_specs["sigma"], eddy_share=trafo_specs["eddy_share"])
+P_LL = Calculation_functions.calculate_transformer_load_loss(I_RMS=I_L2_RMS, I_R=trafo_specs["I_R"], P_R=P_R, P_EC=P_EC, P_OSL=P_OSL, F_HL=F_HL, F_HL_STR=F_HL_STR)
+P_T = P_LL + trafo_specs["P_NL"] # [W] Total Losses
+
+# Temperature
+
+Theta_TO = Calculation_functions.calculate_transformer_top_oil_rise(P_LL=P_LL, P_LL_R=trafo_specs["P_LL_R"], P_NL=trafo_specs["P_NL"],Theta_TO_R=trafo_specs["Theta_TO_R"], x_oil=trafo_specs["x_oil"]) # [°C]
+Theta_g = Calculation_functions.calculate_transformer_hotspot_gradient(I_RMS=I_L2_RMS, I_R=trafo_specs["I_R"], P_R=P_R, P_EC=P_EC, F_HL=F_HL, Theta_g_R=trafo_specs["Theta_g_R"], y_winding=trafo_specs["y_winding"]) # [°C]
+Theta_H = (T_amb - 273.15) + Theta_TO + Theta_g # [°C] Final temperature
+
+# Life
+
+F_AA = Calculation_functions.calculate_transformer_ageing_acceleration(Theta_H=Theta_H, Theta_ref=trafo_specs["Theta_ref"])
+F_EQA, LOL_trafo, Lifetime_trafo = Calculation_functions.calculate_transformer_loss_of_life(F_AA=F_AA, seconds_per_sample=seconds_per_sample, L_normal=trafo_specs["L_normal"])
+#Calculation_functions.report_transformer(trafo_specs=trafo_specs, P_R=P_R, P_EC=P_EC, P_OSL=P_OSL, F_HL=F_HL, F_HL_STR=F_HL_STR, P_LL=P_LL, P_T=P_T, Theta_TO=Theta_TO, Theta_g=Theta_g, Theta_H=Theta_H, F_AA=F_AA, F_EQA=F_EQA, LOL=LOL_trafo, Lifetime_years=Lifetime_trafo, I_RMS=I_L2_RMS, T_amb=T_amb)
+
+# ----------------------------------------#
+# Monte Carlo Simulations transformer
+# ----------------------------------------#
+
+Monte_carlo_inputs["rng"] = Monte_carlo_inputs["rng_original"]
+Lifetime_trafo_eq = Lifetime_trafo
+Theta_H_eq = Calculation_functions.equivalent_temperature_transformer(L_eq_years=Lifetime_trafo_eq, Theta_ref=trafo_specs["Theta_ref"],L_normal=trafo_specs["L_normal"])
+Theta_H_samples   = Calculation_functions.normal_distribution_function(Theta_H_eq, Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+Theta_ref_samples = Calculation_functions.normal_distribution_function(trafo_specs["Theta_ref"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+L_normal_samples  = Calculation_functions.normal_distribution_function(trafo_specs["L_normal"], Monte_carlo_inputs["normal_distribution"], Monte_carlo_inputs["number_of_samples"], Monte_carlo_inputs["rng"])
+F_AA_MC = Calculation_functions.calculate_transformer_ageing_acceleration(Theta_H=Theta_H_samples, Theta_ref=Theta_ref_samples)
+Lifetime_trafo_MC = L_normal_samples / (F_AA_MC * 365.0 * 24.0)   # [years]
+
+###########################################################################################################################################
 
 #blabla = False
 blabla = True
@@ -352,11 +444,8 @@ if blabla == True:
             "THD_percent_I_L2": np.where(np.arange(len(Vs)) == len(Vs) - 1, THD_percent_I_L2, np.nan),
             "THD_percent_Vs": np.where(np.arange(len(Vs)) == len(Vs) - 1, THD_percent_Vs, np.nan)
         })
-
     df_2_power_flow_inst.to_parquet(f"{dataframes_dir}/df_2_power_flow_inst.parquet")
     Plotting_function.plot_df_2_power_flow_inst(df_2_power_flow_inst=df_2_power_flow_inst, figures_dir=figures_dir, resolution_per_cycle=resolution_per_cycle)
-    #Plotting_function.plot_Ig_ref_vs_I_L2(df_2_power_flow_inst, figures_dir, resolution_per_cycle, f=50, t=None, y_margin=0.05,xlabel="Time [s]")
-    #Plotting_function.plot_six_waveforms(df_2_power_flow_inst, figures_dir, resolution_per_cycle, f=50, t=None, y_margin=0.05,xlabel="Time [s]")
     del df_2_power_flow_inst
 
     df_3_C = pd.DataFrame(
@@ -432,117 +521,71 @@ if blabla == True:
     Plotting_function.plot_df_components(df_3_C=df_3_C, df_4_L1=df_4_L1, df_5_L2=df_5_L2, figures_dir=figures_dir,xlabel = "Time [day]")
     del df_3_C, df_4_L1, df_5_L2
 
+    df_6_MC = pd.DataFrame(
+        {
+            "Lifetime_C_MC": Lifetime_C_MC,  # [Years]
+            "Lifetime_L1_MC": Lifetime_L1_MC,  # [Years]
+            "Lifetime_L2_MC": Lifetime_L2_MC,  # [Years]
+            "Lifetime_LCL_MC": Lifetime_LCL_MC,  # [Years]
+            "B10_C": np.percentile(Lifetime_C_MC, 10),  # [-]
+            "B10_L1": np.percentile(Lifetime_L1_MC, 10),  # [-]
+            "B10_L2": np.percentile(Lifetime_L2_MC, 10),  # [-]
+            "B10_LCL": np.percentile(Lifetime_LCL_MC, 10),  # [-]
+        })
+    df_6_MC.to_parquet(f"{dataframes_dir}/df_6_MC.parquet")
+    Plotting_function.plot_lifetime_monte_carlo(Lifetime_C_MC=Lifetime_C_MC, Lifetime_L1_MC=Lifetime_L1_MC, Lifetime_L2_MC=Lifetime_L2_MC,Lifetime_LCL_MC=Lifetime_LCL_MC, figures_dir=figures_dir, plot_type="histogram", bins=50)
+    del df_6_MC
 
-# ----------------------------------------#
-# Monte Carlo Simulations
-# ----------------------------------------#
+    harmonic_orders = np.arange(1, h_max + 1)
+    frames = []
+    for name, arr in [("L1", I_L1_RMS_harmonics), ("C",  I_C_RMS_harmonics), ("L2", I_L2_RMS_harmonics)]:
+        n_sec, n_h = arr.shape
+        frames.append(pd.DataFrame({ "second": np.repeat(np.arange(n_sec), n_h), "component": name, "order": np.tile(harmonic_orders, n_sec), "I_rms": arr.ravel(),}))
+    df_7_harmonics = pd.concat(frames, ignore_index=True)
+    df_7_harmonics["component"] = df_7_harmonics["component"].astype("category")
+    df_7_harmonics.to_parquet(f"{dataframes_dir}/df_7_harmonics.parquet")
+    Plotting_function.plot_df_7_harmonics(df_7_harmonics=df_7_harmonics, figures_dir=figures_dir, h_max_plot=500)
 
-# Inputs
+    df_8_trafo = pd.DataFrame({
+        # --- per-sample ---
+        "F_HL": np.atleast_1d(F_HL),  # [-]    Harmonic loss factor, winding eddy loss (k = 2)
+        "F_HL_STR": np.atleast_1d(F_HL_STR),  # [-]    Harmonic loss factor, other stray loss (k = 0.8)
+        "P_LL": np.atleast_1d(P_LL),  # [W]    Load loss under the distorted current
+        "P_T": np.atleast_1d(P_T),  # [W]    Total loss, load plus no-load
+        "Theta_TO": np.atleast_1d(Theta_TO),  # [K]    Winding hotspot temperature
+        "Theta_g": np.atleast_1d(Theta_g),  # [K]    Winding hotspot gradient above top oil
+        "Theta_H": np.atleast_1d(Theta_H),  # [degC] Top-oil rise above ambient
+        "F_AA": np.atleast_1d(F_AA),  # [-]    Ageing acceleration factor
 
-number_of_samples = 1000
-normal_distribution = 0.01
-rng = np.random.default_rng(42)
-
-# Capacitor
-
-if C_specs["Lifetime_calculations"] == "Graphical":
-
-    T_C_samples = Calculation_functions.normal_distribution_function(np.mean(T_C), normal_distribution, number_of_samples, rng)
-    V_C_samples = Calculation_functions.normal_distribution_function(np.mean(V_C_RMS), normal_distribution, number_of_samples, rng)
-    V_C_RMS_Rated_samples = Calculation_functions.normal_distribution_function(C_specs["V_C_RMS_Rated"], normal_distribution,number_of_samples, rng)
-    lifetime_curves_samples = Calculation_functions.build_lifetime_curves_samples(C_specs["lifetime_curves"], normal_distribution, number_of_samples, rng)
-
-    Lifetime_C_MC = np.empty(number_of_samples)
-    for i in range(number_of_samples):
-        Lifetime_C_MC[i] = Calculation_functions.Capacitor_lifetime_graphical(T_C=np.atleast_1d(T_C_samples[i]),V_C_RMS=np.atleast_1d(V_C_samples[i]),V_C_RMS_Rated=V_C_RMS_Rated_samples[i],lifetime_curves=lifetime_curves_samples[i])[0]
-
-elif C_specs["Lifetime_calculations"] == "Analytical":
-
-    T_eq_C = Calculation_functions.equivalent_temperature_capacitor(L_eq_years=Lifetime_C,  V_C_RMS=np.mean(V_C_RMS), V_C_RMS_Rated=C_specs["V_C_RMS_Rated"], t1=C_specs["Lifetime_Rated"], T1=C_specs["Temperature_Rated"], A=C_specs["A"], n=C_specs["n"])
-
-    T_C_samples   = Calculation_functions.normal_distribution_function(T_eq_C, normal_distribution, number_of_samples, rng)
-    V_C_samples   = Calculation_functions.normal_distribution_function(np.mean(V_C_RMS), normal_distribution, number_of_samples, rng)
-    V_C_RMS_Rated_samples = Calculation_functions.normal_distribution_function(C_specs["V_C_RMS_Rated"], normal_distribution, number_of_samples, rng)
-    t1_samples   = Calculation_functions.normal_distribution_function(C_specs["Lifetime_Rated"], normal_distribution, number_of_samples, rng)
-    T1_samples   = Calculation_functions.normal_distribution_function(C_specs["Temperature_Rated"], normal_distribution, number_of_samples, rng)
-    A_samples     = Calculation_functions.normal_distribution_function(C_specs["A"],    normal_distribution, number_of_samples, rng)
-    n_samples     = Calculation_functions.normal_distribution_function(C_specs["n"],    normal_distribution, number_of_samples, rng)
-
-    Lifetime_C_MC = Calculation_functions.calculate_capacitor_lifetime_analytical(T_operating = T_C_samples,V_C_RMS = V_C_samples,
-                                                                                  V_C_RMS_Rated = V_C_RMS_Rated_samples,t1 = t1_samples,
-                                                                                  T1 = T1_samples, A = A_samples,n = n_samples,)
-
-
-# Inductor L1
-L_eq_L1_years = Lifetime_L1
-
-T_eq_L1 = Calculation_functions.equivalent_temperature(L_eq_L1_years, L1_specs["T_insulation_rated"],L1_specs["L_insulation_rated"], L1_specs["Ea_insulation"],L1_specs["kb"])
-
-T_L1_samples      = Calculation_functions.normal_distribution_function(T_eq_L1,    normal_distribution, number_of_samples, rng)
-T_rated_L1_samples = Calculation_functions.normal_distribution_function(L1_specs["T_insulation_rated"], normal_distribution, number_of_samples, rng)
-L_rated_L1_samples = Calculation_functions.normal_distribution_function(L1_specs["L_insulation_rated"], normal_distribution, number_of_samples, rng)
-Ea_L1_samples     = Calculation_functions.normal_distribution_function(L1_specs["Ea_insulation"], normal_distribution, number_of_samples, rng)
-
-Lifetime_L1_MC = Calculation_functions.calculate_inductor_lifetime(T_operating = T_L1_samples,T_rated = T_rated_L1_samples, L_rated = L_rated_L1_samples, Ea = Ea_L1_samples, kb = L1_specs["kb"], L_max_years = L1_specs["L_max_years"],)
-
-# Inductor 2
-
-L_eq_L2_years = Lifetime_L2
-T_eq_L2 = Calculation_functions.equivalent_temperature(L_eq_L2_years, L2_specs["T_insulation_rated"],L2_specs["L_insulation_rated"], L2_specs["Ea_insulation"],L2_specs["kb"])
-
-T_L2_samples      = Calculation_functions.normal_distribution_function(T_eq_L2, normal_distribution, number_of_samples, rng)
-T_rated_L2_samples = Calculation_functions.normal_distribution_function(L2_specs["T_insulation_rated"], normal_distribution, number_of_samples, rng)
-L_rated_L2_samples = Calculation_functions.normal_distribution_function(L2_specs["L_insulation_rated"], normal_distribution, number_of_samples, rng)
-Ea_L2_samples = Calculation_functions.normal_distribution_function(L2_specs["Ea_insulation"], normal_distribution, number_of_samples, rng)
-
-Lifetime_L2_MC = Calculation_functions.calculate_inductor_lifetime(T_operating = T_L2_samples,T_rated = T_rated_L2_samples,
-                                                                   L_rated = L_rated_L2_samples, Ea = Ea_L2_samples,
-                                                                   kb = L2_specs["kb"], L_max_years = L2_specs["L_max_years"],)
-
-Lifetime_LCL_MC = np.minimum.reduce([Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, ])
-
-B10_C   = np.percentile(Lifetime_C_MC, 10)
-B10_L1  = np.percentile(Lifetime_L1_MC, 10)
-B10_L2  = np.percentile(Lifetime_L2_MC, 10)
-B10_LCL = np.percentile(Lifetime_LCL_MC, 10)
-
-df_6_MC = pd.DataFrame(
-    {
-        "Lifetime_C_MC": Lifetime_C_MC,  # [Years]
-        "Lifetime_L1_MC": Lifetime_L1_MC,  # [Years]
-        "Lifetime_L2_MC": Lifetime_L2_MC,  # [Years]
-        "Lifetime_LCL_MC": Lifetime_LCL_MC,  # [Years]
-        "B10_C": B10_C,  # [-]
-        "B10_L1": B10_L1,  # [-]
-        "B10_L2": B10_L2,  # [-]
-        "B10_LCL": B10_LCL,  # [-]
+        # --- scalars: last row only ---
+        "P_R": Calculation_functions.last_of_column(P_R, Profile_size),  # [W]     Rated ohmic loss
+        "P_EC": Calculation_functions.last_of_column(P_EC, Profile_size),  # [W]     Rated winding eddy loss
+        "P_OSL": Calculation_functions.last_of_column(P_OSL, Profile_size),  # [W]     Rated other stray loss
+        "P_LL_R": Calculation_functions.last_of_column(trafo_specs["P_LL_R"], Profile_size),  # [W]     Rated load loss
+        "P_NL": Calculation_functions.last_of_column(trafo_specs["P_NL"], Profile_size),  # [W]     No-load loss
+        "I_R": Calculation_functions.last_of_column(trafo_specs["I_R"], Profile_size),  # [A]     Rated LV current
+        "sigma": Calculation_functions.last_of_column(trafo_specs["sigma"], Profile_size), # [-]     Stray loss fraction of rated load loss
+        "eddy_share": Calculation_functions.last_of_column(trafo_specs["eddy_share"], Profile_size), # [-]     Eddy share of the total stray loss
+        "Theta_TO_R": Calculation_functions.last_of_column(trafo_specs["Theta_TO_R"], Profile_size), # [K]     Rated top-oil rise
+        "Theta_g_R": Calculation_functions.last_of_column(trafo_specs["Theta_g_R"], Profile_size), # [K]     Rated hotspot gradient
+        "x_oil": Calculation_functions.last_of_column(trafo_specs["x_oil"], Profile_size),  # [-]     Oil exponent
+        "y_winding": Calculation_functions.last_of_column(trafo_specs["y_winding"], Profile_size), # [-]     Winding exponent
+        "Theta_ref": Calculation_functions.last_of_column(trafo_specs["Theta_ref"], Profile_size), # [degC]  Insulation reference temperature
+        "L_normal": Calculation_functions.last_of_column(trafo_specs["L_normal"], Profile_size), # [h]     Normal insulation life at Theta_ref
+        "F_EQA": Calculation_functions.last_of_column(F_EQA, Profile_size), # [-]     Equivalent ageing factor over the profile
+        "LOL_trafo": Calculation_functions.last_of_column(LOL_trafo, Profile_size), # [-]     Fraction of insulation life consumed per profile run
+        "Lifetime_trafo": Calculation_functions.last_of_column(Lifetime_trafo, Profile_size), # [years] Equivalent life of the insulation
     })
-df_6_MC.to_parquet(f"{dataframes_dir}/df_6_MC.parquet")
-Plotting_function.plot_lifetime_monte_carlo(Lifetime_C_MC=Lifetime_C_MC, Lifetime_L1_MC=Lifetime_L1_MC,
-                                            Lifetime_L2_MC=Lifetime_L2_MC,Lifetime_LCL_MC=Lifetime_LCL_MC, figures_dir=figures_dir, B10_C=B10_C,
-                                            B10_L1=B10_L1,B10_L2=B10_L2, B10_LCL=B10_LCL, plot_type="histogram", bins=50)
-del df_6_MC
+    df_8_trafo.to_parquet(f"{dataframes_dir}/df_8_trafo.parquet")
+    Plotting_function.plot_df_trafo(df_8_trafo=df_8_trafo, figures_dir=figures_dir, xlabel = "Time [day]")
+    del df_8_trafo
 
-
-harmonic_orders = np.arange(1, h_max + 1)
-
-
-frames = []
-for name, arr in [("L1", I_L1_RMS_harmonics),
-                  ("C",  I_C_RMS_harmonics),
-                  ("L2", I_L2_RMS_harmonics)]:
-    n_sec, n_h = arr.shape
-    frames.append(pd.DataFrame({
-        "second":    np.repeat(np.arange(n_sec), n_h),
-        "component": name,
-        "order":     np.tile(harmonic_orders, n_sec),
-        "I_rms":     arr.ravel(),
-    }))
-
-df_7_harmonics = pd.concat(frames, ignore_index=True)
-df_7_harmonics["component"] = df_7_harmonics["component"].astype("category")
-df_7_harmonics.to_parquet(f"{dataframes_dir}/df_7_harmonics.parquet")
-
-Plotting_function.plot_df_7_harmonics(df_7_harmonics=df_7_harmonics, figures_dir=figures_dir, h_max_plot=500)
-
+    df_9_MC_trafo = pd.DataFrame(
+        {
+            "Lifetime_trafo_MC": Lifetime_trafo_MC,  # [Years] Equivalent life per sample
+            "B10_trafo": np.percentile(Lifetime_trafo_MC, 10),  # [Years] Lifetime exceeded by 90% of samples
+        })
+    df_9_MC_trafo.to_parquet(f"{dataframes_dir}/df_9_MC_trafo.parquet")
+    Plotting_function.plot_lifetime_monte_carlo_trafo(Lifetime_trafo_MC=Lifetime_trafo_MC, figures_dir=figures_dir,plot_type="histogram", bins=50)
+    del df_9_MC_trafo
 

@@ -865,11 +865,12 @@ def Temperature_delta_t_values():
     #plt.title("Average temperature swing ΔT vs power factor")
 
     plt.xlim(0, 1)
+    plt.ylim(0, 55)
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
 
-    plt.savefig("Paper_figures/DeltaT_IGBT_Diode_vs_pf.pdf")
+    plt.savefig("Paper_figures/DeltaT_IGBT_Diode_vs_pf.png")
     plt.close()
 
 def Temperature_t_mean_values():
@@ -994,11 +995,12 @@ def Temperature_t_mean_values():
     #plt.title("Mean temperature vs power factor")
 
     plt.xlim(0, 1)
+    plt.ylim(0,160)
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
 
-    plt.savefig("Paper_figures/T_mean_IGBT_Diode_vs_pf.pdf")
+    plt.savefig("Paper_figures/T_mean_IGBT_Diode_vs_pf.png")
     plt.close()
 
 def Temperature_thermal_period_values():
@@ -1450,6 +1452,153 @@ def plot_weibull_lifetime_pdfs_MC():
 
 
 
+def Temperature_combined_values():
+    """
+    Combined figure (2 rows x 1 column, shared x-axis):
+      - Top:    mean junction temperature Tmean for IGBT and Diode vs |power factor|
+      - Bottom: average temperature swing deltaT for IGBT and Diode vs |power factor|
+    Capacitive and inductive operation are distinguished.
+    Data source:
+      - Simulation_results/Simulation_i/df_lifetime_IGBT/df_IGBT_final.parquet
+      - Simulation_results/Simulation_i/df_lifetime_Diode/df_Diode_final.parquet
+    """
+
+    pf_values = [1, 0, 0.9, -0.9, 0.8, -0.8, 0.7, -0.7, 0.6, -0.6,
+                 0.5, -0.5, 0.4, -0.4, 0.3, -0.3, 0.2, -0.2, 0.1, -0.1]
+
+    Tmean_dict = {}
+    DeltaT_dict = {}
+
+    # ===============================
+    #   LOAD DATA (single pass)
+    # ===============================
+    for i, pf in enumerate(pf_values, start=1):
+
+        base_folder = Path("Simulation_results") / f"Simulation_{i}"
+
+        igbt_file = base_folder / "df_lifetime_IGBT" / "df_IGBT_final.parquet"
+        diode_file = base_folder / "df_lifetime_Diode" / "df_Diode_final.parquet"
+
+        df_igbt = pd.read_parquet(igbt_file)
+        df_diode = pd.read_parquet(diode_file)
+
+        # PF prefix for capacitive or inductive
+        if pf < 0:
+            key_prefix = f"pf__{abs(pf)}"     # inductive (negative)
+        else:
+            key_prefix = f"pf_{pf}"           # capacitive (positive or 0)
+
+        # Mean temperature [degC]
+        Tmean_dict[f"{key_prefix}_dT_I"] = float((df_igbt["Tmean_igbt"] - 273.15).mean())
+        Tmean_dict[f"{key_prefix}_dT_D"] = float((df_diode["Tmean_diode"] - 273.15).mean())
+
+        # Temperature swing [K]
+        DeltaT_dict[f"{key_prefix}_dT_I"] = float(df_igbt["deltaT_igbt"].mean())
+        DeltaT_dict[f"{key_prefix}_dT_D"] = float(df_diode["deltaT_diode"].mean())
+
+        del df_igbt, df_diode  # free memory
+
+    # ========================================================
+    #   SYNTHETIC INDUCTIVE POINTS AT pf = 0 AND pf = 1
+    # ========================================================
+    for d in (Tmean_dict, DeltaT_dict):
+        for pf in (1, 0):
+            cap_I, cap_D = f"pf_{pf}_dT_I", f"pf_{pf}_dT_D"
+            ind_I, ind_D = f"pf__{pf}_dT_I", f"pf__{pf}_dT_D"
+
+            if cap_I in d and ind_I not in d:
+                d[ind_I] = d[cap_I]
+                d[ind_D] = d[cap_D]
+
+    # ========================================================
+    #   EXTRACT AND SORT DATA
+    # ========================================================
+    def extract(d):
+        pf_abs, val_I, val_D, inductive_flags = [], [], [], []
+
+        for key in d:
+            if key.endswith("_dT_I"):
+
+                if key.startswith("pf__"):
+                    pf_val = -float(key.split("__")[1].replace("_dT_I", ""))
+                    inductive = True
+                else:
+                    pf_val = float(key.split("pf_")[1].replace("_dT_I", ""))
+                    inductive = False
+
+                pf_abs.append(abs(pf_val))
+                inductive_flags.append(inductive)
+                val_I.append(d[key])
+                val_D.append(d[key.replace("_dT_I", "_dT_D")])
+
+        pf_abs = np.array(pf_abs)
+        val_I = np.array(val_I)
+        val_D = np.array(val_D)
+        inductive_flags = np.array(inductive_flags)
+
+        sort_idx = np.argsort(pf_abs)
+        return (pf_abs[sort_idx], val_I[sort_idx],
+                val_D[sort_idx], inductive_flags[sort_idx])
+
+    pf_abs, Tm_I, Tm_D, ind_flags = extract(Tmean_dict)
+    _,      dT_I, dT_D, _         = extract(DeltaT_dict)
+
+    cap = ~ind_flags
+    ind = ind_flags
+
+    # ========================================================
+    #   PLOT: 2 ROWS x 1 COLUMN, SHARED X-AXIS
+    # ========================================================
+    fig, (ax_top, ax_bot) = plt.subplots(
+        2, 1, sharex=True, figsize=(6.4, 4.8 *2)
+    )
+
+    def plot_pair(ax, v_I, v_D):
+        ax.plot(pf_abs[cap], v_I[cap], "-", marker="o", markersize=10,
+                color="blue", linewidth=2.5, label="IGBT (capacitive)")
+        ax.plot(pf_abs[ind], v_I[ind], "--", marker="o", markersize=6,
+                color="orange", label="IGBT (inductive)")
+        ax.plot(pf_abs[cap], v_D[cap], "-", marker="s", markersize=10,
+                color="green", linewidth=2.5, label="Diode (capacitive)")
+        ax.plot(pf_abs[ind], v_D[ind], "--", marker="s", markersize=6,
+                color="red", label="Diode (inductive)")
+        ax.grid(True)
+
+    # ---------- TOP: mean temperature ----------
+    plot_pair(ax_top, Tm_I, Tm_D)
+    ax_top.set_ylabel("Mean temperature [°C]")
+    ax_top.set_title("Mean junction temperature")
+
+    # ---------- BOTTOM: temperature swing ----------
+    plot_pair(ax_bot, dT_I, dT_D)
+    ax_bot.set_ylabel("Temperature swing ΔT [°C]")
+    ax_bot.set_xlabel("Power factor [-]")
+    ax_bot.set_title("Junction temperature swing")
+    ax_bot.set_xlim(0, 1)
+
+    # ---------- SHARED LEGEND OUTSIDE, ON TOP ----------
+    handles, labels = ax_top.get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center",
+               bbox_to_anchor=(0.5, 1.0), ncol=2, frameon=True)
+
+    fig.tight_layout(rect=[0, 0, 1, 0.925])  # leave room for the legend
+
+    fig.savefig("Paper_figures/T_mean_DeltaT_IGBT_Diode_vs_pf.pdf", dpi=300)
+    plt.close(fig)
+
+
+
+Temperature_combined_values()
+
+
+
+
+
+
+
+
+
+
 def _pf_key_prefix(pf: float) -> str:
     # inductive is stored as "pf__{abs(pf)}"
     return f"pf__{abs(pf)}" if pf < 0 else f"pf_{pf}"
@@ -1463,13 +1612,7 @@ def _extract_pf_abs_and_flag_from_key(key: str) -> tuple[float, bool]:
         pf_str = key.split("pf_")[1]
         return float(pf_str), False
 
-def _load_metric_vs_pf(
-    pf_values,
-    sim_base: Path,
-    df_subfolder: str,
-    value_getter,   # callable(df)->(val_igbt, val_diode)
-    add_synthetic_pf0_pf1=True,
-):
+def _load_metric_vs_pf(pf_values,sim_base: Path, df_subfolder: str, value_getter, add_synthetic_pf0_pf1=True,):
     """
     Returns sorted arrays:
       pf_abs, igbt_cap, igbt_ind, diode_cap, diode_ind
@@ -1542,7 +1685,6 @@ def _load_metric_vs_pf(
             D_ind[j] = Dvals[flags][0]
 
     return pf_grid, I_cap, I_ind, D_cap, D_ind
-
 
 def plot_case_study1_summary_4x1():
     pf_values = [1, 0, 0.9, -0.9, 0.8, -0.8, 0.7, -0.7, 0.6, -0.6,
@@ -2146,5 +2288,5 @@ def plot_case_study1_summary_5plots_individual():
     fig.savefig(outdir / "CaseStudy1_switch_lifetime.pdf", dpi=300)
     plt.close(fig)
 
-plot_case_study1_summary_5plots_individual()
+#plot_case_study1_summary_5plots_individual()
 

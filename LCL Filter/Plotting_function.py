@@ -502,7 +502,7 @@ class Plotting_functions_class:
         plt.close(fig20)
 
     @staticmethod
-    def plot_lifetime_monte_carlo(Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, Lifetime_LCL_MC,figures_dir,B10_C=None, B10_L1=None, B10_L2=None, B10_LCL=None,plot_type="histogram", bins=50):
+    def plot_lifetime_monte_carlo(Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, Lifetime_LCL_MC,figures_dir,plot_type="histogram", bins=50):
 
         """
         Plot Monte Carlo lifetime distributions as four separate figures
@@ -520,6 +520,7 @@ class Plotting_functions_class:
         bins : int
             Histogram bin count (also used to build the line curve).
         """
+        B10_C, B10_L1, B10_L2, B10_LCL = [np.percentile(x, 10) for x in (Lifetime_C_MC, Lifetime_L1_MC, Lifetime_L2_MC, Lifetime_LCL_MC)]
 
         panels = [
             ("Capacitor C", Lifetime_C_MC, "Fig_21_lifetime_MC_C", "red"),
@@ -578,63 +579,6 @@ class Plotting_functions_class:
             fig.tight_layout()
             fig.savefig(f"{figures_dir}/Fig_25_B10_bar.png", dpi=300)
             plt.close(fig)
-    '''
-    @staticmethod
-    def plot_df_7_harmonics(df_7_harmonics, figures_dir, h_max_plot=100,second=-1):
-        """
-        Plot the harmonic spectrum of each LCL branch current as a bar chart,
-        one figure per component, saved in figures_dir.
-
-            Fig_26 : I_L1 spectrum
-            Fig_27 : I_C  spectrum
-            Fig_28 : I_L2 spectrum
-
-        Parameters
-        ----------
-        df_7_harmonics : pd.DataFrame
-            Long-format frame with columns second, component, order, I_rms.
-        figures_dir : str
-            Directory to save the figures into.
-        h_max_plot : int
-            Highest harmonic order shown on the x axis.
-        second : int
-            Mission-profile second to plot. -1 gives the last second.
-        """
-
-        y_margin = 0.05
-
-        df = df_7_harmonics
-        sec = df["second"].max() if second == -1 else second
-        df = df[df["second"] == sec]
-
-        panels = [
-            ("L1", "Inverter-side inductor $L_1$", "Fig_26_spectrum_L1", "tab:blue"),
-            ("C", "Filter capacitor $C$", "Fig_27_spectrum_C", "tab:orange"),
-            ("L2", "Grid-side inductor $L_2$", "Fig_28_spectrum_L2", "tab:green"),
-        ]
-
-        for comp, title, fname, color in panels:
-            sub = df[df["component"] == comp]
-            sub = sub[sub["order"] <= h_max_plot].sort_values("order")
-
-            orders = sub["order"].to_numpy()
-            I_rms = sub["I_rms"].to_numpy()
-
-            hi = np.max(I_rms)
-            pad = hi * y_margin if hi > 0 else 1.0
-
-            fig, ax = plt.subplots(figsize=(6.4, 4.8))
-            ax.bar(orders, I_rms, width=0.8, color=color, edgecolor=color)
-            ax.set_xlabel("Harmonic order [-]")
-            ax.set_ylabel("Current [A]")
-            ax.set_title(f"Harmonic spectrum of {title}")
-            ax.set_xlim(0, h_max_plot + 1)
-            ax.set_ylim(0, hi + pad)
-            ax.grid(True, alpha=0.3)
-            fig.tight_layout()
-            fig.savefig(f"{figures_dir}/{fname}.png", dpi=300)
-            plt.close(fig)
-    '''
 
     @staticmethod
     def plot_df_7_harmonics(df_7_harmonics, figures_dir, h_max_plot=500,second=-1, normalise=True):
@@ -695,3 +639,181 @@ class Plotting_functions_class:
             fig.tight_layout()
             fig.savefig(f"{figures_dir}/{fname}.png", dpi=300)
             plt.close(fig)
+
+    @staticmethod
+    def plot_df_trafo(df_8_trafo, figures_dir, xlabel):
+        """
+        Plot the transformer loss / hot-spot temperature profile into two figures
+        saved in figures_dir. x- and y-limits are taken from the data
+        (min/max of the plotted signals), with a small fractional y-margin.
+
+            Fig_29 : P_T                  (single axes)        6.4 x 4.8
+            Fig_30 : Theta_H              (single axes)        6.4 x 4.8
+        """
+
+        y_margin = 0.05
+
+        df = df_8_trafo
+        x = np.arange(len(df))
+        x_range = (x[0], x[-1])
+
+        def ylim_from(*cols):
+            """min/max across the given columns, with fractional margin."""
+            lo = min(np.min(df[c]) for c in cols)
+            hi = max(np.max(df[c]) for c in cols)
+            if lo == hi:  # flat signal: avoid zero-height axis
+                pad = abs(lo) * y_margin or 1.0
+            else:
+                pad = (hi - lo) * y_margin
+            return lo - pad, hi + pad
+
+        # ---------- Fig_29 : total losses ----------
+        fig29, ax29 = plt.subplots(figsize=(6.4, 4.8))
+        ax29.plot(x, df["P_T"], color="tab:blue", label="P_T [W]")
+        ax29.set_xlabel(xlabel)
+        ax29.set_ylabel("Losses [W]")
+        ax29.set_title("Total transformer losses")
+        ax29.set_xlim(x_range)
+        ax29.set_ylim(ylim_from("P_T"))
+        ax29.legend()
+        #ax29.grid(True, alpha=0.3)
+        fig29.tight_layout()
+        fig29.savefig(f"{figures_dir}/Fig_29_losses_P_T.png", dpi=300)
+        plt.close(fig29)
+
+        # ---------- Fig_30 : hot-spot temperature ----------
+        fig30, ax30 = plt.subplots(figsize=(6.4, 4.8))
+        ax30.plot(x, df["Theta_H"], color="tab:red", label=r"$\Theta_H$ [°C]")
+        ax30.set_xlabel(xlabel)
+        ax30.set_ylabel("Temperature [°C]")
+        ax30.set_title("Transformer hot-spot temperature")
+        ax30.set_xlim(x_range)
+        ax30.set_ylim(ylim_from("Theta_H"))
+        ax30.legend()
+        #ax30.grid(True, alpha=0.3)
+        fig30.tight_layout()
+        fig30.savefig(f"{figures_dir}/Fig_30_hotspot_Theta_H.png", dpi=300)
+        plt.close(fig30)
+
+        # ---------- Fig_31 : loss of life and equivalent lifetime ----------
+        # Both are scalars for the whole mission profile, stored on the last row
+        # only, so they are drawn as bars rather than as a series against time.
+        LOL_value = float(df["LOL_trafo"].iloc[-1]) * 100.0  # [%]    fraction consumed, as a percentage
+        Life_value = float(df["Lifetime_trafo"].iloc[-1])  # [years] equivalent life
+
+        fig31, ax31 = plt.subplots(figsize=(6.4, 4.8))
+        ax31_right = ax31.twinx()
+
+        bar_LOL = ax31.bar(0, LOL_value, width=0.5, color="red", label="Life consumed [%]")
+        bar_life = ax31_right.bar(1, Life_value, width=0.5, color="blue", label="Equivalent life [years]")
+
+        ax31.set_ylabel("Life consumed [%]")
+        ax31.tick_params(axis="y")
+        ax31_right.set_ylabel("Equivalent life [years]")
+        ax31_right.tick_params(axis="y")
+
+        ax31.set_ylim(0, LOL_value * (1.0 + 4.0 * y_margin) if LOL_value > 0 else 1.0)
+        ax31_right.set_ylim(0, Life_value * (1.0 + 4.0 * y_margin) if Life_value > 0 else 1.0)
+
+        ax31.set_xticks([0, 1])
+        ax31.set_xticklabels(["Life consumed", "Equivalent life"])
+        ax31.set_xlim(-0.6, 1.6)
+        ax31.set_title("Transformer loss of life")
+
+        ax31.bar_label(bar_LOL, fmt="%.4f", padding=3)
+        ax31_right.bar_label(bar_life, fmt="%.2f", padding=3)
+
+        #ax31.grid(True, alpha=0.3, axis="y")
+        ax31.set_axisbelow(True)
+
+        handles = [bar_LOL, bar_life]
+        #ax31.legend(handles, [h.get_label() for h in handles], loc="upper center")
+
+        fig31.tight_layout()
+        fig31.savefig(f"{figures_dir}/Fig_31_loss_of_life.png", dpi=300)
+        plt.close(fig31)
+
+    @staticmethod
+    def plot_lifetime_monte_carlo_trafo(Lifetime_trafo_MC, figures_dir,B10_trafo=None,plot_type="histogram", bins=50):
+
+        """
+        Plot the Monte Carlo lifetime results of the connection-point
+        transformer as two figures.
+
+            Fig_32 : distribution of the sampled lifetimes
+            Fig_33 : unreliability curve, with the B10 point marked
+
+        The unreliability curve is the empirical cumulative distribution of the
+        sampled lifetimes, that is the fraction of the population expected to
+        have failed by a given age. The B10 lifetime is the age at which that
+        fraction reaches 0.1, so that ninety percent of units survive beyond it,
+        and is read off the curve where it crosses the horizontal marker.
+
+        Parameters
+        ----------
+        Lifetime_trafo_MC : np.ndarray
+            Monte Carlo lifetime samples of the transformer insulation [years].
+        figures_dir : str
+            Directory to save the figures into.
+        B10_trafo : float, optional
+            B10 lifetime [years]. Computed from the samples if not supplied.
+        plot_type : str
+            "histogram" -> bar histogram
+            "line"      -> smooth density curve (line)
+        bins : int
+            Histogram bin count (also used to build the line curve).
+        """
+        data = np.asarray(Lifetime_trafo_MC, dtype=float)
+        data = data[np.isfinite(data)]  # drop NaN/inf
+
+        if data.size == 0:
+            raise ValueError(
+                "No finite Monte Carlo samples to plot for the transformer.")
+
+        if B10_trafo is None:
+            B10_trafo = np.percentile(data, 10)
+
+        # ── Fig_32 : distribution ─────────────────────────────────────
+        fig, ax = plt.subplots(figsize=(6.4, 4.8))
+
+        if plot_type == "histogram":
+            ax.hist(data, bins=bins, color="red", edgecolor="black", linewidth=0.8)
+            ax.set_ylabel("Count")
+
+        elif plot_type == "line":
+            kde = gaussian_kde(data)
+            x = np.linspace(data.min(), data.max())
+            ax.plot(x, kde(x), color="red")
+            ax.set_ylabel("Probability density")
+
+        else:
+            raise ValueError("plot_type must be 'histogram' or 'line'.")
+
+        ax.set_title("Transformer")
+        ax.set_xlabel("Lifetime [years]")
+
+        fig.tight_layout()
+        fig.savefig(f"{figures_dir}/Fig_32_lifetime_MC_trafo.png", dpi=300)
+        plt.close(fig)
+
+        # ── Fig_33 : unreliability curve ──────────────────────────────
+        years = np.sort(data)
+        unreliability = np.arange(1, years.size + 1) / years.size
+
+        fig, ax = plt.subplots(figsize=(6.4, 4.8))
+        ax.plot(years, unreliability, color="red", linewidth=1.5)
+
+        ax.axhline(0.1, color="black", linestyle="--", linewidth=1.2)
+        ax.axvline(B10_trafo, color="black", linestyle="--", linewidth=1.2)
+        ax.plot(B10_trafo, 0.1, "ko", markersize=5)
+        #ax.annotate(rf"$B_{{10}}$ = {B10_trafo:.2f} yr", xy=(B10_trafo, 0.1), xytext=(8, 12), textcoords="offset points")
+
+        ax.set_xlabel("Lifetime [years]")
+        ax.set_ylabel("Unreliability")
+        ax.set_title("Transformer")
+        ax.set_xlim(years[0], B10_trafo+B10_trafo*0.05)
+        ax.set_ylim(0, 0.11)
+
+        fig.tight_layout()
+        fig.savefig(f"{figures_dir}/Fig_33_unreliability_trafo.png", dpi=300)
+        plt.close(fig)

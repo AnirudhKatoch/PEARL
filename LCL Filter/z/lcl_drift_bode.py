@@ -37,11 +37,13 @@ s = 1j * 2.0 * np.pi * f
 # ----------------------------------------------------------------------
 # Plot
 # ----------------------------------------------------------------------
-plt.figure(figsize=(6.4, 4.8*0.75))
+plt.figure(figsize=(6.4, 4.8*0.5))
 
 gains_at_fsw = []
 
-for C_ratio, color, style in zip(C_ratios, colors, styles):
+labels = ["%d%%" % round((1.0 - r) * 100) for r in C_ratios]
+
+for C_ratio, color, style, label in zip(C_ratios, colors, styles, labels):
 
     C = C_ratio * C0
 
@@ -51,8 +53,6 @@ for C_ratio, color, style in zip(C_ratios, colors, styles):
 
     gain_db = 20.0 * np.log10(np.abs(G))
     gains_at_fsw.append(np.interp(fsw, f, gain_db))
-
-    label = "$C/C_0 = %.2f$" % C_ratio
 
     plt.semilogx(f, gain_db, style, color=color, linewidth=1.5, label=label)
 
@@ -65,14 +65,14 @@ delta_db = g_degraded - g_nominal
 delta_percent = (10.0 ** (delta_db / 20.0) - 1.0) * 100.0
 
 plt.axvline(fsw, color="grey", linewidth=1.5, linestyle="--")
-plt.text(fsw * 0.95, -32.5, "$f_{sw}$", color="grey",horizontalalignment="right")
+plt.text(fsw * 0.95, -32.5, "$f_{sw}$", color="black",horizontalalignment="right")
 
 plt.axvline(fsw / 2.0, color="grey", linewidth=1.5, linestyle="--")
-plt.text(fsw / 2.0 * 1.225, -32.5, "$f_{sw}/2$", color="grey",horizontalalignment="right")
+plt.text(fsw / 2.0 * 1.225, -32.5, "$f_{sw}/2$", color="black",horizontalalignment="right")
 
 plt.annotate("",xy=(fsw, g_degraded),xytext=(fsw, g_nominal))
 
-plt.text(fsw * 1.05,(g_nominal + g_degraded) / 2.0,"$+%.1f$ dB" % delta_db,color="red",verticalalignment="center")
+#plt.text(fsw * 1.05,(g_nominal + g_degraded) / 2.0,"$+%.1f$ dB" % delta_db,color="red",verticalalignment="center")
 
 plt.xlabel("Frequency (kHz)")
 plt.ylabel("$|I_g / V_i|$  (dB)")
@@ -81,10 +81,13 @@ plt.xticks([3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 12000, 14000],
            ["3", "4", "5", "6", "7", "8", "9", "10", "12", "14"])
 plt.ylim(-35, 17.5)
 #plt.grid(True, which="both", alpha=0.25, linewidth=0.6)
-plt.legend(frameon=False, loc="lower left")
+plt.legend(ncol=4, loc="lower center",
+           bbox_to_anchor=(0.5, 0.925), frameon=False,
+           handlelength=2, borderpad=0.1,
+           columnspacing=1, labelspacing=0.125)
 plt.tight_layout()
 
-plt.savefig("lcl_drift_bode.png", dpi=300, bbox_inches="tight")
+plt.savefig("lcl_drift_bode.png", dpi=600, bbox_inches="tight")
 plt.savefig("lcl_drift_bode.pdf", bbox_inches="tight")
 
 # ----------------------------------------------------------------------

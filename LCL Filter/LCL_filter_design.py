@@ -289,7 +289,6 @@ def LCL_filter_design_function(Vg_ll_RMS,
     R3_max = 1 / (omega_sw * C)
     R3 = np.sqrt(R3_min * R3_max)
 
-    R3 = R3_min
 
     if R3_min >= R3_max:
         raise ValueError(
