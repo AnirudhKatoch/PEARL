@@ -48,27 +48,3 @@ Preprint, Zenodo. https://doi.org/10.5281/zenodo.22672994
 **LCL filter module**  
 Citation will be added upon publication.
 
-### BibTeX
-
-```bibtex
-@misc{Katoch2026IGBT,
-  author       = {Katoch, Anirudh and Pant, Prashant and Hamacher, Thomas},
-  title        = {An Open-Source Tool for Lifetime Estimation of {IGBT}--Diode Power Modules: A Module in {PEARL}},
-  year         = {2026},
-  howpublished = {Preprint, Zenodo. 2026 10th International Conference on Power Energy Systems
-                  and Applications (ICoPESA 2026), Munich, Germany},
-  doi          = {10.5281/zenodo.20702777}
-}
-
-@misc{Katoch2026DCLink,
-  author       = {Katoch, Anirudh and Hamacher, Thomas and Pant, Prashant},
-  title        = {An Open-Source Tool for Lifetime Assessment of {DC}-Link Capacitors in Grid-Connected Converters},
-  year         = {2026},
-  howpublished = {Preprint, Zenodo. IEEE PES ISGT Europe 2026, Budapest, Hungary},
-  doi          = {10.5281/zenodo.22672994}
-}
-```
-
-> **Version DOIs vs. all-versions DOIs:** the DOIs above point to the exact version cited.
-> To always link to the latest version, use the all-versions (concept) DOIs:
-> IGBT–diode `10.5281/zenodo.20702776`, DC-link `10.5281/zenodo.20703095`.
