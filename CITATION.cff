@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use PEARL, please cite the paper(s) of the module(s) you used (see references)."
+title: "PEARL: Power Electronics Age and Reliability"
+type: software
+authors:
+  - family-names: Katoch
+    given-names: Anirudh
+    affiliation: Technical University of Munich
+    email: anirudh.katoch@tum.de
+  - family-names: Pant
+    given-names: Prashant
+    affiliation: Technical University of Munich
+  - family-names: Hamacher
+    given-names: Thomas
+    affiliation: Technical University of Munich
+repository-code: "https://github.com/AnirudhKatoch/PEARL"
+license: MIT          # change to your actual license
+references:
+  - type: conference-paper
+    title: "An Open-Source Tool for Lifetime Estimation of IGBT–Diode Power Modules: A Module in PEARL"
+    authors:
+      - {family-names: Katoch, given-names: Anirudh}
+      - {family-names: Pant, given-names: Prashant}
+      - {family-names: Hamacher, given-names: Thomas}
+    year: 2026
+    doi: 10.5281/zenodo.20702777
+    conference:
+      name: "10th International Conference on Power Energy Systems and Applications (ICoPESA 2026)"
+      city: Munich
+      country: DE
+  - type: conference-paper
+    title: "An Open-Source Tool for Lifetime Assessment of DC-Link Capacitors in Grid-Connected Converters"
+    authors:
+      - {family-names: Katoch, given-names: Anirudh}
+      - {family-names: Hamacher, given-names: Thomas}
+      - {family-names: Pant, given-names: Prashant}
+    year: 2026
+    doi: 10.5281/zenodo.22672994
+    conference:
+      name: "IEEE PES ISGT Europe 2026"
+      city: Budapest
+      country: HU
